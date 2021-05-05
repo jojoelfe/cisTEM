@@ -25,6 +25,11 @@ public:
 Peak TemplateScore(void *scoring_parameters)
 {
 	TemplateComparisonObject *comparison_object = reinterpret_cast < TemplateComparisonObject *> (scoring_parameters);
+	//wxPrintf("Calculating Score %f %f %f %f %f \n",comparison_object->angles->ReturnPhiAngle()
+	//,comparison_object->angles->ReturnThetaAngle()
+	//,comparison_object->angles->ReturnPsiAngle()
+	//,comparison_object->angles->ReturnShiftX()
+	//,comparison_object->angles->ReturnShiftY());
 	Image current_projection;
 //	Peak box_peak;
 
@@ -170,8 +175,8 @@ void RefineTemplateApp::DoInteractiveUserInput()
 //	low_resolution_limit = my_input->GetFloatFromUser("Low resolution limit (A)", "Low resolution limit of the data used for alignment in Angstroms", "300.0", 0.0);
 //	high_resolution_limit = my_input->GetFloatFromUser("High resolution limit (A)", "High resolution limit of the data used for alignment in Angstroms", "8.0", 0.0);
 //	angular_range = my_input->GetFloatFromUser("Angular refinement range", "Angular range to refine", "2.0", 0.1);
-	angular_step = my_input->GetFloatFromUser("Out of plane angular step", "Angular step size for global grid search", "0.2", 0.01);
-	in_plane_angular_step = my_input->GetFloatFromUser("In plane angular step", "Angular step size for in-plane rotations during the search", "0.1", 0.01);
+	angular_step = my_input->GetFloatFromUser("Out of plane angular step", "Angular step size for global grid search", "0.2", 0.0);
+	in_plane_angular_step = my_input->GetFloatFromUser("In plane angular step", "Angular step size for in-plane rotations during the search", "0.1", 0.0);
 	number_of_steps = my_input->GetIntFromUser("Number of angular steps to search", "The number of angular steps for a systematic grid search ", "0", 0);
 //	best_parameters_to_keep = my_input->GetIntFromUser("Number of top hits to refine", "The number of best global search orientations to refine locally", "20", 1);
 	defocus_search_range = my_input->GetFloatFromUser("Defocus search range (A) (0.0 = no search)", "Search range (-value ... + value) around current defocus", "200.0", 0.0);
@@ -795,7 +800,10 @@ bool RefineTemplateApp::DoCalculation()
 					starting_score = score_adjustment * scaled_mip_image.real_values[current_address] * starting_score / mip_image.real_values[current_address];
 
 					if (max_threads == 1) wxPrintf("\nRefining peak %i at x, y =  %6i, %6i\n", peak_number + 1, myroundint(current_peak.x), myroundint(current_peak.y));
-
+					if (angular_step == 0.0 | in_plane_angular_step == 0.0) {
+						if (max_threads == 1) wxPrintf("Peak %4i: dx, dy, dpsi, dtheta, dphi, ddefocus, dpixel size = %12.6f, %12.6f, %12.6f, %12.6f, %12.6f, %12.6f, %12.6f | value = %10.6f\n", peak_number + 1, 0.,0.,0.,0.,0.,0.,0., starting_score);
+						goto NEXTPEAK;
+					}										
 //					template_reconstruction.CopyFrom(&input_reconstruction);
 //					template_reconstruction.ForwardFFT();
 //					template_reconstruction.ZeroCentralPixel();
@@ -817,7 +825,6 @@ bool RefineTemplateApp::DoCalculation()
 							projection_filter.ApplyCurveFilter(&whitening_filter);
 
 //							angles.Init(current_phi, current_theta, current_psi, 0.0, 0.0);
-
 							template_peak = TemplateScore(&template_object);
 							score = template_peak.value;
 							if (score > best_score)
@@ -1140,6 +1147,7 @@ bool RefineTemplateApp::DoCalculation()
 				best_pixel_size.real_values[best_address] = best_pixel_size_local.real_values[best_address];
 			}
 		}
+		NEXTPEAK: wxPrintf("Stopping refinement now\n");
 	}
 
 	windowed_particle.Deallocate();
@@ -1150,7 +1158,6 @@ bool RefineTemplateApp::DoCalculation()
 	} // end omp section
 
 //	delete my_progress;
-
 	best_mip.QuickAndDirtyWriteSlice(mip_output_file.ToStdString(), 1, true, pixel_size);
 	best_scaled_mip.QuickAndDirtyWriteSlice(scaled_mip_output_file.ToStdString(), 1, true, pixel_size);
 	best_psi.QuickAndDirtyWriteSlice(best_psi_output_file.ToStdString(), 1, true, pixel_size);
