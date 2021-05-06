@@ -25,11 +25,12 @@ public:
 Peak TemplateScore(void *scoring_parameters)
 {
 	TemplateComparisonObject *comparison_object = reinterpret_cast < TemplateComparisonObject *> (scoring_parameters);
-	//wxPrintf("Calculating Score %f %f %f %f %f \n",comparison_object->angles->ReturnPhiAngle()
-	//,comparison_object->angles->ReturnThetaAngle()
-	//,comparison_object->angles->ReturnPsiAngle()
-	//,comparison_object->angles->ReturnShiftX()
-	//,comparison_object->angles->ReturnShiftY());
+	
+	MyDebugPrint("Calculating Score %f %f %f %f %f \n",comparison_object->angles->ReturnPhiAngle()
+	,comparison_object->angles->ReturnThetaAngle()
+	,comparison_object->angles->ReturnPsiAngle()
+	,comparison_object->angles->ReturnShiftX()
+	,comparison_object->angles->ReturnShiftY());
 	Image current_projection;
 //	Peak box_peak;
 
@@ -800,7 +801,7 @@ bool RefineTemplateApp::DoCalculation()
 					starting_score = score_adjustment * scaled_mip_image.real_values[current_address] * starting_score / mip_image.real_values[current_address];
 
 					if (max_threads == 1) wxPrintf("\nRefining peak %i at x, y =  %6i, %6i\n", peak_number + 1, myroundint(current_peak.x), myroundint(current_peak.y));
-					if (angular_step == 0.0 | in_plane_angular_step == 0.0) {
+					if (angular_step == 0.0 & in_plane_angular_step == 0.0) {
 						if (max_threads == 1) wxPrintf("Peak %4i: dx, dy, dpsi, dtheta, dphi, ddefocus, dpixel size = %12.6f, %12.6f, %12.6f, %12.6f, %12.6f, %12.6f, %12.6f | value = %10.6f\n", peak_number + 1, 0.,0.,0.,0.,0.,0.,0., starting_score);
 						goto NEXTPEAK;
 					}										
