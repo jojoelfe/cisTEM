@@ -49,18 +49,44 @@ IMPLEMENT_APP(MatchTemplateDatabase)
 void MatchTemplateDatabase::DoInteractiveUserInput()
 {
 
-	int new_z_size = 1;
+
+	bool 		use_gpu_input = false;
+	int			max_threads = 1; // Only used for the GPU code
 
 	UserInput *my_input = new UserInput("MatchTemplateDatabase", 1.0);
 
 	std::string input_filename_database	=		my_input->GetFilenameFromUser("Database filename", "Filename of the database", "project.db", true );
 	std::string input_image_group	=		my_input->GetStringFromUser("Name of image group", "Name of the group of images that should be searched", "all", true );
 	int input_volume_asset	=		my_input->GetIntFromUser("ID of Volume Asset", "ID of the volume asset that should be used to search", "1", true );
+	float high_resolution_limit = my_input->GetFloatFromUser("High resolution limit (A)", "High resolution limit of the data used for alignment in Angstroms", "8.0", 0.0);
+	float angular_step = my_input->GetFloatFromUser("Out of plane angular step (0.0 = set automatically)", "Angular step size for global grid search", "0.0", 0.0);
+	float in_plane_angular_step = my_input->GetFloatFromUser("In plane angular step (0.0 = set automatically)", "Angular step size for in-plane rotations during the search", "0.0", 0.0);
+//	best_parameters_to_keep = my_input->GetIntFromUser("Number of top hits to refine", "The number of best global search orientations to refine locally", "20", 1);
+	float defocus_search_range = my_input->GetFloatFromUser("Defocus search range (A)", "Search range (-value ... + value) around current defocus", "500.0", 0.0);
+	float defocus_step = my_input->GetFloatFromUser("Defocus step (A) (0.0 = no search)", "Step size used in the defocus search", "50.0", 0.0);
+	float pixel_size_search_range = my_input->GetFloatFromUser("Pixel size search range (A)", "Search range (-value ... + value) around current pixel size", "0.1", 0.0);
+	float pixel_size_step = my_input->GetFloatFromUser("Pixel size step (A) (0.0 = no search)", "Step size used in the pixel size search", "0.01", 0.0);
+	float padding = my_input->GetFloatFromUser("Padding factor", "Factor determining how much the input volume is padded to improve projections", "1.0", 1.0, 2.0);
+//	ctf_refinement = my_input->GetYesNoFromUser("Refine defocus", "Should the particle defocus be refined?", "No");
+	float particle_radius_angstroms = my_input->GetFloatFromUser("Mask radius for global search (A) (0.0 = max)", "Radius of a circular mask to be applied to the input images during global search", "0.0", 0.0);
+	wxString my_symmetry = my_input->GetSymmetryFromUser("Template symmetry", "The symmetry of the template reconstruction", "C1");
+#ifdef ENABLEGPU
+	use_gpu_input = my_input->GetYesNoFromUser("Use GPU", "Offload expensive calcs to GPU","No");
+	max_threads = my_input->GetIntFromUser("Max. threads to use for calculation", "when threading, what is the max threads to run", "1", 1);
+#endif
 
 	delete my_input;
 
-	my_current_job.Reset(1);
-	my_current_job.ManualSetArguments("t", input_filename_database.c_str());
+	my_current_job.Reset(3);
+	my_current_job.ManualSetArguments("ttit", input_filename_database.c_str(),
+															input_image_group,
+															input_volume_asset,
+															high_resolution_limit,
+															my_symmetry.ToUTF8().data(),
+															angular_step,
+															in_plane_angular_step,													
+															use_gpu_input,
+															max_threads);
 
 }
 
@@ -69,6 +95,8 @@ void MatchTemplateDatabase::DoInteractiveUserInput()
 bool MatchTemplateDatabase::DoCalculation()
 {
 	std::string	input_filename_database						= my_current_job.arguments[0].ReturnStringArgument();
+	std::string input_image_group	=  my_current_job.arguments[1].ReturnStringArgument();
+	int input_volume_asset =  my_current_job.arguments[2].ReturnStringArgument();
     wxFileName database_file;
     database_file.Assign(input_filename_database);       
     database_file.MakeAbsolute();
@@ -120,7 +148,7 @@ bool MatchTemplateDatabase::DoCalculation()
 
 
 		// start the matching here...
-		
+		StartEstimation(input_image_group, input_volume_asset);
 
 		
 		
@@ -132,7 +160,7 @@ bool MatchTemplateDatabase::DoCalculation()
 	return true;
 }
 
-bool MatchTemplateDatabase::StartEstimation(std::string input_image_group)
+bool MatchTemplateDatabase::StartEstimation(std::string input_image_group, int input_volume_asset)
 {
 
 	active_group.CopyFrom(&image_asset_panel->all_groups_list->groups[GroupComboBox->GetSelection()]);
