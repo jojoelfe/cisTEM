@@ -13,7 +13,7 @@ MatchTemplateDatabase : public MyApp
 
     Project current_project;
 	AssetGroup active_group;
-	bool StartEstimation();
+	bool StartEstimation(std::string input_image_group, int input_volume_asset);
 	float resolution_limit;
 	float orientations_per_process;
 	float current_orientation_counter;
@@ -56,8 +56,8 @@ void MatchTemplateDatabase::DoInteractiveUserInput()
 	UserInput *my_input = new UserInput("MatchTemplateDatabase", 1.0);
 
 	std::string input_filename_database	=		my_input->GetFilenameFromUser("Database filename", "Filename of the database", "project.db", true );
-	std::string input_image_group	=		my_input->GetStringFromUser("Name of image group", "Name of the group of images that should be searched", "all", true );
-	int input_volume_asset	=		my_input->GetIntFromUser("ID of Volume Asset", "ID of the volume asset that should be used to search", "1", true );
+	std::string input_image_group	=		my_input->GetStringFromUser("Name of image group", "Name of the group of images that should be searched", "all" );
+	int input_volume_asset	=		my_input->GetIntFromUser("ID of Volume Asset", "ID of the volume asset that should be used to search", "1", 0 );
 	float high_resolution_limit = my_input->GetFloatFromUser("High resolution limit (A)", "High resolution limit of the data used for alignment in Angstroms", "8.0", 0.0);
 	float angular_step = my_input->GetFloatFromUser("Out of plane angular step (0.0 = set automatically)", "Angular step size for global grid search", "0.0", 0.0);
 	float in_plane_angular_step = my_input->GetFloatFromUser("In plane angular step (0.0 = set automatically)", "Angular step size for in-plane rotations during the search", "0.0", 0.0);
@@ -79,7 +79,7 @@ void MatchTemplateDatabase::DoInteractiveUserInput()
 
 	my_current_job.Reset(3);
 	my_current_job.ManualSetArguments("ttit", input_filename_database.c_str(),
-															input_image_group,
+															input_image_group.c_str(),
 															input_volume_asset,
 															high_resolution_limit,
 															my_symmetry.ToUTF8().data(),
@@ -96,13 +96,12 @@ bool MatchTemplateDatabase::DoCalculation()
 {
 	std::string	input_filename_database						= my_current_job.arguments[0].ReturnStringArgument();
 	std::string input_image_group	=  my_current_job.arguments[1].ReturnStringArgument();
-	int input_volume_asset =  my_current_job.arguments[2].ReturnStringArgument();
+	int input_volume_asset =  my_current_job.arguments[2].ReturnIntegerArgument();
     wxFileName database_file;
     database_file.Assign(input_filename_database);       
     database_file.MakeAbsolute();
 	wxString project_database = database_file.GetFullPath();
 
-    wxPrintf(wxString::Format("Attempting migration of %s\n", project_database));
 
 	if (wxDirExists(project_database + ".lock"))
 	{
@@ -163,22 +162,21 @@ bool MatchTemplateDatabase::DoCalculation()
 bool MatchTemplateDatabase::StartEstimation(std::string input_image_group, int input_volume_asset)
 {
 
-	active_group.CopyFrom(&image_asset_panel->all_groups_list->groups[GroupComboBox->GetSelection()]);
 	current_project.database.BeginAllImageGroupsSelect();
 	AssetGroup temp_group;
-	while (main_frame->current_project.database.last_return_code == SQLITE_ROW)
+	while (current_project.database.last_return_code == SQLITE_ROW)
 	{
-		temp_group = main_frame->current_project.database.GetNextImageGroup();
+		temp_group = current_project.database.GetNextImageGroup();
 
 		// the members of this group are referenced by asset id's, we need to translate this to array position..
 
 		if (temp_group.name == input_image_group) {
-			active_group.CopyFrom(temp_group);
+			active_group.CopyFrom(&temp_group);
 		}
 
 		
 	}
-	main_frame->current_project.database.EndAllImageGroupsSelect();
+	current_project.database.EndAllImageGroupsSelect();
 
 	
 
@@ -189,10 +187,26 @@ bool MatchTemplateDatabase::StartEstimation(std::string input_image_group, int i
 	EulerSearch	*current_image_euler_search;
 	ImageAsset *current_image;
 	VolumeAsset *current_volume;
+	VolumeAsset temp_asset;
 
-	current_volume = 
+	// current_volume = 
+	current_project.database.BeginAllVolumeAssetsSelect();
 
+	while (current_project.database.last_return_code == SQLITE_ROW)
+	{
+		temp_asset = current_project.database.GetNextVolumeAsset();
+		wxPrintf("%f pixels\n",temp_asset.reconstruction_job_id);
+		if (temp_asset.asset_id == input_volume_asset) {
+		current_volume->CopyFrom(&temp_asset);
+		}
+	}
 
+	current_project.database.EndAllVolumeAssetsSelect();
+
+	wxPrintf("Image group with %i members\n",active_group.number_of_members);
+	wxPrintf("Volume has %f pixels\n",current_volume->x_size / current_volume->pixel_size);
+	return true;
+	/*
 
 
 
@@ -552,9 +566,10 @@ bool MatchTemplateDatabase::StartEstimation(std::string input_image_group, int i
 
 
 	ProgressBar->Pulse();
+	*/
 }
-
-void MatchTemplatePanel::HandleSocketTemplateMatchResultReady(wxSocketBase *connected_socket, int &image_number, float &threshold_used, ArrayOfTemplateMatchFoundPeakInfos &peak_infos, ArrayOfTemplateMatchFoundPeakInfos &peak_changes)
+/*
+void MatchTemplateDatabase::HandleSocketTemplateMatchResultReady(wxSocketBase *connected_socket, int &image_number, float &threshold_used, ArrayOfTemplateMatchFoundPeakInfos &peak_infos, ArrayOfTemplateMatchFoundPeakInfos &peak_changes)
 {
 	// result is available for an image..
 
@@ -576,3 +591,4 @@ void MatchTemplatePanel::HandleSocketTemplateMatchResultReady(wxSocketBase *conn
 	main_frame->current_project.database.Commit();
 	match_template_results_panel->is_dirty = true;
 }
+*/
