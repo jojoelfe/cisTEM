@@ -790,7 +790,7 @@ bool RefineTemplateApp::DoCalculation()
 					starting_score = score_adjustment * scaled_mip_image.real_values[current_address] * starting_score / mip_image.real_values[current_address];
 
 					if (max_threads == 1) wxPrintf("\nRefining peak %i at x, y =  %6i, %6i\n", peak_number + 1, myroundint(current_peak.x), myroundint(current_peak.y));
-					if (angular_step == 0.0 & in_plane_angular_step == 0.0) {
+					if (angular_step == 0.0 && in_plane_angular_step == 0.0) {
 						if (max_threads == 1) wxPrintf("Peak %4i: dx, dy, dpsi, dtheta, dphi, ddefocus, dpixel size = %12.6f, %12.6f, %12.6f, %12.6f, %12.6f, %12.6f, %12.6f | value = %10.6f\n", peak_number + 1, 0.,0.,0.,0.,0.,0.,0., starting_score);
 						goto NEXTPEAK;
 					}
@@ -1132,7 +1132,7 @@ bool RefineTemplateApp::DoCalculation()
 				best_pixel_size.real_values[best_address] = best_pixel_size_local.real_values[best_address];
 			}
 		}
-		NEXTPEAK: if (angular_step == 0.0 & in_plane_angular_step == 0.0) wxPrintf("Stopping refinement now\n");
+		NEXTPEAK: if (angular_step == 0.0 && in_plane_angular_step == 0.0) wxPrintf("Stopping refinement now\n");
 	}
 
 	windowed_particle.Deallocate();
