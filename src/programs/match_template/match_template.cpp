@@ -1533,18 +1533,18 @@ bool MatchTemplateApp::DoCalculation()
 
 		SendProgramDefinedResultToMaster(result, number_of_result_floats, image_number_for_gui, number_of_jobs_per_image_in_gui);
 		
-		// My feeling is the result array should be deallocated, but it leads to a segfault
-		// Ok, after some research in turns out the worker thread will free up this memory after sending it to the master. Hunt is still on....
+		// The result should not be deleted here, as the worker thread will free it up once it has been send to the master
 		// delete [] result;
 	}
 
 	delete [] histogram_data;
-	// This fixes a memory leak for both CPU & GPU, but the bigger one appears to be in the GPU code
 	delete [] correlation_pixel_sum;
 	delete [] correlation_pixel_sum_of_squares;
-	// This fixes the big memory leak in the GPU code
 	#ifdef ENABLEGPU
-		delete [] GPU;
+		if (use_gpu)
+		{
+			delete [] GPU;
+		}
 	#endif
 
 	if (is_running_locally == true)
