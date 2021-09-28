@@ -367,6 +367,7 @@ bool UnBlurApp::DoCalculation()
 	long slice_byte_size;
 
 	Image *unbinned_image_stack; // We will allocate this later depending on if we are binning or not.
+	Image *cropped_image_stack;
 	Image *image_stack = new Image[number_of_input_images];
 	Image *running_average_stack; // we will allocate this later if necessary;
 
@@ -545,7 +546,7 @@ bool UnBlurApp::DoCalculation()
 	pre_binning_factor = int(myround(5. / output_pixel_size));
 	if (pre_binning_factor < 1) pre_binning_factor = 1;
 
-//	wxPrintf("Prebinning factor = %i\n", pre_binning_factor);
+	wxPrintf("Prebinning factor = %i\n", pre_binning_factor);
 
 	// if we are going to be binning, we need to allocate the unbinned array..
 
@@ -553,6 +554,7 @@ bool UnBlurApp::DoCalculation()
 	{
 		unbinned_image_stack = image_stack;
 		image_stack = new Image[number_of_input_images];
+		cropped_image_stack = new Image[number_of_input_images];
 		pixel_size = output_pixel_size * pre_binning_factor;
 	}
 	else
@@ -579,8 +581,16 @@ bool UnBlurApp::DoCalculation()
 		#pragma omp parallel for default(shared) num_threads(max_threads) private(image_counter)
 		for (image_counter = 0; image_counter < number_of_input_images; image_counter++)
 		{
-			image_stack[image_counter].Allocate(unbinned_image_stack[image_counter].logical_x_dimension / pre_binning_factor, unbinned_image_stack[image_counter].logical_y_dimension / pre_binning_factor, 1, false);
-			unbinned_image_stack[image_counter].ClipInto(&image_stack[image_counter]);
+			cropped_image_stack[image_counter].Allocate(unbinned_image_stack[image_counter].logical_x_dimension / 2, unbinned_image_stack[image_counter].logical_y_dimension / 2, 1, true);
+			unbinned_image_stack[image_counter].BackwardFFT();
+			unbinned_image_stack[image_counter].ClipInto(&cropped_image_stack[image_counter]);
+			
+			unbinned_image_stack[image_counter].ForwardFFT();
+			cropped_image_stack[image_counter].ForwardFFT();
+			cropped_image_stack[image_counter].ZeroCentralPixel();
+
+			image_stack[image_counter].Allocate(cropped_image_stack[image_counter].logical_x_dimension / pre_binning_factor, cropped_image_stack[image_counter].logical_y_dimension / pre_binning_factor, 1, false);
+			cropped_image_stack[image_counter].ClipInto(&image_stack[image_counter]);
 			//image_stack[image_counter].QuickAndDirtyWriteSlice("binned.mrc", image_counter + 1);
 		}
 		profile_timing.lap("make prebinned stack");
@@ -610,7 +620,8 @@ bool UnBlurApp::DoCalculation()
 		// we don't need the binned images anymore..
 
 		delete [] image_stack;
-		image_stack = unbinned_image_stack;
+		// delete [] cropped_image_stack;
+		image_stack = cropped_image_stack;
 		pixel_size = output_pixel_size;
 
 		// Adjust the shifts, then phase shift the original images
@@ -641,7 +652,14 @@ bool UnBlurApp::DoCalculation()
 		unblur_refine_alignment(image_stack, number_of_input_images, max_iterations, unitless_bfactor, should_mask_central_cross, vertical_mask_size, horizontal_mask_size, 0., max_shift_in_pixels, termination_threshold_in_pixels, output_pixel_size, number_of_frames_for_running_average, myroundint(5.0f / exposure_per_frame), max_threads, x_shifts, y_shifts, profile_timing_refinement_method);
 		profile_timing.lap("final refine");
 		// if allocated delete the binned stack, and swap the unbinned to image_stack - so that no matter what is happening we can just use image_stack
-
+		delete [] cropped_image_stack;
+		image_stack = unbinned_image_stack;
+		#pragma omp parallel for default(shared) num_threads(max_threads) private(image_counter)
+		for (image_counter = 0; image_counter < number_of_input_images; image_counter++)
+		{
+			
+			image_stack[image_counter].PhaseShift(x_shifts[image_counter], y_shifts[image_counter], 0.0);
+		}
 
 
 	}
