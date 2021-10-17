@@ -144,7 +144,7 @@ void MyImageAssetPanel::CompletelyRemoveAssetByID(long wanted_asset_id)
 
 	// remove all picking jobs and results..
 
-	tables = main_frame->current_project.database.ReturnStringArrayFromSelectCommand("SELECT name FROM sqlite_leader WHERE name like 'PARTICLE_PICKING_RESULTS_%';");
+	tables = main_frame->current_project.database.ReturnStringArrayFromSelectCommand("SELECT name FROM sqlite_master WHERE name like 'PARTICLE_PICKING_RESULTS_%';");
 
 	for (counter = 0; counter < tables.GetCount(); counter++)
 	{
@@ -167,7 +167,7 @@ void MyImageAssetPanel::CompletelyRemoveAssetByID(long wanted_asset_id)
 
 	// we need to go through ALL the refinement package assets and set anything with the relevant image_asset_id to -1 so manipulations will be done on the stack, not recut out.
 
-	tables = main_frame->current_project.database.ReturnStringArrayFromSelectCommand("SELECT name FROM sqlite_leader WHERE name like 'REFINEMENT_PACKAGE_CONTAINED_PARTICLES_%';");
+	tables = main_frame->current_project.database.ReturnStringArrayFromSelectCommand("SELECT name FROM sqlite_master WHERE name like 'REFINEMENT_PACKAGE_CONTAINED_PARTICLES_%';");
 
 	for (counter = 0; counter < tables.GetCount(); counter++)
 	{
