@@ -53,7 +53,7 @@ MatchTemplateApp : public MyApp
 
 	bool DoCalculation();
 	void DoInteractiveUserInput();
-	void MasterHandleProgramDefinedResult(float *result_array, long array_size, int result_number, int number_of_expected_results);
+	void LeaderHandleProgramDefinedResult(float *result_array, long array_size, int result_number, int number_of_expected_results);
 	void ProgramSpecificInit();
 
 	// for leader collation
@@ -1531,7 +1531,7 @@ bool MatchTemplateApp::DoCalculation()
 			result_array_counter++;
 		}
 
-		SendProgramDefinedResultToMaster(result, number_of_result_floats, image_number_for_gui, number_of_jobs_per_image_in_gui);
+		SendProgramDefinedResultToLeader(result, number_of_result_floats, image_number_for_gui, number_of_jobs_per_image_in_gui);
 		// The result should not be deleted here, as the worker thread will free it up once it has been send to the leader
 		// delete [] result;
 	}
@@ -1558,7 +1558,7 @@ bool MatchTemplateApp::DoCalculation()
 	return true;
 }
 
-void MatchTemplateApp::MasterHandleProgramDefinedResult(float *result_array, long array_size, int result_number, int number_of_expected_results)
+void MatchTemplateApp::LeaderHandleProgramDefinedResult(float *result_array, long array_size, int result_number, int number_of_expected_results)
 {
 	// do we have this image number already?
 
@@ -1566,7 +1566,7 @@ void MatchTemplateApp::MasterHandleProgramDefinedResult(float *result_array, lon
 	int array_location = -1;
 	long pixel_counter;
 
-	wxPrintf("Master Handling result for image %i..", result_number);
+	wxPrintf("Leader Handling result for image %i..", result_number);
 
 	for (int result_counter = 0; result_counter < aggregated_results.GetCount(); result_counter++)
 	{

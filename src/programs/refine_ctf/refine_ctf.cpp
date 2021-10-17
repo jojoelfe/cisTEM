@@ -7,7 +7,7 @@ RefineCTFApp : public MyApp
 
 	bool DoCalculation();
 	void DoInteractiveUserInput();
-	void MasterHandleProgramDefinedResult(float *result_array, long array_size, int result_number, int number_of_expected_results);
+	void LeaderHandleProgramDefinedResult(float *result_array, long array_size, int result_number, int number_of_expected_results);
 	void ProgramSpecificInit();
 	// for leader collation
 
@@ -1121,17 +1121,17 @@ bool RefineCTFApp::DoCalculation()
 				result_array_counter++;
 			}
 
-			SendProgramDefinedResultToMaster(result, number_of_result_floats, job_number_from_gui, expected_number_of_jobs_from_gui);
+			SendProgramDefinedResultToLeader(result, number_of_result_floats, job_number_from_gui, expected_number_of_jobs_from_gui);
 		}
 	}
 
 	return true;
 }
 
-void RefineCTFApp::MasterHandleProgramDefinedResult(float *result_array, long array_size, int result_number, int number_of_expected_results) // my_app.cpp deletes the result array memory
+void RefineCTFApp::LeaderHandleProgramDefinedResult(float *result_array, long array_size, int result_number, int number_of_expected_results) // my_app.cpp deletes the result array memory
 {
 
-	wxPrintf("Master, Received result %i (%i of %i)\n", result_number, number_of_received_results  + 1, number_of_expected_results);
+	wxPrintf("Leader, Received result %i (%i of %i)\n", result_number, number_of_received_results  + 1, number_of_expected_results);
 
 	if (sum_for_leader.is_in_memory == false)
 	{

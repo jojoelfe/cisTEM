@@ -298,7 +298,7 @@ void MyApp::SendJobResultQueue(ArrayofJobResults &queue_to_send)
 	SendResultQueueToSocket(controller_socket, queue_to_send);
 }
 
-void MyApp::MasterSendIntenalQueue()
+void MyApp::LeaderSendIntenalQueue()
 {
 	SendJobResultQueue(leader_job_queue);
 	leader_job_queue.Clear();
@@ -315,7 +315,7 @@ void MyApp::SendAllJobsFinished()
 	wxSleep(1);
 	//Yield();
 
-	if (leader_job_queue.GetCount() != 0) MasterSendIntenalQueue();
+	if (leader_job_queue.GetCount() != 0) LeaderSendIntenalQueue();
 
 	WriteToSocket(controller_socket, socket_all_jobs_finished, SOCKET_CODE_SIZE, true, "SendSocketJobType", FUNCTION_DETAILS_AS_WXSTRING);
 	WriteToSocket(controller_socket, &total_milliseconds_spent_on_threads, sizeof(long), true, "SendTotalMillisecondsSpentOnThreads", FUNCTION_DETAILS_AS_WXSTRING);
@@ -380,11 +380,11 @@ void MyApp::OnZombieTimer(wxTimerEvent& event)
 	}
 }
 
-void MyApp::OnMasterQueueTimer(wxTimerEvent& event)
+void MyApp::OnLeaderQueueTimer(wxTimerEvent& event)
 {
 	if (leader_job_queue.GetCount() > 0)
 	{
-		MasterSendIntenalQueue();
+		LeaderSendIntenalQueue();
 	}
 
 	leader_queue_timer_set = false;
@@ -466,8 +466,8 @@ void MyApp::OnThreadSendImageResult(wxThreadEvent& my_event)
 	details[2] = position_in_stack;
 
 	WriteToSocket(leader_socket, socket_result_with_image_to_write, SOCKET_CODE_SIZE, true, "SendSocketJobType", FUNCTION_DETAILS_AS_WXSTRING);
-	WriteToSocket(leader_socket, details, sizeof(int) * 3, true, "SendResultImageDetailsFromFollowerToMaster", FUNCTION_DETAILS_AS_WXSTRING);
-	WriteToSocket(leader_socket, image_to_send.real_values, image_to_send.real_memory_allocated * sizeof(float), true, "SendResultImageDataFromFollowerToMaster", FUNCTION_DETAILS_AS_WXSTRING);
+	WriteToSocket(leader_socket, details, sizeof(int) * 3, true, "SendResultImageDetailsFromFollowerToLeader", FUNCTION_DETAILS_AS_WXSTRING);
+	WriteToSocket(leader_socket, image_to_send.real_values, image_to_send.real_memory_allocated * sizeof(float), true, "SendResultImageDataFromFollowerToLeader", FUNCTION_DETAILS_AS_WXSTRING);
 	SendwxStringToSocket(&filename_to_write, leader_socket);
 
 	// post a message to the message queue to allow the calulcation thread to send the next image..
@@ -490,8 +490,8 @@ void MyApp::OnThreadSendProgramDefinedResult(ReturnProgramDefinedResultEvent& my
 	details[2] = number_of_expected_results;
 
 	WriteToSocket(leader_socket, socket_program_defined_result, SOCKET_CODE_SIZE, true, "SendSocketJobType", FUNCTION_DETAILS_AS_WXSTRING);
-	WriteToSocket(leader_socket, details, sizeof(int) * 3, true, "SendProgramDefinedResultDetailsFromFollowerToMaster", FUNCTION_DETAILS_AS_WXSTRING);
-	WriteToSocket(leader_socket, array_to_send, size_of_array * sizeof(float), true, "SendProgramDefinedResultArrayFromFollowerToMaster", FUNCTION_DETAILS_AS_WXSTRING);
+	WriteToSocket(leader_socket, details, sizeof(int) * 3, true, "SendProgramDefinedResultDetailsFromFollowerToLeader", FUNCTION_DETAILS_AS_WXSTRING);
+	WriteToSocket(leader_socket, array_to_send, size_of_array * sizeof(float), true, "SendProgramDefinedResultArrayFromFollowerToLeader", FUNCTION_DETAILS_AS_WXSTRING);
 
 	delete [] array_to_send;
 }
@@ -668,11 +668,11 @@ void MyApp::SendProcessedImageResult(Image *image_to_send, int position_in_stack
 	}
 }
 
-void MyApp::SendProgramDefinedResultToMaster(float *array_to_send, long size_of_array, int result_number, int number_of_expected_results)
+void MyApp::SendProgramDefinedResultToLeader(float *array_to_send, long size_of_array, int result_number, int number_of_expected_results)
 {
 	if (work_thread != NULL)
 	{
-		work_thread->SendProgramDefinedResultToMaster(array_to_send, size_of_array, result_number, number_of_expected_results);
+		work_thread->SendProgramDefinedResultToLeader(array_to_send, size_of_array, result_number, number_of_expected_results);
 	}
 	else
 	{
@@ -790,7 +790,7 @@ void CalculateThread::SendProcessedImageResult(Image *image_to_send, int positio
 	wxQueueEvent(main_thread_pointer, test_event);
 }
 
-void CalculateThread::SendProgramDefinedResultToMaster(float  *array_to_send, long size_of_array, int result_number, int number_of_expected_results)
+void CalculateThread::SendProgramDefinedResultToLeader(float  *array_to_send, long size_of_array, int result_number, int number_of_expected_results)
 {
 	ReturnProgramDefinedResultEvent *test_event = new ReturnProgramDefinedResultEvent(wxEVT_COMMAND_MYTHREAD_SEND_PROGRAM_DEFINED_RESULT);
 	test_event->SetResultData(array_to_send);
@@ -836,7 +836,7 @@ CalculateThread::~CalculateThread()
 //	delete received_package;
 //}
 
-void MyApp::HandleSocketYouAreTheMaster(wxSocketBase *connected_socket, JobPackage *received_package)
+void MyApp::HandleSocketYouAreTheLeader(wxSocketBase *connected_socket, JobPackage *received_package)
 {
 
 	current_job_package = *received_package;
@@ -859,7 +859,7 @@ void MyApp::HandleSocketYouAreTheMaster(wxSocketBase *connected_socket, JobPacka
 
 	// bind to the leader queue timer..
 
-	Bind(wxEVT_TIMER, wxTimerEventHandler( MyApp::OnMasterQueueTimer ), this, 3);
+	Bind(wxEVT_TIMER, wxTimerEventHandler( MyApp::OnLeaderQueueTimer ), this, 3);
 
 	my_port = ReturnServerPort();
 	my_port_string = ReturnServerPortString();
@@ -1165,14 +1165,14 @@ void MyApp::HandleSocketResultWithImageToWrite(wxSocketBase *connected_socket, w
 		{
 			// must be a lot of queued event, so the timer is not being called -  send the current result queue anyway so the gui gets updated;
 
-			MasterSendIntenalQueue();
+			LeaderSendIntenalQueue();
 		}
 	}
 }
 
 void MyApp::HandleSocketProgramDefinedResult(wxSocketBase *connected_socket, float *data_array, int size_of_data_array, int result_number, int number_of_expected_results)
 {
-	MasterHandleProgramDefinedResult(data_array, size_of_data_array, result_number, number_of_expected_results);
+	LeaderHandleProgramDefinedResult(data_array, size_of_data_array, result_number, number_of_expected_results);
 	delete [] data_array;
 }
 
@@ -1301,7 +1301,7 @@ void MyApp::HandleSocketDisconnect(wxSocketBase *connected_socket)
 {
 	if (connected_socket == controller_socket && i_am_the_leader == true) // kill everything..
 	{
-		MyDebugPrint("Master received disconnect from controller");
+		MyDebugPrint("Leader received disconnect from controller");
 
 		for (int counter = 0; counter < follower_socket_pointers.GetCount(); counter++)
 		{

@@ -60,7 +60,7 @@ class CalculateThread : public wxThread
     	void QueueInfo(wxString info_to_queue);
     	void MarkIntermediateResultAvailable();
     	void SendProcessedImageResult(Image *image_to_send, int position_in_stack, wxString filename_to_save);
-    	void SendProgramDefinedResultToMaster(float *result_to_send, long size_of_result, int result_number, int number_of_expected_results);
+    	void SendProgramDefinedResultToLeader(float *result_to_send, long size_of_result, int result_number, int number_of_expected_results);
 
 	protected:
 
@@ -92,7 +92,7 @@ MyApp : public wxAppConsole, public SocketCommunicator
 
 
 		void OnQueueTimer(wxTimerEvent& event);
-		void OnMasterQueueTimer(wxTimerEvent& event);
+		void OnLeaderQueueTimer(wxTimerEvent& event);
 		void OnZombieTimer(wxTimerEvent& event);
 
 		virtual float GetMaxJobWaitTimeInSeconds() {return 30.0f;}
@@ -112,7 +112,7 @@ MyApp : public wxAppConsole, public SocketCommunicator
 
 		void HandleNewSocketConnection(wxSocketBase *new_connection,  unsigned char *identification_code);
 		//void HandleSocketJobPackage(wxSocketBase *connected_socket, JobPackage *received_package);
-		void HandleSocketYouAreTheMaster(wxSocketBase *connected_socket, JobPackage *received_package);
+		void HandleSocketYouAreTheLeader(wxSocketBase *connected_socket, JobPackage *received_package);
 		void HandleSocketYouAreAFollower(wxSocketBase *connected_socket, wxString leader_ip_address, wxString leader_port_string);
 		void HandleSocketTimeToDie(wxSocketBase *connected_socket);
 		void HandleSocketJobResult(wxSocketBase *connected_socket, JobResult *received_result);
@@ -207,17 +207,17 @@ MyApp : public wxAppConsole, public SocketCommunicator
 		JobResult * PopJobFromResultQueue();
 		void SendAllResultsFromResultQueue();
 		void SendProcessedImageResult(Image *image_to_send, int position_in_stack, wxString filename_to_save);
-		void SendProgramDefinedResultToMaster(float *result_to_send, long size_of_result, int result_number, int number_of_expected_results); // can override MasterHandleSpecialResult to do something with this
+		void SendProgramDefinedResultToLeader(float *result_to_send, long size_of_result, int result_number, int number_of_expected_results); // can override LeaderHandleSpecialResult to do something with this
 
 		private:
 
 		void SendJobFinished(int job_number);
 		void SendJobResult(JobResult *result);
 		void SendJobResultQueue(ArrayofJobResults &queue_to_send);
-		void MasterSendIntenalQueue();
+		void LeaderSendIntenalQueue();
 		void SendAllJobsFinished();
 
-		virtual void MasterHandleProgramDefinedResult(float *result_array, long array_size, int result_number, int number_of_expected_results){wxPrintf("warning parent MasterHandleProgramDefinedResult called, you should probably be overriding this!\n");} // can use this for program specific results by overiding in combination with SendSpecialResultForMaster in the program
+		virtual void LeaderHandleProgramDefinedResult(float *result_array, long array_size, int result_number, int number_of_expected_results){wxPrintf("warning parent LeaderHandleProgramDefinedResult called, you should probably be overriding this!\n");} // can use this for program specific results by overiding in combination with SendSpecialResultForLeader in the program
 
 		void SocketSendError(wxString error_message);
 		void SocketSendInfo(wxString info_message);

@@ -1,4 +1,4 @@
-/*  \brief  Master Job Controller for the gui, for tracking and communicating with all running jobs.
+/*  \brief  Leader Job Controller for the gui, for tracking and communicating with all running jobs.
 
 
 */

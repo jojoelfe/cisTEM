@@ -643,7 +643,7 @@ wxThread::ExitCode SocketClientMonitorThread::Entry()
 								JobPackage *temp_package = new JobPackage;
 								if (temp_package->ReceiveJobPackage(monitored_sockets[socket_counter]) == true)
 								{
-									parent_pointer->brother_event_handler->CallAfter(std::bind(&SocketCommunicator::HandleSocketYouAreTheMaster, parent_pointer, monitored_sockets[socket_counter], temp_package));
+									parent_pointer->brother_event_handler->CallAfter(std::bind(&SocketCommunicator::HandleSocketYouAreTheLeader, parent_pointer, monitored_sockets[socket_counter], temp_package));
 								}
 								else
 								{
@@ -856,12 +856,12 @@ wxThread::ExitCode SocketClientMonitorThread::Entry()
 								int position_in_stack;
 
 								int details[3];
-								if (ReadFromSocket(monitored_sockets[socket_counter], details, sizeof(int) * 3, true, "SendResultImageDetailsFromFollowerToMaster", FUNCTION_DETAILS_AS_WXSTRING) == true)
+								if (ReadFromSocket(monitored_sockets[socket_counter], details, sizeof(int) * 3, true, "SendResultImageDetailsFromFollowerToLeader", FUNCTION_DETAILS_AS_WXSTRING) == true)
 								{
 									image_to_write->Allocate(details[0], details[1], 1, true, false);
 									position_in_stack = details[2];
 
-									if (ReadFromSocket(monitored_sockets[socket_counter], image_to_write->real_values, image_to_write->real_memory_allocated * sizeof(float), true, "SendResultImageDataFromFollowerToMaster", FUNCTION_DETAILS_AS_WXSTRING) == true)
+									if (ReadFromSocket(monitored_sockets[socket_counter], image_to_write->real_values, image_to_write->real_memory_allocated * sizeof(float), true, "SendResultImageDataFromFollowerToLeader", FUNCTION_DETAILS_AS_WXSTRING) == true)
 									{
 										bool no_error;
 										filename_to_write = ReceivewxStringFromSocket(monitored_sockets[socket_counter], no_error);
@@ -927,7 +927,7 @@ wxThread::ExitCode SocketClientMonitorThread::Entry()
 								int result_number;
 								int number_of_expected_results;
 
-								if (ReadFromSocket(monitored_sockets[socket_counter], details, sizeof(int) * 3, true, "SendProgramDefinedResultDetailsFromFollowerToMaster", FUNCTION_DETAILS_AS_WXSTRING) == true)
+								if (ReadFromSocket(monitored_sockets[socket_counter], details, sizeof(int) * 3, true, "SendProgramDefinedResultDetailsFromFollowerToLeader", FUNCTION_DETAILS_AS_WXSTRING) == true)
 								{
 
 									size_of_data_array = details[0];
@@ -936,7 +936,7 @@ wxThread::ExitCode SocketClientMonitorThread::Entry()
 
 									data_array = new float[size_of_data_array];
 
-									if (ReadFromSocket(monitored_sockets[socket_counter], data_array, size_of_data_array * sizeof(float), true, "SendProgramDefinedResultArrayFromFollowerToMaster", FUNCTION_DETAILS_AS_WXSTRING) == true)
+									if (ReadFromSocket(monitored_sockets[socket_counter], data_array, size_of_data_array * sizeof(float), true, "SendProgramDefinedResultArrayFromFollowerToLeader", FUNCTION_DETAILS_AS_WXSTRING) == true)
 									{
 										parent_pointer->brother_event_handler->CallAfter(std::bind(&SocketCommunicator::HandleSocketProgramDefinedResult, parent_pointer, monitored_sockets[socket_counter], data_array, size_of_data_array, result_number, number_of_expected_results));
 									}
