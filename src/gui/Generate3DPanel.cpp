@@ -602,7 +602,7 @@ void Generate3DPanel::SetupReconstructionJob()
 	long first_particle;
 	long last_particle;
 
-	// for now, number of jobs is number of processes -1 (master)..
+	// for now, number of jobs is number of processes -1 (leader)..
 
 	number_of_particles = active_refinement_package->contained_particles.GetCount();
 

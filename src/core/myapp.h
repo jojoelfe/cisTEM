@@ -86,8 +86,8 @@ MyApp : public wxAppConsole, public SocketCommunicator
 		wxTimer *queue_timer;
 		bool queue_timer_set;
 
-		wxTimer *master_queue_timer;
-		bool master_queue_timer_set;
+		wxTimer *leader_queue_timer;
+		bool leader_queue_timer_set;
 
 
 
@@ -113,7 +113,7 @@ MyApp : public wxAppConsole, public SocketCommunicator
 		void HandleNewSocketConnection(wxSocketBase *new_connection,  unsigned char *identification_code);
 		//void HandleSocketJobPackage(wxSocketBase *connected_socket, JobPackage *received_package);
 		void HandleSocketYouAreTheMaster(wxSocketBase *connected_socket, JobPackage *received_package);
-		void HandleSocketYouAreASlave(wxSocketBase *connected_socket, wxString master_ip_address, wxString master_port_string);
+		void HandleSocketYouAreAFollower(wxSocketBase *connected_socket, wxString leader_ip_address, wxString leader_port_string);
 		void HandleSocketTimeToDie(wxSocketBase *connected_socket);
 		void HandleSocketJobResult(wxSocketBase *connected_socket, JobResult *received_result);
 		void HandleSocketIHaveAnError(wxSocketBase *connected_socket, wxString error_message);
@@ -134,15 +134,15 @@ MyApp : public wxAppConsole, public SocketCommunicator
 
 		JobResult my_result;
 		ArrayofJobResults job_queue;
-		ArrayofJobResults master_job_queue;
+		ArrayofJobResults leader_job_queue;
 
 		// socket stuff
 
 		wxSocketClient *controller_socket;
-		wxSocketClient *master_socket;
+		wxSocketClient *leader_socket;
 
 		bool 			is_connected;
-		bool			connected_to_the_master;
+		bool			connected_to_the_leader;
 		bool            currently_running_a_job;
 		wxIPV4address 	active_controller_address;
 		long 			controller_port;
@@ -161,8 +161,8 @@ MyApp : public wxAppConsole, public SocketCommunicator
 		bool is_running_locally;
 		int number_of_threads_requested_on_command_line;
 
-		bool i_am_the_master;
-		bool i_am_a_slave;
+		bool i_am_the_leader;
+		bool i_am_a_follower;
 
 		int number_of_results_sent;
 		int number_of_timing_results_received;
@@ -170,19 +170,19 @@ MyApp : public wxAppConsole, public SocketCommunicator
 		RunJob my_current_job;
 		RunJob global_job_parameters;
 
-		wxString master_ip_address;
-		wxString master_port_string;
-		short int master_port;
+		wxString leader_ip_address;
+		wxString leader_port_string;
+		short int leader_port;
 
-		long max_number_of_connected_slaves; // for the master...
+		long max_number_of_connected_followers; // for the leader...
 		long number_of_dispatched_jobs;
 		long number_of_finished_jobs;
 
-		//wxSocketBase **slave_sockets;  // POINTER TO POINTER..
-		ArrayOfSocketBasePointers slave_socket_pointers;
+		//wxSocketBase **follower_sockets;  // POINTER TO POINTER..
+		ArrayOfSocketBasePointers follower_socket_pointers;
 
 		// HashMap to keep track of which socket is currently working on which job
-		SocketJobPointerHash socket_to_slave_job_pointer_hash;
+		SocketJobPointerHash socket_to_follower_job_pointer_hash;
 
 
 		wxCmdLineParser command_line_parser;
@@ -201,7 +201,7 @@ MyApp : public wxAppConsole, public SocketCommunicator
 		int thread_next_action;
 
 		long time_of_last_queue_send;
-		long time_of_last_master_queue_send;
+		long time_of_last_leader_queue_send;
 
 		void AddJobToResultQueue(JobResult *);
 		JobResult * PopJobFromResultQueue();

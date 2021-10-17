@@ -104,7 +104,7 @@ void MyVolumeAssetPanel::CompletelyRemoveAssetByID(long wanted_asset_id)
 
 	// set an reference to this 3D in startups to 0 all startup jobs that produced this 3D..
 
-	tables = main_frame->current_project.database.ReturnStringArrayFromSelectCommand("SELECT name FROM sqlite_master WHERE name like 'STARTUP_RESULT_%'");
+	tables = main_frame->current_project.database.ReturnStringArrayFromSelectCommand("SELECT name FROM sqlite_leader WHERE name like 'STARTUP_RESULT_%'");
 
 	// go through all the tables and replace this..
 
@@ -115,7 +115,7 @@ void MyVolumeAssetPanel::CompletelyRemoveAssetByID(long wanted_asset_id)
 
 	// refinement_package_current_references
 
-	tables = main_frame->current_project.database.ReturnStringArrayFromSelectCommand("SELECT name FROM sqlite_master WHERE name like 'REFINEMENT_PACKAGE_CURRENT_REFERENCES_%'");
+	tables = main_frame->current_project.database.ReturnStringArrayFromSelectCommand("SELECT name FROM sqlite_leader WHERE name like 'REFINEMENT_PACKAGE_CURRENT_REFERENCES_%'");
 
 	for (counter = 0; counter < tables.GetCount(); counter++)
 	{
@@ -124,7 +124,7 @@ void MyVolumeAssetPanel::CompletelyRemoveAssetByID(long wanted_asset_id)
 
 	// refinement details
 
-	tables = main_frame->current_project.database.ReturnStringArrayFromSelectCommand("SELECT name FROM sqlite_master WHERE name like 'REFINEMENT_DETAILS_%'");
+	tables = main_frame->current_project.database.ReturnStringArrayFromSelectCommand("SELECT name FROM sqlite_leader WHERE name like 'REFINEMENT_DETAILS_%'");
 
 	for (counter = 0; counter < tables.GetCount(); counter++)
 	{

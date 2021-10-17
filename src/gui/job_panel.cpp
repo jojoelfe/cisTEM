@@ -148,7 +148,7 @@ void JobPanel::SetNumberConnectedTextToZeroAndStartTracking()
 void JobPanel::HandleSocketDisconnect(wxSocketBase *connected_socket)
 {
 	WriteErrorText("Error: Controller Disconnected - shutting down job.");
-	//master has disconnected..
+	//leader has disconnected..
 	main_frame->job_controller.KillJobIfSocketExists(connected_socket);
 
 }

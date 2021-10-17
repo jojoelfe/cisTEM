@@ -1409,7 +1409,7 @@ void CTFRefinementManager::SetupRefinementJob()
 
 	//	wxPrintf("Input refinement has %li particles\n", input_refinement->number_of_particles);
 
-	// for now, number of jobs is number of processes -1 (master)..
+	// for now, number of jobs is number of processes -1 (leader)..
 
 	number_of_refinement_processes = active_refinement_run_profile.ReturnTotalJobs();
 	number_of_refinement_jobs = number_of_refinement_processes;

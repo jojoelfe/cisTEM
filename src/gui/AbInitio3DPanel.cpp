@@ -1439,7 +1439,7 @@ void AbInitioManager::SetupReconstructionJob()
 	long first_particle;
 	long last_particle;
 
-	// for now, number of jobs is number of processes -1 (master)..
+	// for now, number of jobs is number of processes -1 (leader)..
 
 	if (active_use_classums == false) number_of_particles = active_refinement_package->contained_particles.GetCount();
 	else number_of_particles = active_classification_selection.selections.GetCount() * active_number_of_2d_classes;
@@ -1788,7 +1788,7 @@ void AbInitioManager::SetupRefinementJob()
 
 //	wxPrintf("Input refinement has %li particles\n", input_refinement->number_of_particles);
 
-	// for now, number of jobs is number of processes -1 (master)..
+	// for now, number of jobs is number of processes -1 (leader)..
 
 	number_of_refinement_processes = std::min(number_of_particles,active_refinement_run_profile.ReturnTotalJobs());
 	number_of_refinement_jobs = number_of_refinement_processes;

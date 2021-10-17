@@ -9,7 +9,7 @@ RefineCTFApp : public MyApp
 	void DoInteractiveUserInput();
 	void MasterHandleProgramDefinedResult(float *result_array, long array_size, int result_number, int number_of_expected_results);
 	void ProgramSpecificInit();
-	// for master collation
+	// for leader collation
 
 	private:
 
@@ -18,11 +18,11 @@ RefineCTFApp : public MyApp
 
 	MRCFile input_file;
 	ReconstructedVolume			input_3d, unbinned_3d;
-	Image						sum_for_master;
-	long						total_results_for_master;
+	Image						sum_for_leader;
+	long						total_results_for_leader;
 	int							number_of_received_results;
-	float						voltage_for_master;
-	float						spherical_aberration_for_master;
+	float						voltage_for_leader;
+	float						spherical_aberration_for_leader;
 };
 
 class ImageProjectionComparison
@@ -1094,7 +1094,7 @@ bool RefineCTFApp::DoCalculation()
 		wxDateTime finish_time = wxDateTime::Now();
 		wxPrintf("Total Run Time : %s\n\n", finish_time.Subtract(start_time).Format("%Hh:%Mm:%Ss"));
 	}
-	else // we need to send our section of the beam tilt images back to the master..
+	else // we need to send our section of the beam tilt images back to the leader..
 	{
 
 		if (beamtilt_refinement == true)
@@ -1133,30 +1133,30 @@ void RefineCTFApp::MasterHandleProgramDefinedResult(float *result_array, long ar
 
 	wxPrintf("Master, Received result %i (%i of %i)\n", result_number, number_of_received_results  + 1, number_of_expected_results);
 
-	if (sum_for_master.is_in_memory == false)
+	if (sum_for_leader.is_in_memory == false)
 	{
-		sum_for_master.Allocate(result_array[0], result_array[1], 1, false);
-		sum_for_master.SetToConstant(0.0f);
-		total_results_for_master = 0;
+		sum_for_leader.Allocate(result_array[0], result_array[1], 1, false);
+		sum_for_leader.SetToConstant(0.0f);
+		total_results_for_leader = 0;
 		number_of_received_results = 0;
 
-		voltage_for_master = result_array[4];
-		spherical_aberration_for_master = result_array[5];
+		voltage_for_leader = result_array[4];
+		spherical_aberration_for_leader = result_array[5];
 	}
 
 	// add this result..
-	total_results_for_master += result_array[3];
+	total_results_for_leader += result_array[3];
 
 	for (long pixel_counter = 0; pixel_counter < result_array[2]; pixel_counter++)
 	{
-		sum_for_master.real_values[pixel_counter] += result_array[pixel_counter + 6];
+		sum_for_leader.real_values[pixel_counter] += result_array[pixel_counter + 6];
 	}
 
 	// check voltage hasn't changed..
 
-	if (voltage_for_master != result_array[4] || spherical_aberration_for_master != result_array[5])
+	if (voltage_for_leader != result_array[4] || spherical_aberration_for_leader != result_array[5])
 	{
-		MyPrintWithDetails("Error: Mismatched voltage (%f / %f) or Cs (%f / %f)\n\n", voltage_for_master, result_array[4], spherical_aberration_for_master, result_array[5]);
+		MyPrintWithDetails("Error: Mismatched voltage (%f / %f) or Cs (%f / %f)\n\n", voltage_for_leader, result_array[4], spherical_aberration_for_leader, result_array[5]);
 	}
 
 	// did this complete a result?
@@ -1169,16 +1169,16 @@ void RefineCTFApp::MasterHandleProgramDefinedResult(float *result_array, long ar
 		std::string phase_error_filename = current_job_package.jobs[0].arguments[7].ReturnStringArgument();
 		float pixel_size = current_job_package.jobs[0].arguments[12].ReturnFloatArgument();
 
-		sum_for_master.DivideByConstant(total_results_for_master);
-		sum_for_master.CosineMask(0.45f, pixel_size / 20.0f);
+		sum_for_leader.DivideByConstant(total_results_for_leader);
+		sum_for_leader.CosineMask(0.45f, pixel_size / 20.0f);
 
 
 		Image temp;
-		temp.Allocate(sum_for_master.logical_x_dimension, sum_for_master.logical_y_dimension, true);
-		sum_for_master.ComputeAmplitudeSpectrumFull2D(&temp, true, 1.0f);
+		temp.Allocate(sum_for_leader.logical_x_dimension, sum_for_leader.logical_y_dimension, true);
+		sum_for_leader.ComputeAmplitudeSpectrumFull2D(&temp, true, 1.0f);
 
 //		temp.QuickAndDirtyWriteSlice("/tmp/ori.mrc", 1);
-		sum_for_master.QuickAndDirtyWriteSlice(phase_error_filename, 1, true);
+		sum_for_leader.QuickAndDirtyWriteSlice(phase_error_filename, 1, true);
 
 /*		wxPrintf("Estimating Beam Tilt...\n");
 		std::string phase_error_filename = current_job_package.jobs[0].arguments[7].ReturnStringArgument();
@@ -1196,15 +1196,15 @@ void RefineCTFApp::MasterHandleProgramDefinedResult(float *result_array, long ar
 		Image difference_image;
 		Image beamtilt_image;
 
-		phase_error.Allocate(sum_for_master.logical_x_dimension, sum_for_master.logical_y_dimension, 1, true);
-		difference_image.Allocate(sum_for_master.logical_x_dimension, sum_for_master.logical_y_dimension, 1, true);
-		beamtilt_image.Allocate(sum_for_master.logical_x_dimension, sum_for_master.logical_y_dimension, 1, true);
+		phase_error.Allocate(sum_for_leader.logical_x_dimension, sum_for_leader.logical_y_dimension, 1, true);
+		difference_image.Allocate(sum_for_leader.logical_x_dimension, sum_for_leader.logical_y_dimension, 1, true);
+		beamtilt_image.Allocate(sum_for_leader.logical_x_dimension, sum_for_leader.logical_y_dimension, 1, true);
 
-		sum_for_master.DivideByConstant(total_results_for_master);
-		sum_for_master.CosineMask(0.45f, pixel_size / 20.0f);
+		sum_for_leader.DivideByConstant(total_results_for_leader);
+		sum_for_leader.CosineMask(0.45f, pixel_size / 20.0f);
 
-		input_ctf.Init(voltage_for_master, spherical_aberration_for_master, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, pixel_size, 0.0f);
-		score = sum_for_master.FindBeamTilt(input_ctf, pixel_size, phase_error, beamtilt_image, difference_image, found_beamtilt_x, found_beamtilt_y, found_particle_shift_x, found_particle_shift_y, 1.0f, true);
+		input_ctf.Init(voltage_for_leader, spherical_aberration_for_leader, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, pixel_size, 0.0f);
+		score = sum_for_leader.FindBeamTilt(input_ctf, pixel_size, phase_error, beamtilt_image, difference_image, found_beamtilt_x, found_beamtilt_y, found_particle_shift_x, found_particle_shift_y, 1.0f, true);
 
 		phase_error.QuickAndDirtyWriteSlice(phase_error_filename, 1, true);
 		beamtilt_image.QuickAndDirtyWriteSlice(found_beamtilt_filename, 1, true);

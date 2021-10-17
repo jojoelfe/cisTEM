@@ -1485,7 +1485,7 @@ void RefinementManager::SetupReconstructionJob()
 	long first_particle;
 	long last_particle;
 
-	// for now, number of jobs is number of processes -1 (master)..
+	// for now, number of jobs is number of processes -1 (leader)..
 
 	number_of_particles = active_refinement_package->contained_particles.GetCount();
 
@@ -1674,7 +1674,7 @@ void RefinementManager::SetupRefinementJob()
 
 //	wxPrintf("Input refinement has %li particles\n", input_refinement->number_of_particles);
 
-	// for now, number of jobs is number of processes -1 (master)..
+	// for now, number of jobs is number of processes -1 (leader)..
 
 	number_of_particles = active_refinement_package->contained_particles.GetCount();
 
@@ -1856,7 +1856,7 @@ void RefinementManager::SetupRefinementJob()
 
 	//	wxPrintf("Input refinement has %li particles\n", input_refinement->number_of_particles);
 
-		// for now, number of jobs is number of processes -1 (master)..
+		// for now, number of jobs is number of processes -1 (leader)..
 
 		number_of_refinement_processes = run_profiles_panel->run_profile_manager.run_profiles[my_parent->RefinementRunProfileComboBox->GetSelection()].ReturnTotalJobs();
 		number_of_refinement_jobs = number_of_refinement_processes - 1;

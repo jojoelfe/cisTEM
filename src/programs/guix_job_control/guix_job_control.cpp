@@ -21,20 +21,20 @@ class
 JobControlApp : public wxAppConsole, public SocketCommunicator
 #endif
 {
-	bool have_assigned_master;
+	bool have_assigned_leader;
 	wxArrayString possible_gui_addresses;
 
 	wxIPV4address active_gui_address;
 	wxIPV4address my_address;
-	wxIPV4address master_process_address;
+	wxIPV4address leader_process_address;
 
 	wxSocketClient *gui_socket;
-	wxSocketBase   *master_socket;
+	wxSocketBase   *leader_socket;
 
 	int number_of_received_jobs;
 
 	long gui_port;
-	long master_process_port;
+	long leader_process_port;
 
 	bool all_jobs_are_finished;
 
@@ -42,10 +42,10 @@ JobControlApp : public wxAppConsole, public SocketCommunicator
 	wxArrayString my_possible_ip_addresses;
 	wxString my_port_string;
 	wxString my_active_ip_address;
-	wxString master_ip_address;
-	wxString master_port;
+	wxString leader_ip_address;
+	wxString leader_port;
 
-	long number_of_slaves_already_connected;
+	long number_of_followers_already_connected;
 
 	// Socket Handling overrides..
 
@@ -72,7 +72,7 @@ JobControlApp : public wxAppConsole, public SocketCommunicator
 	void SendJobResult(JobResult *result_to_send);
 	void SendJobResultQueue(ArrayofJobResults &queue_to_send);
 
-	void SendAllJobsFinished(long total_timing_from_master);
+	void SendAllJobsFinished(long total_timing_from_leader);
 	void SendNumberofConnections();
 
 	void OnThreadLaunchJob(wxThreadEvent &event);
@@ -154,7 +154,7 @@ void JobControlApp::OnEventLoopEnter(wxEventLoopBase *	loop)
 		wxIPV4address junk_address;
 		wxString current_address;
 		wxArrayString buffer_addresses;
-		have_assigned_master = false;
+		have_assigned_leader = false;
 
 		// Set brother event handler, this is a nastly little hack so that the socket communicator can use the event handler, and it will work whether the "brother" is a console app or gui panel.
 		// it needs to be done in all classes that derive from SocketCommunicator
@@ -253,7 +253,7 @@ void JobControlApp::OnEventLoopEnter(wxEventLoopBase *	loop)
 		gui_socket->SetFlags(SOCKET_FLAGS);
 		MyDebugPrint("Job Controller: Succeeded - Connection established!\n\n");
 
-		number_of_slaves_already_connected = 0;
+		number_of_followers_already_connected = 0;
 
 
 		// monitor gui socket..
@@ -397,23 +397,23 @@ void JobControlApp::SendJobResultQueue(ArrayofJobResults &queue_to_send)
 }
 
 
-void JobControlApp::SendAllJobsFinished(long total_timing_from_master)
+void JobControlApp::SendAllJobsFinished(long total_timing_from_leader)
 {
 	WriteToSocket(gui_socket, socket_all_jobs_finished, SOCKET_CODE_SIZE, true, "SendSocketJobType", FUNCTION_DETAILS_AS_WXSTRING);
-	WriteToSocket(gui_socket, &total_timing_from_master, sizeof(long), true, "SendTotalMillisecondsSpentOnThreads", FUNCTION_DETAILS_AS_WXSTRING);
+	WriteToSocket(gui_socket, &total_timing_from_leader, sizeof(long), true, "SendTotalMillisecondsSpentOnThreads", FUNCTION_DETAILS_AS_WXSTRING);
 }
 
 void JobControlApp::SendNumberofConnections()
 {
 	WriteToSocket(gui_socket, socket_number_of_connections, SOCKET_CODE_SIZE, true, "SendSocketJobType", FUNCTION_DETAILS_AS_WXSTRING);
-	WriteToSocket(gui_socket, &number_of_slaves_already_connected, 4, true, "SendNumberOfConnections", FUNCTION_DETAILS_AS_WXSTRING);
+	WriteToSocket(gui_socket, &number_of_followers_already_connected, 4, true, "SendNumberOfConnections", FUNCTION_DETAILS_AS_WXSTRING);
 
 	int number_of_commands_to_run;
 
 	if (current_job_package.number_of_jobs + 1 < current_job_package.my_profile.ReturnTotalJobs()) number_of_commands_to_run = current_job_package.number_of_jobs + 1;
 	else number_of_commands_to_run = current_job_package.my_profile.ReturnTotalJobs();
 
-	if (number_of_slaves_already_connected == number_of_commands_to_run)
+	if (number_of_followers_already_connected == number_of_commands_to_run)
 	{
 
 		ShutDownServer();
@@ -440,46 +440,46 @@ void JobControlApp::HandleNewSocketConnection(wxSocketBase *new_connection, unsi
 	 }
 	 else
 	 {
-		 // one of the slaves has connected to us.  If it is the first one then
-		 // we need to make it the master, tell it to start a socket server
-		 // and send us the address so we can pass it on to all future slaves.
-		 // If we have already assigned the master, then we just need to send it
-		 // the masters address.
+		 // one of the followers has connected to us.  If it is the first one then
+		 // we need to make it the leader, tell it to start a socket server
+		 // and send us the address so we can pass it on to all future followers.
+		 // If we have already assigned the leader, then we just need to send it
+		 // the leaders address.
 
-		 if (have_assigned_master == false)  // we don't have a master, so assign it
+		 if (have_assigned_leader == false)  // we don't have a leader, so assign it
 		 {
 
-			 master_socket = new_connection;
-			 have_assigned_master = true;
+			 leader_socket = new_connection;
+			 have_assigned_leader = true;
 
-			 WriteToSocket(new_connection, socket_you_are_the_master, SOCKET_CODE_SIZE, true, "SendSocketJobType", FUNCTION_DETAILS_AS_WXSTRING);
+			 WriteToSocket(new_connection, socket_you_are_the_leader, SOCKET_CODE_SIZE, true, "SendSocketJobType", FUNCTION_DETAILS_AS_WXSTRING);
 			 current_job_package.SendJobPackage(new_connection);
 
 			 bool no_error;
-			 master_ip_address = ReceivewxStringFromSocket(new_connection, no_error);
-			 master_port = ReceivewxStringFromSocket(new_connection, no_error);
+			 leader_ip_address = ReceivewxStringFromSocket(new_connection, no_error);
+			 leader_port = ReceivewxStringFromSocket(new_connection, no_error);
 
-			 // monitor the master socket..
+			 // monitor the leader socket..
 
 			 MonitorSocket(new_connection);
 
-			 number_of_slaves_already_connected++;
+			 number_of_followers_already_connected++;
 			 SendNumberofConnections();
 
 		 }
-		 else  // we have a master, tell this slave who it's master is.
+		 else  // we have a leader, tell this follower who it's leader is.
 		 {
-			 WriteToSocket(new_connection, socket_you_are_a_slave, SOCKET_CODE_SIZE, true, "SendSocketJobType", FUNCTION_DETAILS_AS_WXSTRING);
-			 SendwxStringToSocket(&master_ip_address, new_connection);
-			 SendwxStringToSocket(&master_port, new_connection);
+			 WriteToSocket(new_connection, socket_you_are_a_follower, SOCKET_CODE_SIZE, true, "SendSocketJobType", FUNCTION_DETAILS_AS_WXSTRING);
+			 SendwxStringToSocket(&leader_ip_address, new_connection);
+			 SendwxStringToSocket(&leader_port, new_connection);
 
-			 // that should be the end of our interactions with the slave
+			 // that should be the end of our interactions with the follower
 			 // it should disconnect itself. We have to monitor it however so that
 			 // we can destroy it once it disconnects..
 
 			 MonitorSocket(new_connection);
 
-			 number_of_slaves_already_connected++;
+			 number_of_followers_already_connected++;
 			 SendNumberofConnections();
 
 
@@ -546,10 +546,10 @@ void JobControlApp::HandleSocketJobPackage(wxSocketBase *connected_socket, JobPa
 
 void JobControlApp::HandleSocketTimeToDie(wxSocketBase *connected_socket)
 {
-	  if (have_assigned_master == true)
+	  if (have_assigned_leader == true)
 	  {
-		  WriteToSocket(master_socket, socket_time_to_die, SOCKET_CODE_SIZE, true, "SendSocketJobType", FUNCTION_DETAILS_AS_WXSTRING);
-		  StopMonitoringAndDestroySocket(master_socket);
+		  WriteToSocket(leader_socket, socket_time_to_die, SOCKET_CODE_SIZE, true, "SendSocketJobType", FUNCTION_DETAILS_AS_WXSTRING);
+		  StopMonitoringAndDestroySocket(leader_socket);
 
 	  }
 
@@ -648,10 +648,10 @@ void JobControlApp::HandleSocketDisconnect(wxSocketBase *connected_socket)
 	{
 		MyDebugPrint("Got a disconnect from the GUI - aborting");
 
-		 if (have_assigned_master == true)
+		 if (have_assigned_leader == true)
 		 {
-			 WriteToSocket(master_socket, socket_time_to_die, SOCKET_CODE_SIZE, true, "SendSocketJobType", FUNCTION_DETAILS_AS_WXSTRING);
-			 StopMonitoringAndDestroySocket(master_socket);
+			 WriteToSocket(leader_socket, socket_time_to_die, SOCKET_CODE_SIZE, true, "SendSocketJobType", FUNCTION_DETAILS_AS_WXSTRING);
+			 StopMonitoringAndDestroySocket(leader_socket);
 		 }
 
 		 ShutDownServer();
@@ -669,15 +669,15 @@ void JobControlApp::HandleSocketDisconnect(wxSocketBase *connected_socket)
 		 return;
 	}
 	else
-	if (connected_socket == master_socket)
+	if (connected_socket == leader_socket)
 	{
-		//must be from the master..
+		//must be from the leader..
 		//Have we send all jobs are finished?
 
 		if (all_jobs_are_finished == false) // something went wrong
 		{
-				MyDebugPrint("Controller got disconnect from master...");
-				SendError("Controller received a disconnect from the master before the job was finished..");
+				MyDebugPrint("Controller got disconnect from leader...");
+				SendError("Controller received a disconnect from the leader before the job was finished..");
 
 
 				ShutDownServer();
@@ -696,7 +696,7 @@ void JobControlApp::HandleSocketDisconnect(wxSocketBase *connected_socket)
 
 		// otherwise we don't care.. still wait for gui to kill us..
 	}
-	else // Must be a slave dropping us to connect to the master
+	else // Must be a follower dropping us to connect to the leader
 	{
 		 StopMonitoringAndDestroySocket(connected_socket);
 	}

@@ -1230,7 +1230,7 @@ void AutoRefinementManager::SetupReconstructionJob()
 	long first_particle;
 	long last_particle;
 
-	// for now, number of jobs is number of processes -1 (master)..
+	// for now, number of jobs is number of processes -1 (leader)..
 
 	number_of_particles = active_refinement_package->contained_particles.GetCount();
 
@@ -1508,7 +1508,7 @@ void AutoRefinementManager::SetupRefinementJob()
 	written_parameter_files = input_refinement->WritecisTEMStarFiles(main_frame->current_project.parameter_file_directory.GetFullPath() + "/auto_input_par", 1.0f, 0.0f, true);
 	written_res_files = input_refinement->WriteResolutionStatistics(main_frame->current_project.parameter_file_directory.GetFullPath() + "/auto_input_stats");
 
-	// for now, number of jobs is number of processes -1 (master)..
+	// for now, number of jobs is number of processes -1 (leader)..
 
 	number_of_particles = active_refinement_package->contained_particles.GetCount();
 

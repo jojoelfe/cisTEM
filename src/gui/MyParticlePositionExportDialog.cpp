@@ -10,7 +10,7 @@ MyParticlePositionExportDialog::MyParticlePositionExportDialog( wxWindow * paren
 ParticlePositionExportDialog( parent )
 {
 	ExportButton->Enable(false);
-	FillGroupComboBoxSlave( GroupComboBox , true );
+	FillGroupComboBoxFollower( GroupComboBox , true );
 	WarningText->Show(findparticles_panel->ReturnNumberOfJobsCurrentlyRunning() > 0);
 }
 

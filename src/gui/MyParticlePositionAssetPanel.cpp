@@ -234,7 +234,7 @@ void MyParticlePositionAssetPanel::RemoveParticlePositionAssetsWithGivenParentIm
 		}
 	}
 
-	// Remove assets from the "master" asset list
+	// Remove assets from the "leader" asset list
 	reinterpret_cast < ParticlePositionAssetList *> (all_assets_list)->RemoveAssetsWithGivenParentImageID(parent_image_id);
 
 	FillContentsList();

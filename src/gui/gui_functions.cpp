@@ -152,7 +152,7 @@ void AddProjectToRecentProjects(wxString project_to_add)
 }
 
 
-void FillGroupComboBoxSlave( wxComboBox *GroupComboBox, bool include_all_images_group )
+void FillGroupComboBoxFollower( wxComboBox *GroupComboBox, bool include_all_images_group )
 {
 	extern MyImageAssetPanel *image_asset_panel;
 	GroupComboBox->Freeze();

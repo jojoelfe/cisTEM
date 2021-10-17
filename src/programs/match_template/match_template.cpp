@@ -56,7 +56,7 @@ MatchTemplateApp : public MyApp
 	void MasterHandleProgramDefinedResult(float *result_array, long array_size, int result_number, int number_of_expected_results);
 	void ProgramSpecificInit();
 
-	// for master collation
+	// for leader collation
 
 	ArrayOfAggregatedTemplateResults aggregated_results;
 	bool 		is_rotated_by_90 = false;
@@ -1374,7 +1374,7 @@ bool MatchTemplateApp::DoCalculation()
 	}
 	else
 	{
-		// send back the final images to master (who should merge them, and send to the gui)
+		// send back the final images to leader (who should merge them, and send to the gui)
 
 		long result_array_counter;
 		long number_of_result_floats = number_of_meta_data_values; // first float is x size, 2nd is y size of images, 3rd is number allocated, 4th  float is number of doubles in the histogram
@@ -1532,7 +1532,7 @@ bool MatchTemplateApp::DoCalculation()
 		}
 
 		SendProgramDefinedResultToMaster(result, number_of_result_floats, image_number_for_gui, number_of_jobs_per_image_in_gui);
-		// The result should not be deleted here, as the worker thread will free it up once it has been send to the master
+		// The result should not be deleted here, as the worker thread will free it up once it has been send to the leader
 		// delete [] result;
 	}
 
