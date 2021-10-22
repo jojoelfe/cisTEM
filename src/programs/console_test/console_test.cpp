@@ -14,6 +14,7 @@
 #include "sine_128x128x1.cpp"
 
 #define PrintResult(result)  PrintResultWorker(result, __LINE__);
+
 #define FailTest {if (test_has_passed == true) PrintResultWorker(false, __LINE__); test_has_passed = false;}
 
 
