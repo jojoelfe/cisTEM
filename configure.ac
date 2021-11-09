@@ -233,6 +233,19 @@ AC_ARG_ENABLE(samples, [  --enable-samples      Compile with samples [[default=n
   ]) 
 AM_CONDITIONAL([ENABLESAMPLES_AM], [test x$want_samples = xtrue])
 
+# Compile python module
+want_python="no"  
+AC_ARG_ENABLE(python, [  --enable-python      Compile python module [[default=no]]],[
+  if test "$enableval" = yes; then
+    CXXFLAGS="$CXXFLAGS -DPYTHON"
+    CPPFLAGS="$CPPFLAGS -DPYTHON"
+  	want_python="true"
+  	AC_MSG_NOTICE([Compiling python module])	
+  fi
+  ]) 
+AM_CONDITIONAL([ENABLEPYTHON_AM], [test x$want_python = xtrue])
+
+
 # experimental
 compile_experimental="false"
 AC_ARG_ENABLE(experimental, AS_HELP_STRING([--enable-experimental],[Compile with experimental [default=no]]),[
