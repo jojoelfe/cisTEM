@@ -272,11 +272,9 @@ if ENABLEPYTHON_AM
 
     noinst_LIBRARIES += libpythonmodule.a
     libpythonmodule_a_SOURCES = pycistem/src/main.cpp
-    libpythonmodule_a_CXXFLAGS = $(WX_CPPFLAGS_BASE)
-    libpythonmodule_a_CPPFLAGS = $(WX_CPPFLAGS_BASE)
-    libpythonmodule_OBJECTS = $(pythommdule_a_SOURCES:.cpp=.o)
-    libpythonmodule_a_LIBADD = pycistem/main.o
-    pycistem/main.o: $(libgpucore_OBJECTS)
+    libpythonmodule_a_CXXFLAGS = $(WX_CPPFLAGS_BASE) -I/groups/elferich/.pyenv/versions/3.9.2/include/python3.9 -I/groups/elferich/cisTEM/src/pycistem/pycistem-venv/lib/python3.9/site-packages/pybind11/include
+    libpythonmodule_a_CPPFLAGS = $(WX_CPPFLAGS_BASE) -I/groups/elferich/.pyenv/versions/3.9.2/include/python3.9 -I/groups/elferich/cisTEM/src/pycistem/pycistem-venv/lib/python3.9/site-packages/pybind11/include
+    libpythonmodule_OBJECTS = $(pythonmdule_so_SOURCES:.cpp=.o)
 endif
 libcore_a_SOURCES =    core/functions.cpp \
 		       core/globals.cpp \
