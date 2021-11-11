@@ -516,8 +516,9 @@ bool UnBlurApp::DoCalculation()
 		// FT
 		profile_timing.start("forward FFT");
 		image_stack[image_counter - 1].ForwardFFT(true);
-		image_stack[image_counter - 1].ZeroCentralPixel();
+		// image_stack[image_counter - 1].ZeroCentralPixel();
 		profile_timing.lap("forward FFT");
+
 
 		// Resize the FT (binning)
 		if (output_binning_factor > 1.0001)
