@@ -24,3 +24,4 @@ RemoteSystemsTempFiles
 .vscode
 src/pycistem/python
 src/pycistem/pycistem-venv
+src/pycistem/*venv/
