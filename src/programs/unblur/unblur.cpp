@@ -502,7 +502,7 @@ bool UnBlurApp::DoCalculation()
 
 		// FT
 		image_stack[image_counter - 1].ForwardFFT(true);
-		image_stack[image_counter - 1].ZeroCentralPixel();
+		// image_stack[image_counter - 1].ZeroCentralPixel();
 
 		// Resize the FT (binning)
 		if (output_binning_factor > 1.0001)
