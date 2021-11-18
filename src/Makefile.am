@@ -269,11 +269,11 @@ gpu/gpudevicecode.o: $(libgpucore_OBJECTS)
 	$(NVCC) $(CUDA_CXXFLAGS) --device-link $(libgpucore_OBJECTS) -o gpu/gpudevicecode.o $(CUDA_LIBS)
 endif
 if ENABLEPYTHON_AM
-
+    PYBINDFLAGS= -shared `../../../src/pycistem/pycistem-venv/bin/python -m pybind11 --includes` `../../../src/pycistem/python/bin/python-config --ldflags`
     noinst_LIBRARIES += libpythonmodule.a
     libpythonmodule_a_SOURCES = pycistem/src/main.cpp
-    libpythonmodule_a_CXXFLAGS = $(WX_CPPFLAGS_BASE) -I/groups/elferich/.pyenv/versions/3.9.2/include/python3.9 -I/groups/elferich/cisTEM/src/pycistem/pycistem-venv/lib/python3.9/site-packages/pybind11/include
-    libpythonmodule_a_CPPFLAGS = $(WX_CPPFLAGS_BASE) -I/groups/elferich/.pyenv/versions/3.9.2/include/python3.9 -I/groups/elferich/cisTEM/src/pycistem/pycistem-venv/lib/python3.9/site-packages/pybind11/include
+    libpythonmodule_a_CXXFLAGS = $(WX_CPPFLAGS_BASE) $(PYBINDFLAGS)
+    libpythonmodule_a_CPPFLAGS = $(WX_CPPFLAGS_BASE) $(PYBINDFLAGS)
     libpythonmodule_OBJECTS = $(pythonmdule_so_SOURCES:.cpp=.o)
 endif
 libcore_a_SOURCES =    core/functions.cpp \
