@@ -22,3 +22,5 @@ RemoteSystemsTempFiles
 **/build*
 **/.DS_Store
 .vscode
+src/pycistem/python
+src/pycistem/pycistem-venv

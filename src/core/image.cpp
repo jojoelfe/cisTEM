@@ -5841,8 +5841,8 @@ std::tuple<int,int> Image::CropAndAddGaussianNoiseToDarkAreas(float sigma_for_fi
 	int wanted_y_dimension = (max_y - min_y) + 1;
 
 	// I think for ClipInto I need the coordinate of the center, where (0,0,0) is defined as the center.
-	int center_x = logical_x_dimension / 2 - (max_x + min_x) / 2;
-	int center_y = logical_y_dimension / 2 - (max_y + min_y) / 2;
+	int center_x = (max_x + min_x) / 2 - logical_x_dimension / 2 ;
+	int center_y = (max_y + min_y) / 2 - logical_y_dimension / 2 ;
 	Image temp_image2;
 	temp_image2.Allocate(wanted_x_dimension, wanted_y_dimension, logical_z_dimension, true);
 	ClipInto(&temp_image2, 0.0f, false, 1.0f, center_x, center_y);
