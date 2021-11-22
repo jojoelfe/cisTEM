@@ -1469,6 +1469,7 @@ class MovieImportDialog : public wxDialog
 		NumericTextCtrl* MinorScaleTextCtrl;
 		wxCheckBox* MoviesHaveInvertedContrast;
 		wxCheckBox* SkipFullIntegrityCheck;
+		wxCheckBox* ImportMetadataCheckbox;
 		wxStaticLine* m_staticline8;
 		wxButton* m_button13;
 		wxButton* ImportButton;
@@ -2759,7 +2760,7 @@ class AddRunCommandDialog : public wxDialog
 		wxCheckBox* OverrideCheckBox;
 		wxSpinCtrl* OverridenNoCopiesSpinCtrl;
 
-		AddRunCommandDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Enter Command..."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 528,262 ), long style = wxDEFAULT_DIALOG_STYLE );
+		AddRunCommandDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Enter Command..."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE );
 		~AddRunCommandDialog();
 
 };

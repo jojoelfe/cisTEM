@@ -5294,6 +5294,18 @@ MovieImportDialog::MovieImportDialog( wxWindow* parent, wxWindowID id, const wxS
 
 	bSizer26->Add( bSizer32121, 1, wxEXPAND, 5 );
 
+	wxBoxSizer* bSizer32122;
+	bSizer32122 = new wxBoxSizer( wxHORIZONTAL );
+
+	ImportMetadataCheckbox = new wxCheckBox( this, wxID_ANY, wxT("Import Metadata"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer32122->Add( ImportMetadataCheckbox, 50, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+
+
+	bSizer32122->Add( 0, 0, 50, wxEXPAND, 5 );
+
+
+	bSizer26->Add( bSizer32122, 1, wxEXPAND, 5 );
+
 	m_staticline8 = new wxStaticLine( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
 	bSizer26->Add( m_staticline8, 0, wxEXPAND | wxALL, 5 );
 
@@ -11044,10 +11056,10 @@ AddRunCommandDialog::AddRunCommandDialog( wxWindow* parent, wxWindowID id, const
 	bSizer47 = new wxBoxSizer( wxHORIZONTAL );
 
 	OKButton = new wxButton( this, wxID_ANY, wxT("OK"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer47->Add( OKButton, 0, wxALL, 5 );
+	bSizer47->Add( OKButton, 0, wxALL|wxEXPAND, 5 );
 
 	CancelButton = new wxButton( this, wxID_ANY, wxT("Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer47->Add( CancelButton, 0, wxALL, 5 );
+	bSizer47->Add( CancelButton, 0, wxALL|wxEXPAND, 5 );
 
 
 	bSizer45->Add( bSizer47, 0, wxALIGN_CENTER, 5 );
@@ -11055,6 +11067,7 @@ AddRunCommandDialog::AddRunCommandDialog( wxWindow* parent, wxWindowID id, const
 
 	this->SetSizer( bSizer45 );
 	this->Layout();
+	bSizer45->Fit( this );
 
 	this->Centre( wxBOTH );
 
