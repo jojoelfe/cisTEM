@@ -452,10 +452,10 @@ bool UnBlurApp::DoCalculation()
 
 
 	// read in frames, non threaded..
-
+	number_of_input_images = (last_frame-first_frame)+1;
 	number_of_preprocess_blocks = int(ceilf(float(number_of_input_images) / float(max_threads)));
 
-	first_frame_to_preprocess = 1;
+	first_frame_to_preprocess = first_frame;
 	last_frame_to_preprocess = max_threads;
 	total_processed = 0;
 
@@ -679,7 +679,10 @@ bool UnBlurApp::DoCalculation()
 			sum_image_no_dose_filter.Allocate(image_stack[0].logical_x_dimension, image_stack[0].logical_y_dimension, false);
 			sum_image_no_dose_filter.SetToConstant(0.0);
 
-			for (image_counter = first_frame - 1; image_counter < last_frame; image_counter++)
+
+		for (image_counter = 0; image_counter < number_of_input_images; image_counter++)
+		{
+			if (write_out_amplitude_spectrum == true)
 			{
 				sum_image_no_dose_filter.AddImage(&image_stack[image_counter]);
 			}
@@ -707,7 +710,7 @@ bool UnBlurApp::DoCalculation()
 		shared_ptr->lap("setup dose filter");
 
 		#pragma omp for
-		for (image_counter = first_frame - 1; image_counter < last_frame; image_counter++)
+		for (image_counter = 0; image_counter < number_of_input_images; image_counter++)
 		{
 			shared_ptr->start("calc dose filter");
 			my_electron_dose->CalculateDoseFilterAs1DArray(&image_stack[image_counter], dose_filter, (image_counter * exposure_per_frame) + pre_exposure_amount, ((image_counter + 1) * exposure_per_frame) + pre_exposure_amount);
@@ -743,7 +746,8 @@ bool UnBlurApp::DoCalculation()
 
 		} // end omp section
 		profile_timing.start("final sum");
-		for (image_counter = first_frame - 1; image_counter < last_frame; image_counter++)
+
+		for (image_counter = 0; image_counter < number_of_input_images; image_counter++)
 		{
 			sum_image.AddImage(&image_stack[image_counter]);
 
@@ -757,7 +761,7 @@ bool UnBlurApp::DoCalculation()
 	else // just add them
 	{
 		profile_timing.start("final sum");
-		for (image_counter = first_frame - 1; image_counter < last_frame; image_counter++)
+		for (image_counter = 0; image_counter < number_of_input_images; image_counter++)
 		{
 			sum_image.AddImage(&image_stack[image_counter]);
 
@@ -884,6 +888,16 @@ bool UnBlurApp::DoCalculation()
 	profile_timing.start("write out sum image");
 	MRCFile output_file(output_filename, true);
 	sum_image.BackwardFFT();
+	std::tuple<int, int> crop_location = sum_image.CropAndAddGaussianNoiseToDarkAreas();
+	float temp_float2[2];
+
+	NumericTextFile crop_output_file(output_filename+".crop", OPEN_TO_WRITE, 2);
+	
+		temp_float2[0] = std::get<0>(crop_location);
+		temp_float2[1] = std::get<1>(crop_location);
+
+		crop_output_file.WriteLine(temp_float2);
+	
 	sum_image.WriteSlice(&output_file, 1); // I made this change as the file is only used once, and this way it is not created until it is actually written, which is cleaner for cancelled / crashed jobs
 	output_file.SetPixelSize(output_pixel_size);
 	EmpiricalDistribution density_distribution;
