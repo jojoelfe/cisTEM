@@ -152,7 +152,7 @@ void AddProjectToRecentProjects(wxString project_to_add)
 }
 
 
-void FillGroupComboBoxSlave( wxComboBox *GroupComboBox, bool include_all_images_group )
+void FillGroupComboBoxWorker( wxComboBox *GroupComboBox, bool include_all_images_group )
 {
 	extern MyImageAssetPanel *image_asset_panel;
 	GroupComboBox->Freeze();
@@ -206,6 +206,21 @@ void AppendVolumeAssetsToComboBox(wxComboBox *ComboBox)
 
 		ComboBox->Thaw();
 }
+
+#ifdef EXPERIMENTAL
+void AppendAtomicCoordinatesAssetsToComboBox(wxComboBox *ComboBox)
+{
+	extern AtomicCoordinatesAssetPanel *atomic_coordinates_asset_panel;
+	ComboBox->Freeze();
+
+	for (unsigned long counter = 0; counter < atomic_coordinates_asset_panel->ReturnNumberOfAssets(); counter++)
+		{
+			ComboBox->Append(atomic_coordinates_asset_panel->ReturnAssetName(counter));
+		}
+
+		ComboBox->Thaw();
+}
+#endif
 
 void AppendRefinementPackagesToComboBox(wxComboBox *ComboBox)
 {

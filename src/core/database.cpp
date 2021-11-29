@@ -803,6 +803,12 @@ bool Database::CreateAllTables()
 	CheckSuccess(success);
 	success = CreateVolumeGroupListTable();
 	CheckSuccess(success);
+#ifdef EXPERIMENTAL
+	success = CreateAtomicCoordinatesAssetTable();
+	CheckSuccess(success);
+	success = CreateAtomicCoordinatesGroupListTable();
+	CheckSuccess(success);
+#endif  
 	success = CreateRefinementPackageAssetTable();
 	CheckSuccess(success);
 	success = CreateRefinementListTable();
@@ -818,6 +824,8 @@ bool Database::CreateAllTables()
 	success = CreateTable("ESTIMATED_CTF_PARAMETERS", "piiiirrrrirrrrririrrrrrrrrrrtiirrr", "CTF_ESTIMATION_ID", "CTF_ESTIMATION_JOB_ID", "DATETIME_OF_RUN", "IMAGE_ASSET_ID", "ESTIMATED_ON_MOVIE_FRAMES", "VOLTAGE", "SPHERICAL_ABERRATION", "PIXEL_SIZE", "AMPLITUDE_CONTRAST", "BOX_SIZE", "MIN_RESOLUTION", "MAX_RESOLUTION", "MIN_DEFOCUS", "MAX_DEFOCUS", "DEFOCUS_STEP", "RESTRAIN_ASTIGMATISM", "TOLERATED_ASTIGMATISM", "FIND_ADDITIONAL_PHASE_SHIFT", "MIN_PHASE_SHIFT", "MAX_PHASE_SHIFT", "PHASE_SHIFT_STEP", "DEFOCUS1", "DEFOCUS2", "DEFOCUS_ANGLE", "ADDITIONAL_PHASE_SHIFT", "SCORE", "DETECTED_RING_RESOLUTION", "DETECTED_ALIAS_RESOLUTION", "OUTPUT_DIAGNOSTIC_FILE","NUMBER_OF_FRAMES_AVERAGED","LARGE_ASTIGMATISM_EXPECTED","ICINESS", "TILT_ANGLE", "TILT_AXIS");
 	CheckSuccess(success);
 	success = CreateTemplateMatchingResultsTable();
+	CheckSuccess(success);
+	success = CreateMovieMetadataTable();
 	CheckSuccess(success);
 
 	return success;
@@ -1190,6 +1198,32 @@ void Database::EndMovieAssetInsert()
 	EndBatchInsert();
 }
 
+void Database::BeginMovieAssetMetadataInsert()
+{
+	BeginBatchInsert("MOVIE_ASSETS_METADATA", 11, "MOVIE_ASSET_ID", "METADATA_SOURCE", "CONTENT_JSON", "TILT_ANGLE", "STAGE_POSITION_X", "STAGE_POSITION_Y", "STAGE_POSITION_Z", "IMAGE_SHIFT_X", "IMAGE_SHIFT_Y", "EXPOSURE_DOSE", "ACQUISITION_TIME");
+}
+
+void Database::AddNextMovieAssetMetadata(MovieMetadataAsset asset)
+{
+	AddToBatchInsert("lttrrrrrrrl", asset.movie_asset_id, 
+	                        asset.metadata_source.ToUTF8().data(),
+							asset.content_json.ToUTF8().data(), 
+							asset.tilt_angle,
+							asset.stage_position_x,
+							asset.stage_position_y,
+							asset.stage_position_z,
+							asset.image_shift_x,
+							asset.image_shift_y,
+							asset.exposure_dose,
+							(asset.acquisition_time.IsValid()) ?
+							asset.acquisition_time.GetAsDOS() : -1);
+}
+
+void Database::EndMovieAssetMetadataInsert()
+{
+	EndBatchInsert();
+}
+
 void Database::UpdateNumberOfFramesForAMovieAsset(int movie_asset_id, int new_number_of_frames)
 {
 	ExecuteSQL(wxString::Format("UPDATE MOVIE_ASSETS SET NUMBER_OF_FRAMES = %i WHERE MOVIE_ASSET_ID = %i",new_number_of_frames,movie_asset_id));
@@ -1210,6 +1244,20 @@ void Database::AddNextVolumeAsset(int image_asset_id,  wxString name, wxString f
 {
 	AddToBatchInsert("ittiriiitt", image_asset_id, name.ToUTF8().data(), filename.ToUTF8().data(), reconstruction_job_id, pixel_size, x_size, y_size, z_size, half_map_1_filename.ToUTF8().data(), half_map_2_filename.ToUTF8().data());
 }
+
+#ifdef EXPERIMENTAL
+void Database::BeginAtomicCoordinatesAssetInsert()
+{
+	BeginBatchInsert("ATOMIC_COORDINATES_ASSETS", 11, "ATOMIC_COORDINATES_ASSET_ID", "NAME", "FILENAME", "SIMULATION_3D_JOB_ID", "X_SIZE", "Y_SIZE", "Z_SIZE", "PDB_ID", "PDB_AVG_BFACTOR", "PDB_STD_BFACTOR", "EFFECTIVE_WEIGHT");
+}
+
+void Database::AddNextAtomicCoordinatesAsset(const AtomicCoordinatesAsset *asset)
+{
+	AddToBatchInsert("ittiiiitrrr", asset->asset_id, asset->asset_name.ToUTF8().data(), asset->filename.GetFullPath().ToUTF8().data(), 
+                                  asset->simulation_3d_job_id, asset->x_size, asset->y_size, asset->z_size, 
+                                  asset->pdb_id.ToUTF8().data(), asset->pdb_avg_bfactor, asset->pdb_std_bfactor, asset->effective_weight);
+}
+#endif
 
 void Database::AddNextImageAsset(int image_asset_id,  wxString name, wxString filename, int position_in_stack, int parent_movie_id, int alignment_id, int ctf_estimation_id, int x_size, int y_size, double voltage, double pixel_size, double spherical_aberration, int protein_is_white)
 {
@@ -1354,6 +1402,13 @@ void Database::BeginAllVolumeAssetsSelect()
 {
 	BeginBatchSelect("SELECT * FROM VOLUME_ASSETS;");
 }
+
+#ifdef EXPERIMENTAL
+void Database::BeginAllAtomicCoordinatesAssetsSelect()
+{
+	BeginBatchSelect("SELECT * FROM ATOMIC_COORDINATES_ASSETS;");
+}
+#endif
 
 void Database::BeginAllParticlePositionGroupsSelect()
 {
@@ -1790,6 +1845,20 @@ VolumeAsset Database::GetNextVolumeAsset()
 	GetFromBatchSelect("itflriiitt", &temp_asset.asset_id, &temp_asset.asset_name, &temp_asset.filename, &temp_asset.reconstruction_job_id, &temp_asset.pixel_size, &temp_asset.x_size, &temp_asset.y_size, &temp_asset.z_size, &temp_asset.half_map_1_filename, &temp_asset.half_map_2_filename);
 	return temp_asset;
 }
+
+#ifdef EXPERIMENTAL
+
+AtomicCoordinatesAsset Database::GetNextAtomicCoordinatesAsset()
+{
+	AtomicCoordinatesAsset temp_asset;
+  // Note: no distinction between single and double (s/r) seems to be made in writing to the DB, based on format strings, yet when reading it must be correct. 
+  // 
+	GetFromBatchSelect("itfliiitsss", &temp_asset.asset_id, &temp_asset.asset_name, &temp_asset.filename, &temp_asset.simulation_3d_job_id, 
+                                    &temp_asset.x_size, &temp_asset.y_size, &temp_asset.z_size, &temp_asset.pdb_id, 
+                                    &temp_asset.pdb_avg_bfactor, &temp_asset.pdb_std_bfactor, &temp_asset.effective_weight);
+	return temp_asset;
+}
+#endif
 
 
 void Database::AddOrReplaceRunProfile(RunProfile *profile_to_add)

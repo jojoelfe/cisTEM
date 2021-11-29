@@ -140,6 +140,10 @@ public :
 	void AddNextMovieAsset(int movie_asset_id,  wxString name, wxString filename, int position_in_stack, int x_size, int y_size, int number_of_frames, double voltage, double pixel_size, double dose_per_frame, double spherical_aberration, wxString gain_filename, wxString dark_reference, double output_binning_factor, int correct_mag_distortion, float mag_distortion_angle, float mag_distortion_major_scale, float mag_distortion_minor_scale, int protein_is_white, int eer_super_res_factor, int eer_frames_per_image);
 	void EndMovieAssetInsert();
 
+	void BeginMovieAssetMetadataInsert();
+	void AddNextMovieAssetMetadata(MovieMetadataAsset asset);
+	void EndMovieAssetMetadataInsert();
+
 	void UpdateNumberOfFramesForAMovieAsset(int movie_asset_id, int new_number_of_frames);
 
 	void BeginImageAssetInsert();
@@ -150,7 +154,11 @@ public :
 	void AddNextVolumeAsset(int image_asset_id,  wxString name, wxString filename, int reconstruction_job_id, double pixel_size, int x_size, int y_size, int z_size, wxString half_map_1_filename, wxString half_map_2_filename);
 	void EndVolumeAssetInsert() {EndBatchInsert();};
 
-
+#ifdef EXPERIMENTAL
+	void BeginAtomicCoordinatesAssetInsert();
+  void AddNextAtomicCoordinatesAsset(const AtomicCoordinatesAsset *asset);
+	void EndAtomicCoordinatesAssetInsert() {EndBatchInsert();};
+#endif
 	void BeginParticlePositionAssetInsert();
 	//void AddNextParticlePositionAsset(int particle_position_asset_id, int parent_image_asset_id, int pick_job_id, double x_position, double y_position);
 	void AddNextParticlePositionAsset(const ParticlePositionAsset *asset);
@@ -177,6 +185,11 @@ public :
 	bool CreateVolumeAssetTable() {return CreateTable("VOLUME_ASSETS", "pttiriiitt", "VOLUME_ASSET_ID", "NAME", "FILENAME", "RECONSTRUCTION_JOB_ID", "PIXEL_SIZE", "X_SIZE", "Y_SIZE", "Z_SIZE", "HALF_MAP1_FILENAME", "HALF_MAP2_FILENAME");};
 	bool CreateVolumeGroupListTable() {return  CreateTable("VOLUME_GROUP_LIST", "pti", "GROUP_ID", "GROUP_NAME", "LIST_ID" );};
 
+#ifdef EXPERIMENTAL
+  bool CreateAtomicCoordinatesAssetTable() {return CreateTable("ATOMIC_COORDINATES_ASSETS", "pttiiiitrrr", "ATOMIC_COORDINATES_ASSET_ID", "NAME", "FILENAME", "SIMULATION_3D_JOB_ID", "X_SIZE", "Y_SIZE", "Z_SIZE", "PDB_ID", "PDB_AVG_BFACTOR", "PDB_STD_BFACTOR", "EFFECTIVE_WEIGHT");};
+	bool CreateAtomicCoordinatesGroupListTable() {return  CreateTable("ATOMIC_COORDINATES_GROUP_LIST", "pti", "GROUP_ID", "GROUP_NAME", "LIST_ID" );};
+  // TODO: I'm not sure if the following sections that are related to refinement will also be needed for AtomicCoordinates objects, though I may be given we do refinement....just not refinement packages.
+#endif
 
 	bool CreateRefinementPackageAssetTable() {return CreateTable("REFINEMENT_PACKAGE_ASSETS", "pttirtrriiii", "REFINEMENT_PACKAGE_ASSET_ID", "NAME", "STACK_FILENAME", "STACK_BOX_SIZE", "OUTPUT_PIXEL_SIZE", "SYMMETRY", "MOLECULAR_WEIGHT", "PARTICLE_SIZE","NUMBER_OF_CLASSES", "NUMBER_OF_REFINEMENTS", "LAST_REFINEMENT_ID", "STACK_HAS_WHITE_PROTEIN");};
 	bool CreateRefinementPackageContainedParticlesTable(const long refinement_package_asset_id) {return CreateTable(wxString::Format("REFINEMENT_PACKAGE_CONTAINED_PARTICLES_%li", refinement_package_asset_id), "piirrrrrrrrrri", "ORIGINAL_PARTICLE_POSITION_ASSET_ID", "PARENT_IMAGE_ASSET_ID", "POSITION_IN_STACK", "X_POSITION", "Y_POSITION", "PIXEL_SIZE", "DEFOCUS_1", "DEFOCUS_2", "DEFOCUS_ANGLE", "PHASE_SHIFT", "SPHERICAL_ABERRATION", "MICROSCOPE_VOLTAGE", "AMPLITUDE_CONTRAST","ASSIGNED_SUBSET");};
@@ -195,8 +208,7 @@ public :
 																																														"DEFOCUS_SEARCH_STEP", "AVERAGE_OCCUPANCY", "ESTIMATED_RESOLUTION", "RECONSTRUCTED_VOLUME_ASSET_ID",
 																																														"RECONSTRUCTION_ID", "SHOULD_AUTOMASK", "SHOULD_REFINE_INPUT_PARAMS", "SHOULD_USE_SUPPLIED_MASK",
 																																														"MASK_ASSET_ID", "MASK_EDGE_WIDTH", "OUTSIDE_MASK_WEIGHT", "SHOULD_LOWPASS_OUTSIDE_MASK", "MASK_FILTER_RESOLUTION");};
-
-
+	bool CreateMovieMetadataTable() { return CreateTable("MOVIE_ASSETS_METADATA", "Plttrrrrrrrl", "MOVIE_ASSET_METADATA_ID", "MOVIE_ASSET_ID", "METADATA_SOURCE", "CONTENT_JSON", "TILT_ANGLE", "STAGE_POSITION_X", "STAGE_POSITION_Y", "STAGE_POSITION_Z", "IMAGE_SHIFT_X", "IMAGE_SHIFT_Y", "EXPOSURE_DOSE", "ACQUISITION_TIME"); }
 	bool CreateTemplateMatchingResultsTable() { return CreateTable("TEMPLATE_MATCH_LIST", "Ptllilllitrrrrrrrrrrrrrrrrrrrrrrittttttttttt", "TEMPLATE_MATCH_ID", "JOB_NAME", "DATETIME_OF_RUN", "TEMPLATE_MATCH_JOB_ID", "JOB_TYPE_CODE", "INPUT_TEMPLATE_MATCH_ID", "IMAGE_ASSET_ID", "REFERENCE_VOLUME_ASSET_ID", "IS_ACTIVE", "USED_SYMMETRY", "USED_PIXEL_SIZE", "USED_VOLTAGE", "USED_SPHERICAL_ABERRATION", "USED_AMPLITUDE_CONTRAST", "USED_DEFOCUS1", "USED_DEFOCUS2", "USED_DEFOCUS_ANGLE", "USED_PHASE_SHIFT", "LOW_RESOLUTION_LIMIT", "HIGH_RESOLUTION_LIMIT", "OUT_OF_PLANE_ANGULAR_STEP", "IN_PLANE_ANGULAR_STEP", "DEFOCUS_SEARCH_RANGE", "DEFOCUS_STEP", "PIXEL_SIZE_SEARCH_RANGE", "PIXEL_SIZE_STEP", "REFINEMENT_THRESHOLD", "USED_THRESHOLD", "REF_BOX_SIZE_IN_ANGSTROMS", "MASK_RADIUS", "MIN_PEAK_RADIUS", "XY_CHANGE_THRESHOLD", "EXCLUDE_ABOVE_XY_THRESHOLD", "MIP_OUTPUT_FILE", "SCALED_MIP_OUTPUT_FILE", "AVG_OUTPUT_FILE", "STD_OUTPUT_FILE", "PSI_OUTPUT_FILE", "THETA_OUTPUT_FILE", "PHI_OUTPUT_FILE", "DEFOCUS_OUTPUT_FILE", "PIXEL_SIZE_OUTPUT_FILE", "HISTOGRAM_OUTPUT_FILE", "PROJECTION_RESULT_OUTPUT_FILE");}
 	bool CreateTemplateMatchPeakListTable(const long template_match_job_id) {return CreateTable(wxString::Format("TEMPLATE_MATCH_PEAK_LIST_%li", template_match_job_id), "prrrrrrrr", "PEAK_NUMBER", "X_POSITION", "Y_POSITION", "PSI", "THETA", "PHI", "DEFOCUS", "PIXEL_SIZE", "PEAK_HEIGHT");}
 	bool CreateTemplateMatchPeakChangeListTable(const long template_match_job_id) {return CreateTable(wxString::Format("TEMPLATE_MATCH_PEAK_CHANGE_LIST_%li", template_match_job_id), "prrrrrrrrii", "PEAK_NUMBER", "X_POSITION", "Y_POSITION", "PSI", "THETA", "PHI", "DEFOCUS", "PIXEL_SIZE", "PEAK_HEIGHT", "ORIGINAL_PEAK_NUMBER", "NEW_PEAK_NUMBER");}
@@ -252,6 +264,12 @@ public :
 	void BeginAllVolumeAssetsSelect();
 	VolumeAsset GetNextVolumeAsset();
 	void EndAllVolumeAssetsSelect() {EndBatchSelect();};
+
+#ifdef EXPERIMENTAL
+	void BeginAllAtomicCoordinatesAssetsSelect();
+	AtomicCoordinatesAsset GetNextAtomicCoordinatesAsset();
+	void EndAllAtomicCoordinatesAssetsSelect() {EndBatchSelect();};
+#endif
 
 	void BeginAllVolumeGroupsSelect();
 	AssetGroup GetNextVolumeGroup();
