@@ -217,7 +217,6 @@ noinst_HEADERS += 	gui/MatchTemplatePanel.h \
                     gui/AtomicCoordinatesAssetPanel.h \
                     gui/AtomicCoordinatesChooserDialog.h \
                     gui/AtomicCoordinatesImportDialog.h 
-
 endif      
 
 if EXPERIMENTAL_AM
