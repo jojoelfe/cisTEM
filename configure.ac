@@ -352,8 +352,8 @@ if test "x$HAVE_MKL" = "xyes"; then
 	CPPFLAGS="$CPPFLAGS -DMKL"
 
 	if test "x$CXX" = "xicpc"; then
-		CPPFLAGS="$CPPFLAGS -mkl=sequential"
-		LIBS="$LIBS -mkl=sequential"
+		CPPFLAGS="$CPPFLAGS -mkl=sequential -fPIC"
+		LIBS="$LIBS -mkl=sequential -lz"
 	else
 		LDFLAGS="$LDFLAGS -L\$(MKLROOT)/lib/intel64"
 		if test "x$static_link" = "xtrue"; then
