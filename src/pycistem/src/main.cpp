@@ -305,8 +305,14 @@ PYBIND11_MODULE(pycistem, m) {
       .def(py::init<>())
       .def_readonly("database", &Project::database)
       .def("Close", &Project::Close)
-      .def("CreateNewProject", &Project::CreateNewProject)
-      .def("OpenProjectFromFile", &Project::OpenProjectFromFile)
+      .def("CreateNewProject", [](Project &__inst, std::string database_file, std::string project_directory, std::string project_name) {
+          wxString wanted_database_file = database_file;
+          return __inst.CreateNewProject(wanted_database_file, project_directory, project_name);
+      })
+      .def("OpenProjectFromFile", [](Project &__inst, std::string database_file) {
+         wxString wanted_database_file = database_file;
+         return __inst.OpenProjectFromFile(wanted_database_file);
+      })   
       .def("ReadMasterSettings", &Project::ReadMasterSettings)
       .def("WriteProjectStatisticsToDatabase", &Project::WriteProjectStatisticsToDatabase);  
 
