@@ -25,6 +25,16 @@ PYBIND11_MODULE(pycistem, m)
            Image
     )pbdoc";
 
+
+  m.def("GetMRCDetails", [](const char* filename) {
+    int x_size;
+    int y_size;
+    int number_of_images;
+    auto __ret = GetMRCDetails(filename, x_size, y_size, number_of_images);
+    return std::make_tuple(__ret, x_size, y_size, number_of_images);
+  }, "A function which details an mrc?");
+
+
   py::class_<Database> database(m, "Database");
   database
       .def(py::init<>())
