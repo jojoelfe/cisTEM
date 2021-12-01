@@ -35,6 +35,8 @@ class MyMovieAssetPanel : public MyAssetPanelParent
 		bool ReturnAssetProteinIsWhite(long wanted_asset);
 		int ReturnAssetEerFramesPerImage(long wanted_asset);
 		int ReturnAssetEerSuperResFactor(long wanted_asset);
+		int ReturnAssetPositionInStack(long wanted_asset);
+		int ReturnAssetNumberOfFrames(long wanted_asset);
 		int ReturnAssetID(long wanted_asset);
 		wxString ReturnAssetGainFilename(long wanted_asset);
 		wxString ReturnAssetDarkFilename(long wanted_asset);

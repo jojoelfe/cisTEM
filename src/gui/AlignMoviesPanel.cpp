@@ -677,6 +677,8 @@ void MyAlignMoviesPanel::StartAlignmentClick( wxCommandEvent& event )
 		}
 
 		current_filename = movie_asset_panel->ReturnAssetLongFilename(active_group.members[counter]).ToStdString();
+		first_frame = movie_asset_panel->ReturnAssetPositionInStack(active_group.members[counter]);
+		last_frame = (movie_asset_panel->ReturnAssetPositionInStack(active_group.members[counter]) + movie_asset_panel->ReturnAssetNumberOfFrames(active_group.members[counter])) -1 ;
 		current_pixel_size = movie_asset_panel->ReturnAssetPixelSize(active_group.members[counter]);
 		current_acceleration_voltage = movie_asset_panel->ReturnAssetAccelerationVoltage(active_group.members[counter]);
 		current_dose_per_frame = movie_asset_panel->ReturnAssetDosePerFrame(active_group.members[counter]);

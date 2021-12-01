@@ -309,6 +309,7 @@ void MyMovieAssetPanel::FillAssetSpecificContentsList()
 		ContentsListBox->InsertColumn(16,"Particles are white?", wxLIST_FORMAT_LEFT, wxLIST_AUTOSIZE_USEHEADER );
 		ContentsListBox->InsertColumn(17,"EER frames per image", wxLIST_FORMAT_LEFT, wxLIST_AUTOSIZE_USEHEADER );
 		ContentsListBox->InsertColumn(18,"EER super res factor", wxLIST_FORMAT_LEFT, wxLIST_AUTOSIZE_USEHEADER );
+		ContentsListBox->InsertColumn(19,"Position in stack", wxLIST_FORMAT_LEFT, wxLIST_AUTOSIZE_USEHEADER );
 
 /*
 		for (long counter = 0; counter < all_groups_list->groups[selected_group].number_of_members; counter++)
@@ -381,6 +382,8 @@ wxString MyMovieAssetPanel::ReturnItemText(long item, long column) const
 			return wxString::Format(wxT("%i"), all_assets_list->ReturnMovieAssetPointer(all_groups_list->ReturnGroupMember(selected_group, item))->eer_frames_per_image);
 		case 18:
 			return wxString::Format(wxT("%i"), all_assets_list->ReturnMovieAssetPointer(all_groups_list->ReturnGroupMember(selected_group, item))->eer_super_res_factor);
+		case 19:
+			return wxString::Format(wxT("%i"), all_assets_list->ReturnMovieAssetPointer(all_groups_list->ReturnGroupMember(selected_group, item))->position_in_stack);
 		default :
 	       MyPrintWithDetails("Error, asking for column (%li) which does not exist", column);
 	       return "";
@@ -446,6 +449,16 @@ int MyMovieAssetPanel::ReturnAssetEerFramesPerImage(long wanted_asset)
 int MyMovieAssetPanel::ReturnAssetEerSuperResFactor(long wanted_asset)
 {
 	return all_assets_list->ReturnMovieAssetPointer(wanted_asset)->eer_super_res_factor;
+}
+
+int MyMovieAssetPanel::ReturnAssetPositionInStack(long wanted_asset)
+{
+	return all_assets_list->ReturnMovieAssetPointer(wanted_asset)->position_in_stack;
+}
+
+int MyMovieAssetPanel::ReturnAssetNumberOfFrames(long wanted_asset)
+{
+	return all_assets_list->ReturnMovieAssetPointer(wanted_asset)->number_of_frames;
 }
 
 int MyMovieAssetPanel::ReturnAssetID(long wanted_asset)
