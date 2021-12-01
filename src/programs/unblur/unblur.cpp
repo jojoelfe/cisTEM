@@ -359,6 +359,7 @@ bool UnBlurApp::DoCalculation()
 		SendError(wxString::Format("(%s) Specified last frame is greater than total number of frames.. using last frame instead.",input_filename));
 		last_frame = number_of_input_images;
 	}
+	number_of_input_images = (last_frame-first_frame)+1;
 
 	long slice_byte_size;
 
@@ -460,7 +461,7 @@ bool UnBlurApp::DoCalculation()
 		for (image_counter = first_frame_to_preprocess; image_counter <= last_frame_to_preprocess; image_counter++)
 		{
 			// Read from disk
-			image_stack[image_counter - 1].ReadSlice(&input_file,image_counter);
+			image_stack[image_counter - 1].ReadSlice(&input_file,image_counter - 1 + first_frame);
 		}
 
 		#pragma omp parallel for default(shared) num_threads(max_threads) private(image_counter)
@@ -501,7 +502,7 @@ bool UnBlurApp::DoCalculation()
 
 		// FT
 		image_stack[image_counter - 1].ForwardFFT(true);
-		image_stack[image_counter - 1].ZeroCentralPixel();
+		// image_stack[image_counter - 1].ZeroCentralPixel();
 
 		// Resize the FT (binning)
 		if (output_binning_factor > 1.0001)
@@ -642,7 +643,7 @@ bool UnBlurApp::DoCalculation()
 		}
 
 
-		for (image_counter = first_frame - 1; image_counter < last_frame; image_counter++)
+		for (image_counter = 0; image_counter < number_of_input_images; image_counter++)
 		{
 			if (write_out_amplitude_spectrum == true)
 			{
@@ -666,7 +667,7 @@ bool UnBlurApp::DoCalculation()
 		ZeroFloatArray(thread_dose_filter_sum_of_squares, image_stack[0].real_memory_allocated/2);
 
 		#pragma omp for
-		for (image_counter = first_frame - 1; image_counter < last_frame; image_counter++)
+		for (image_counter = 0; image_counter < number_of_input_images; image_counter++)
 		{
 			my_electron_dose->CalculateDoseFilterAs1DArray(&image_stack[image_counter], dose_filter, (image_counter * exposure_per_frame) + pre_exposure_amount, ((image_counter + 1) * exposure_per_frame) + pre_exposure_amount);
 
@@ -699,7 +700,7 @@ bool UnBlurApp::DoCalculation()
 
 		} // end omp section
 
-		for (image_counter = first_frame - 1; image_counter < last_frame; image_counter++)
+		for (image_counter = 0; image_counter < number_of_input_images; image_counter++)
 		{
 			sum_image.AddImage(&image_stack[image_counter]);
 
@@ -711,7 +712,7 @@ bool UnBlurApp::DoCalculation()
 	}
 	else // just add them
 	{
-		for (image_counter = first_frame - 1; image_counter < last_frame; image_counter++)
+		for (image_counter = 0; image_counter < number_of_input_images; image_counter++)
 		{
 			sum_image.AddImage(&image_stack[image_counter]);
 
