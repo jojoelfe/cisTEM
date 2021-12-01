@@ -451,6 +451,16 @@ int MyMovieAssetPanel::ReturnAssetEerSuperResFactor(long wanted_asset)
 	return all_assets_list->ReturnMovieAssetPointer(wanted_asset)->eer_super_res_factor;
 }
 
+int MyMovieAssetPanel::ReturnAssetPositionInStack(long wanted_asset)
+{
+	return all_assets_list->ReturnMovieAssetPointer(wanted_asset)->position_in_stack;
+}
+
+int MyMovieAssetPanel::ReturnAssetNumberOfFrames(long wanted_asset)
+{
+	return all_assets_list->ReturnMovieAssetPointer(wanted_asset)->number_of_frames;
+}
+
 int MyMovieAssetPanel::ReturnAssetID(long wanted_asset)
 {
 	return all_assets_list->ReturnMovieAssetPointer(wanted_asset)->asset_id;

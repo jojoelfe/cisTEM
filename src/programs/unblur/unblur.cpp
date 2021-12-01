@@ -328,6 +328,7 @@ bool UnBlurApp::DoCalculation()
 	else
 	{
 		wxPrintf("Input file looks OK, proceeding\n");
+		
 	}
 	//MRCFile output_file(output_filename, true); changed to quick and dirty write as the file is only used once, and this way it is not created until it is actually written, which is cleaner for cancelled / crashed jobs
 
@@ -359,8 +360,11 @@ bool UnBlurApp::DoCalculation()
 		SendError(wxString::Format("(%s) Specified last frame is greater than total number of frames.. using last frame instead.",input_filename));
 		last_frame = number_of_input_images;
 	}
+	number_of_input_images = (last_frame-first_frame)+1;
+	wxPrintf("Values: %i, %i, %ld \n",first_frame, last_frame, number_of_input_images);
 
 	long slice_byte_size;
+	
 
 	Image *unbinned_image_stack; // We will allocate this later depending on if we are binning or not.
 	Image *cropped_image_stack;
@@ -448,10 +452,9 @@ bool UnBlurApp::DoCalculation()
 
 
 	// read in frames, non threaded..
-	number_of_input_images = (last_frame-first_frame)+1;
 	number_of_preprocess_blocks = int(ceilf(float(number_of_input_images) / float(max_threads)));
 
-	first_frame_to_preprocess = first_frame;
+	first_frame_to_preprocess = 1;
 	last_frame_to_preprocess = max_threads;
 	total_processed = 0;
 
@@ -461,7 +464,8 @@ bool UnBlurApp::DoCalculation()
 		for (image_counter = first_frame_to_preprocess; image_counter <= last_frame_to_preprocess; image_counter++)
 		{
 			// Read from disk
-			image_stack[image_counter - 1].ReadSlice(&input_file,image_counter);
+			image_stack[image_counter - 1].ReadSlice(&input_file,image_counter - 1 + first_frame);
+			wxPrintf("Reading frame %ld into slot %ld\n", image_counter - 1 + first_frame, image_counter - 1);
 		}
 
 		#pragma omp parallel for default(shared) num_threads(max_threads) private(image_counter)
@@ -524,7 +528,7 @@ bool UnBlurApp::DoCalculation()
 	input_file.CloseFile();
 
 	read_frames_finish = wxDateTime::Now();
-
+	wxPrintf("Read %i slices: %i by %i\n", image_counter, image_stack->logical_x_dimension, image_stack->logical_y_dimension);
 	// if we are binning - choose a binning factor..
 
 	pre_binning_factor = int(myround(5. / output_pixel_size));
