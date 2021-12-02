@@ -35,6 +35,161 @@ PYBIND11_MODULE(pycistem, m)
   }, "A function which details an mrc?");
 
 
+    py::class_<Asset> asset(m, "Asset");
+    asset
+      .def(py::init<>())
+      .def("ReturnFullPathString", &Asset::ReturnFullPathString)
+      .def("ReturnShortNameString", &Asset::ReturnShortNameString);
+    
+    py::class_<MovieAsset> movieasset(m, "MovieAsset");
+    movieasset
+      .def(py::init<>())
+      .def(py::init<wxString>())
+      .def("Update", &MovieAsset::Update)
+      .def("CopyFrom", &MovieAsset::CopyFrom);
+    
+    py::class_<MovieMetadataAsset> moviemetadataasset(m, "MovieMetadataAsset");
+    moviemetadataasset
+      .def(py::init<>());
+    
+    py::class_<ImageAsset> imageasset(m, "ImageAsset");
+    imageasset
+      .def(py::init<>())
+      .def(py::init<wxString>())
+      .def("Update", &ImageAsset::Update)
+      .def("CopyFrom", &ImageAsset::CopyFrom);
+    
+    py::class_<ParticlePositionAsset> particlepositionasset(m, "ParticlePositionAsset");
+    particlepositionasset
+      .def(py::init<>())
+      .def(py::init<float,float>())
+      .def("Reset", &ParticlePositionAsset::Reset)
+      .def("CopyFrom", &ParticlePositionAsset::CopyFrom);
+    
+    py::class_<VolumeAsset> volumeasset(m, "VolumeAsset");
+    volumeasset
+      .def(py::init<>())
+      .def(py::init<wxString>())
+      .def("Update", &VolumeAsset::Update)
+      .def("CopyFrom", &VolumeAsset::CopyFrom);
+    
+    py::class_<AtomicCoordinatesAsset> atomiccoordinatesasset(m, "AtomicCoordinatesAsset");
+    atomiccoordinatesasset
+      .def(py::init<>())
+      .def(py::init<wxString>())
+      .def("Update", &AtomicCoordinatesAsset::Update)
+      .def("CopyFrom", &AtomicCoordinatesAsset::CopyFrom);
+    
+    py::class_<AssetList> assetlist(m, "AssetList");
+    assetlist
+      .def(py::init<>())
+      .def("AddAsset", &AssetList::AddAsset)
+      .def("RemoveAsset", &AssetList::RemoveAsset)
+      .def("RemoveAll", &AssetList::RemoveAll)
+      .def("CheckMemory", &AssetList::CheckMemory)
+      .def("ReturnAssetPointer", &AssetList::ReturnAssetPointer)
+      .def("ReturnMovieAssetPointer", &AssetList::ReturnMovieAssetPointer)
+      .def("ReturnImageAssetPointer", &AssetList::ReturnImageAssetPointer)
+      .def("ReturnParticlePositionAssetPointer", &AssetList::ReturnParticlePositionAssetPointer)
+      .def("ReturnVolumeAssetPointer", &AssetList::ReturnVolumeAssetPointer)
+      .def("ReturnAtomicCoordinatesAssetPointer", &AssetList::ReturnAtomicCoordinatesAssetPointer)
+      .def("ReturnAssetID", &AssetList::ReturnAssetID)
+      .def("ReturnParentAssetID", &AssetList::ReturnParentAssetID)
+      .def("ReturnAssetName", &AssetList::ReturnAssetName)
+      .def("ReturnArrayPositionFromID", &AssetList::ReturnArrayPositionFromID)
+      .def("ReturnArrayPositionFromParentID", &AssetList::ReturnArrayPositionFromParentID)
+      .def("ReturnAssetFullFilename", &AssetList::ReturnAssetFullFilename)
+      .def("ReturnNumberOfAssets", &AssetList::ReturnNumberOfAssets);
+    
+    py::class_<MovieAssetList> movieassetlist(m, "MovieAssetList");
+    movieassetlist
+      .def(py::init<>())
+      .def("ReturnAssetPointer", &MovieAssetList::ReturnAssetPointer)
+      .def("ReturnMovieAssetPointer", &MovieAssetList::ReturnMovieAssetPointer)
+      .def("ReturnAssetID", &MovieAssetList::ReturnAssetID)
+      .def("ReturnParentAssetID", &MovieAssetList::ReturnParentAssetID)
+      .def("ReturnAssetName", &MovieAssetList::ReturnAssetName)
+      .def("ReturnArrayPositionFromID", &MovieAssetList::ReturnArrayPositionFromID)
+      .def("ReturnArrayPositionFromParentID", &MovieAssetList::ReturnArrayPositionFromParentID)
+      .def("ReturnAssetFullFilename", &MovieAssetList::ReturnAssetFullFilename)
+      .def("AddAsset", &MovieAssetList::AddAsset)
+      .def("RemoveAsset", &MovieAssetList::RemoveAsset)
+      .def("RemoveAll", &MovieAssetList::RemoveAll)
+      .def("FindFile", &MovieAssetList::FindFile)
+      .def("CheckMemory", &MovieAssetList::CheckMemory);
+    
+    py::class_<ImageAssetList> imageassetlist(m, "ImageAssetList");
+    imageassetlist
+      .def(py::init<>())
+      .def("ReturnAssetPointer", &ImageAssetList::ReturnAssetPointer)
+      .def("ReturnImageAssetPointer", &ImageAssetList::ReturnImageAssetPointer)
+      .def("ReturnAssetID", &ImageAssetList::ReturnAssetID)
+      .def("ReturnParentAssetID", &ImageAssetList::ReturnParentAssetID)
+      .def("ReturnAssetName", &ImageAssetList::ReturnAssetName)
+      .def("ReturnArrayPositionFromID", &ImageAssetList::ReturnArrayPositionFromID)
+      .def("ReturnArrayPositionFromParentID", &ImageAssetList::ReturnArrayPositionFromParentID)
+      .def("ReturnAssetFullFilename", &ImageAssetList::ReturnAssetFullFilename)
+      .def("AddAsset", &ImageAssetList::AddAsset)
+      .def("RemoveAsset", &ImageAssetList::RemoveAsset)
+      .def("RemoveAll", &ImageAssetList::RemoveAll)
+      .def("FindFile", &ImageAssetList::FindFile)
+      .def("CheckMemory", &ImageAssetList::CheckMemory);
+    
+    py::class_<ParticlePositionAssetList> particlepositionassetlist(m, "ParticlePositionAssetList");
+    particlepositionassetlist
+      .def(py::init<>())
+      .def("ReturnAssetPointer", &ParticlePositionAssetList::ReturnAssetPointer)
+      .def("ReturnParticlePositionAssetPointer", &ParticlePositionAssetList::ReturnParticlePositionAssetPointer)
+      .def("ReturnAssetID", &ParticlePositionAssetList::ReturnAssetID)
+      .def("ReturnParentAssetID", &ParticlePositionAssetList::ReturnParentAssetID)
+      .def("ReturnAssetName", &ParticlePositionAssetList::ReturnAssetName)
+      .def("ReturnAssetFullFilename", &ParticlePositionAssetList::ReturnAssetFullFilename)
+      .def("ReturnArrayPositionFromID", &ParticlePositionAssetList::ReturnArrayPositionFromID)
+      .def("ReturnArrayPositionFromParentID", &ParticlePositionAssetList::ReturnArrayPositionFromParentID)
+      .def("AddAsset", &ParticlePositionAssetList::AddAsset)
+      .def("RemoveAsset", &ParticlePositionAssetList::RemoveAsset)
+      .def("RemoveAssetsWithGivenParentImageID", &ParticlePositionAssetList::RemoveAssetsWithGivenParentImageID)
+      .def("RemoveAll", &ParticlePositionAssetList::RemoveAll)
+      .def("CheckMemory", &ParticlePositionAssetList::CheckMemory);
+    
+    py::class_<VolumeAssetList> volumeassetlist(m, "VolumeAssetList");
+    volumeassetlist
+      .def(py::init<>())
+      .def("ReturnAssetPointer", &VolumeAssetList::ReturnAssetPointer)
+      .def("ReturnVolumeAssetPointer", &VolumeAssetList::ReturnVolumeAssetPointer)
+      .def("ReturnAssetID", &VolumeAssetList::ReturnAssetID)
+      .def("ReturnParentAssetID", &VolumeAssetList::ReturnParentAssetID)
+      .def("ReturnAssetName", &VolumeAssetList::ReturnAssetName)
+      .def("ReturnArrayPositionFromID", &VolumeAssetList::ReturnArrayPositionFromID)
+      .def("ReturnArrayPositionFromParentID", &VolumeAssetList::ReturnArrayPositionFromParentID)
+      .def("ReturnAssetFullFilename", &VolumeAssetList::ReturnAssetFullFilename)
+      .def("AddAsset", &VolumeAssetList::AddAsset)
+      .def("RemoveAsset", &VolumeAssetList::RemoveAsset)
+      .def("RemoveAll", &VolumeAssetList::RemoveAll)
+      .def("FindFile", &VolumeAssetList::FindFile)
+      .def("CheckMemory", &VolumeAssetList::CheckMemory);
+    
+    py::class_<AtomicCoordinatesAssetList> atomiccoordinatesassetlist(m, "AtomicCoordinatesAssetList");
+    atomiccoordinatesassetlist
+      .def(py::init<>())
+      .def("ReturnAssetPointer", &AtomicCoordinatesAssetList::ReturnAssetPointer)
+      .def("ReturnAtomicCoordinatesAssetPointer", &AtomicCoordinatesAssetList::ReturnAtomicCoordinatesAssetPointer)
+      .def("ReturnAssetID", &AtomicCoordinatesAssetList::ReturnAssetID)
+      .def("ReturnParentAssetID", &AtomicCoordinatesAssetList::ReturnParentAssetID)
+      .def("ReturnAssetName", &AtomicCoordinatesAssetList::ReturnAssetName)
+      .def("ReturnArrayPositionFromID", &AtomicCoordinatesAssetList::ReturnArrayPositionFromID)
+      .def("ReturnArrayPositionFromParentID", &AtomicCoordinatesAssetList::ReturnArrayPositionFromParentID)
+      .def("ReturnAssetFullFilename", &AtomicCoordinatesAssetList::ReturnAssetFullFilename)
+      .def("AddAsset", &AtomicCoordinatesAssetList::AddAsset)
+      .def("RemoveAsset", &AtomicCoordinatesAssetList::RemoveAsset)
+      .def("RemoveAll", &AtomicCoordinatesAssetList::RemoveAll)
+      .def("FindFile", &AtomicCoordinatesAssetList::FindFile)
+      .def("CheckMemory", &AtomicCoordinatesAssetList::CheckMemory);
+    
+
+    return m.ptr();
+  }
+
   py::class_<Database> database(m, "Database");
   database
       .def(py::init<>())
