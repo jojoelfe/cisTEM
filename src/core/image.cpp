@@ -5686,59 +5686,6 @@ void Image::BinariseInverse(float threshold_value)
 	}
 }
 
-void Image::CropOutDarkAreas(float sigma_for_filter, float threshold_percentile) {
-	MyDebugAssertTrue(is_in_memory, "Memory not allocated");
-	MyDebugAssertTrue(is_in_real_space, "Not in real space");
-	Image temp_image;
-	temp_image.CopyFrom(this);
-	temp_image.ForwardFFT();
-	temp_image.GaussianLowPassFilter(sigma_for_filter);
-	temp_image.BackwardFFT();
-	temp_image.QuickAndDirtyWriteSlice("/tmp/gauss.mrc",1);
-
-	temp_image.Binarise(threshold_percentile*temp_image.ReturnMaximumValue());
-	temp_image.QuickAndDirtyWriteSlice("/tmp/bin.mrc",1);
-	int k,j,i;
-	int min_x, min_y, max_x, max_y;
-	min_x = logical_x_dimension;
-	min_y = logical_y_dimension;
-	max_x = 0;
-	max_y = 0;
-	long address = 0;
-	for (k = 0; k < logical_z_dimension; k++)
-	{
-		for (j = 0; j < logical_y_dimension; j++)
-		{
-			for (i = 0; i < logical_x_dimension; i++)
-			{
-				if (temp_image.real_values[address] > 0.5) {
-					if (i < min_x) min_x = i;
-					if (j < min_y) min_y = j;
-					if (i > max_x) max_x = i;
-					if (j > max_y) max_y = j;
-				}
-				address++;
-			}
-			address += padding_jump_value;
-		}
-	}
-	if (min_x > max_x or min_y > max_y) {
-		MyDebugPrint("No bright areas");
-		return;
-	}
-	int wanted_x_dimension = (max_x - min_x) + 1;
-	int wanted_y_dimension = (max_y - min_y) + 1;
-
-	// I think for ClipInto I need the coordinate of the center, where (0,0,0) is defined as the center.
-	int center_x = logical_x_dimension / 2 - (max_x + min_x) / 2;
-	int center_y = logical_y_dimension / 2 - (max_y + min_y) / 2;
-	Image temp_image2;
-	temp_image2.Allocate(wanted_x_dimension, wanted_y_dimension, logical_z_dimension, true);
-	ClipInto(&temp_image2, 0.0f, false, 1.0f, center_x, center_y);
-
-	Consume(&temp_image2);
-}
-
 std::tuple<int,int> Image::CropAndAddGaussianNoiseToDarkAreas(float sigma_for_filter, float threshold_percentile, bool calc_sigma_mean, float sigma_for_noise, float mean_for_noise)
 {
 	MyDebugAssertTrue(is_in_memory, "Memory not allocated");
