@@ -452,10 +452,10 @@ bool UnBlurApp::DoCalculation()
 
 
 	// read in frames, non threaded..
-	number_of_input_images = (last_frame-first_frame)+1;
+
 	number_of_preprocess_blocks = int(ceilf(float(number_of_input_images) / float(max_threads)));
 
-	first_frame_to_preprocess = first_frame;
+	first_frame_to_preprocess = 1;
 	last_frame_to_preprocess = max_threads;
 	total_processed = 0;
 
@@ -516,7 +516,7 @@ bool UnBlurApp::DoCalculation()
 		// FT
 		profile_timing.start("forward FFT");
 		image_stack[image_counter - 1].ForwardFFT(true);
-		// image_stack[image_counter - 1].ZeroCentralPixel();
+		image_stack[image_counter - 1].ZeroCentralPixel();
 		profile_timing.lap("forward FFT");
 
 
@@ -547,7 +547,7 @@ bool UnBlurApp::DoCalculation()
 	pre_binning_factor = int(myround(5. / output_pixel_size));
 	if (pre_binning_factor < 1) pre_binning_factor = 1;
 
-	wxPrintf("Prebinning factor = %i\n", pre_binning_factor);
+//	wxPrintf("Prebinning factor = %i\n", pre_binning_factor);
 
 	// if we are going to be binning, we need to allocate the unbinned array..
 
@@ -680,7 +680,7 @@ bool UnBlurApp::DoCalculation()
 			sum_image_no_dose_filter.SetToConstant(0.0);
 
 
-		for (image_counter = 0; image_counter < number_of_input_images; image_counter++)
+		for (image_counter = first_frame - 1; image_counter < last_frame; image_counter++)
 		{
 			if (write_out_amplitude_spectrum == true)
 			{
@@ -710,7 +710,7 @@ bool UnBlurApp::DoCalculation()
 		shared_ptr->lap("setup dose filter");
 
 		#pragma omp for
-		for (image_counter = 0; image_counter < number_of_input_images; image_counter++)
+		for (image_counter = first_frame - 1; image_counter < last_frame; image_counter++)
 		{
 			shared_ptr->start("calc dose filter");
 			my_electron_dose->CalculateDoseFilterAs1DArray(&image_stack[image_counter], dose_filter, (image_counter * exposure_per_frame) + pre_exposure_amount, ((image_counter + 1) * exposure_per_frame) + pre_exposure_amount);
@@ -747,7 +747,7 @@ bool UnBlurApp::DoCalculation()
 		} // end omp section
 		profile_timing.start("final sum");
 
-		for (image_counter = 0; image_counter < number_of_input_images; image_counter++)
+		for (image_counter = first_frame - 1; image_counter < last_frame; image_counter++)
 		{
 			sum_image.AddImage(&image_stack[image_counter]);
 
@@ -761,7 +761,8 @@ bool UnBlurApp::DoCalculation()
 	else // just add them
 	{
 		profile_timing.start("final sum");
-		for (image_counter = 0; image_counter < number_of_input_images; image_counter++)
+
+		for (image_counter = first_frame - 1; image_counter < last_frame; image_counter++)
 		{
 			sum_image.AddImage(&image_stack[image_counter]);
 
