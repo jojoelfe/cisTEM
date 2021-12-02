@@ -439,7 +439,6 @@ public:
 	void SetMinimumAndMaximumValues( float new_minimum_value, float new_maximum_value);
 	void Binarise(float threshold_value);
 	void BinariseInverse(float threshold_value);
-	void CropOutDarkAreas(float sigma_for_filter = 0.01, float threshold_percentile=0.1);
 	std::tuple<int, int> CropAndAddGaussianNoiseToDarkAreas(float sigma_for_filter = 0.01, float threshold_percentile = 0.1, bool calc_sigma_mean = true, float sigma_for_noise = 1.0, float mean_for_noise = 0.0);
 
 
