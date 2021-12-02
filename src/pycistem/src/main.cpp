@@ -80,26 +80,7 @@ PYBIND11_MODULE(pycistem, m)
       .def("Update", &AtomicCoordinatesAsset::Update)
       .def("CopyFrom", &AtomicCoordinatesAsset::CopyFrom);
     
-    py::class_<AssetList> assetlist(m, "AssetList");
-    assetlist
-      .def(py::init<>())
-      .def("AddAsset", &AssetList::AddAsset)
-      .def("RemoveAsset", &AssetList::RemoveAsset)
-      .def("RemoveAll", &AssetList::RemoveAll)
-      .def("CheckMemory", &AssetList::CheckMemory)
-      .def("ReturnAssetPointer", &AssetList::ReturnAssetPointer)
-      .def("ReturnMovieAssetPointer", &AssetList::ReturnMovieAssetPointer)
-      .def("ReturnImageAssetPointer", &AssetList::ReturnImageAssetPointer)
-      .def("ReturnParticlePositionAssetPointer", &AssetList::ReturnParticlePositionAssetPointer)
-      .def("ReturnVolumeAssetPointer", &AssetList::ReturnVolumeAssetPointer)
-      .def("ReturnAtomicCoordinatesAssetPointer", &AssetList::ReturnAtomicCoordinatesAssetPointer)
-      .def("ReturnAssetID", &AssetList::ReturnAssetID)
-      .def("ReturnParentAssetID", &AssetList::ReturnParentAssetID)
-      .def("ReturnAssetName", &AssetList::ReturnAssetName)
-      .def("ReturnArrayPositionFromID", &AssetList::ReturnArrayPositionFromID)
-      .def("ReturnArrayPositionFromParentID", &AssetList::ReturnArrayPositionFromParentID)
-      .def("ReturnAssetFullFilename", &AssetList::ReturnAssetFullFilename)
-      .def("ReturnNumberOfAssets", &AssetList::ReturnNumberOfAssets);
+    
     
     py::class_<MovieAssetList> movieassetlist(m, "MovieAssetList");
     movieassetlist
@@ -187,8 +168,7 @@ PYBIND11_MODULE(pycistem, m)
       .def("CheckMemory", &AtomicCoordinatesAssetList::CheckMemory);
     
 
-    return m.ptr();
-  }
+ 
 
   py::class_<Database> database(m, "Database");
   database
