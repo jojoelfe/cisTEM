@@ -1,7 +1,5 @@
 #include "../../core/core_headers.h"
-#include "../../../include/gemmi/cif.hpp"
 
-namespace cif = gemmi::cif;
 
 class
 MakeParticleStack : public MyApp
@@ -204,7 +202,7 @@ bool MakeParticleStack::DoCalculation()
 	// assume square
 
 	current_particle.Allocate(box_size, box_size, true);
-    std::vector<std::string> scaled_mip_score;
+
 	// loop until the found peak is below the threshold
 
 	wxPrintf("\n");
@@ -298,7 +296,6 @@ bool MakeParticleStack::DoCalculation()
 		output_parameters.image_is_active = 1;
 		output_parameters.stack_filename = output_particle_stack_filename;
 		output_parameters.original_image_filename = input_image_filename;
-		scaled_mip_score.push_back(std::to_string(current_peak.value));
 
 		output_star_file.all_parameters[number_of_peaks_found] = output_parameters;
 
@@ -319,26 +316,6 @@ bool MakeParticleStack::DoCalculation()
 	}
 
 	output_star_file.WriteTocisTEMStarFile(output_star_filename, -1, -1, 1, number_of_peaks_found);
-
-	cif::Document starfile = cif::read_file(output_star_filename.ToStdString());
-	cif::Block& block = starfile.sole_block();
-	cif::Item& item = block.items[0];
-	item.loop.tags.push_back(std::string("_cisTEMtmMIPscore"));
-	int tagsize = item.loop.tags.size(); 
-	wxPrintf("Hello %4i\n", tagsize);
-	
-	for (int index = 0, size = scaled_mip_score.size(); index < size; ++index)
-	{
-		item.loop.values.insert(item.loop.values.begin() + index*tagsize - 1, scaled_mip_score[index]);
-	}
-	for (int index = 0, size = item.loop.values.size(); index < size; ++index)
-	{
-		wxPrintf("one");
-
-		wxPrintf("d %s\n",item.loop.values[index]);
-	}
-
-	
 
 	if (is_running_locally == true)
 	{
