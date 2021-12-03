@@ -16,17 +16,17 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Cache wx
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-wx
-        with:
-          # npm cache files are stored in `~/.npm` on Linux/macOS
-          path: ~/wx
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('~/wx/') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-wx
+      with:
+        # npm cache files are stored in `~/.npm` on Linux/macOS
+        path: ~/wx
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('~/wx/') }}
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.cache-name }}-
+          ${{ runner.os }}-build-
+          ${{ runner.os }}-
     - name: Install Intel
       run: |
         sudo rpm --import https://yum.repos.intel.com/2019/setup/RPM-GPG-KEY-intel-psxe-runtime-2019
