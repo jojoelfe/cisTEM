@@ -9,7 +9,7 @@ on:
 jobs:
   build:
 
-    runs-on: centos6
+    runs-on: ubuntu-18.04
 
 
 
@@ -29,11 +29,18 @@ jobs:
           ${{ runner.os }}-
     - name: Install Intel
       run: |
-        sudo rpm --import https://yum.repos.intel.com/2019/setup/RPM-GPG-KEY-intel-psxe-runtime-2019
-        sudo rpm -Uhv https://yum.repos.intel.com/2019/setup/intel-psxe-runtime-2019-reposetup-1-0.noarch.rpm
-        sudo yum install intel-icc-runtime*
+        wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS-2023.PUB
+        sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS-2023.PUB
+        rm GPG-PUB-KEY-INTEL-SW-PRODUCTS-2023.PUB
+        echo "deb https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
+        sudo apt-get update
+        sudo apt-get install intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic intel-oneapi-mkl intel-oneapi-mkl-devel
+        source /opt/intel/oneapi/setvars.sh
+        printenv >> $GITHUB_ENV
+        echo "CXX=icpc" >> $GITHUB_ENV
+        echo "CC=icc" >> $GITHUB_ENV
     - name: configure
-      run:  CC=icc CXX=icpc ./configure  --enable-experimental --enable-staticmode --enable-openmp  --with-wx-config=${wx_dir}INTEL/bin/wx-config
+      run:  CC=icc CXX=icpc ./configure  --enable-experimental --enable-staticmode --enable-openmp  --with-wx-config=~/wx/bin/wx-config
     - name: make
       run: make
     
