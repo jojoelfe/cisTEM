@@ -39,6 +39,8 @@ jobs:
         printenv >> $GITHUB_ENV
         echo "CXX=icpc" >> $GITHUB_ENV
         echo "CC=icc" >> $GITHUB_ENV
+    - name: regenerate_project
+      run: ./regenerate_project.b
     - name: configure
       run:  CC=icc CXX=icpc ./configure  --enable-experimental --enable-staticmode --enable-openmp  --with-wx-config=~/wx/bin/wx-config
     - name: make
