@@ -868,6 +868,17 @@ bool UnBlurApp::DoCalculation()
 
 	//  Shall we write out a scaled image?
 
+	sum_image.BackwardFFT();
+	std::tuple<int, int> crop_location = sum_image.CropAndAddGaussianNoiseToDarkAreas();
+	float temp_float2[2];
+
+	NumericTextFile crop_output_file(output_filename+".crop", OPEN_TO_WRITE, 2);
+	
+	temp_float2[0] = std::get<0>(crop_location);
+	temp_float2[1] = std::get<1>(crop_location);
+
+	crop_output_file.WriteLine(temp_float2);
+
 	if (write_out_small_sum_image == true)
 	{
 		profile_timing.start("write out small sum image");
@@ -888,16 +899,7 @@ bool UnBlurApp::DoCalculation()
 	// now we just need to write out the final sum..
 	profile_timing.start("write out sum image");
 	MRCFile output_file(output_filename, true);
-	sum_image.BackwardFFT();
-	std::tuple<int, int> crop_location = sum_image.CropAndAddGaussianNoiseToDarkAreas();
-	float temp_float2[2];
-
-	NumericTextFile crop_output_file(output_filename+".crop", OPEN_TO_WRITE, 2);
 	
-		temp_float2[0] = std::get<0>(crop_location);
-		temp_float2[1] = std::get<1>(crop_location);
-
-		crop_output_file.WriteLine(temp_float2);
 	
 	sum_image.WriteSlice(&output_file, 1); // I made this change as the file is only used once, and this way it is not created until it is actually written, which is cleaner for cancelled / crashed jobs
 	output_file.SetPixelSize(output_pixel_size);
@@ -910,7 +912,8 @@ bool UnBlurApp::DoCalculation()
 	// fill the result..
 
 	profile_timing.start("fill result");
-	float *result_array = new float[number_of_input_images * 2];
+
+	float *result_array = new float[number_of_input_images * 6];
 
 	if (is_running_locally == true)
 	{
@@ -933,6 +936,10 @@ bool UnBlurApp::DoCalculation()
 		{
 			result_array[image_counter] = x_shifts[image_counter] * output_pixel_size;
 			result_array[image_counter + number_of_input_images] = y_shifts[image_counter] * output_pixel_size;
+			result_array[image_counter + 2 * number_of_input_images] = original_x;
+			result_array[image_counter + 3 * number_of_input_images] = original_y;
+			result_array[image_counter + 4 * number_of_input_images] = crop_x;
+			result_array[image_counter + 5 * number_of_input_images] = crop_y;
 		}
 	}
 
