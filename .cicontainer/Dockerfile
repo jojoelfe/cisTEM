@@ -8,7 +8,10 @@ RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
 
 ENV LANG en_US.UTF-8 
 
-RUN apt-get --allow-releaseinfo-change update && apt-get install -y gtk2.0-dev fftw3-dev git libtiff-dev 
+RUN apt-get --allow-releaseinfo-change update && apt-get install -y gtk2.0-dev fftw3-dev libtiff-dev software-properties-common 
+
+#Need newer git for Github actions
+RUN add-apt-repository ppa:git-core/ppa -y && apt-get --allow-releaseinfo-change update && apt-get install -y git
 
 RUN wget -q https://github.com/wxWidgets/wxWidgets/releases/download/v3.0.5/wxWidgets-3.0.5.tar.bz2 -O /tmp/wxwidgets.tar.bz2 && \
     echo 'Installing wxWidgets' && \
