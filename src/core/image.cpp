@@ -5686,7 +5686,7 @@ void Image::BinariseInverse(float threshold_value)
 	}
 }
 
-std::tuple<int,int> Image::CropAndAddGaussianNoiseToDarkAreas(float sigma_for_filter, float threshold_percentile, bool calc_sigma_mean, float sigma_for_noise, float mean_for_noise)
+std::tuple<int,int> Image::CropAndAddGaussianNoiseToDarkAreas(float sigma_for_filter, float threshold_percentile, float erosion_pixels, float sigma_for_soft_edge, bool calc_sigma_mean, float sigma_for_noise, float mean_for_noise)
 {
 	MyDebugAssertTrue(is_in_memory, "Memory not allocated");
 	MyDebugAssertTrue(is_in_real_space, "Not in real space");
@@ -5698,6 +5698,9 @@ std::tuple<int,int> Image::CropAndAddGaussianNoiseToDarkAreas(float sigma_for_fi
 	mask_image.QuickAndDirtyWriteSlice("/tmp/gauss.mrc",1);
 
 	mask_image.Binarise(threshold_percentile*mask_image.ReturnMaximumValue());
+	if (erosion_pixels > 0.0) {
+		mask_image.ErodeBinarizedMask(erosion_pixels);
+	}
 	mask_image.QuickAndDirtyWriteSlice("/tmp/bin.mrc",1);
 	int k,j,i;
 	int min_x, min_y, max_x, max_y;
@@ -5742,6 +5745,15 @@ std::tuple<int,int> Image::CropAndAddGaussianNoiseToDarkAreas(float sigma_for_fi
 	noise_image.MultiplyByConstant(0.0f);
 	noise_image.AddGaussianNoise(sqrtf(variance));
 	noise_image.MultiplyAddConstant(1.0,mean);
+
+	// Put soft edge on mask
+
+	mask_image.ForwardFFT();
+	mask_image.GaussianLowPassFilter(sigma_for_soft_edge);
+	mask_image.BackwardFFT();
+
+	// Apply mask to image and replace dark part with noise
+
 	MultiplyPixelWise(mask_image);
 	mask_image.MultiplyAddConstant(-1.0,1.0);
 	noise_image.MultiplyPixelWise(mask_image);
@@ -5760,7 +5772,7 @@ std::tuple<int,int> Image::CropAndAddGaussianNoiseToDarkAreas(float sigma_for_fi
 
 	Consume(&temp_image2);
 
-	return std::make_tuple(min_x,min_y);
+	return std::make_tuple(center_x,center_y);
 
 
 
