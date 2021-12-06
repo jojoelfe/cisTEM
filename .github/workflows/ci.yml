@@ -18,14 +18,12 @@ jobs:
     - uses: actions/checkout@v2
     - name: regenerate_project
       run: ./regenerate_project.b
-    - name:  config1
-      run: CXX=/opt/intel/oneapi/compiler/2021.4.0/linux/bin/intel64/icpc CC=/opt/intel/oneapi/compiler/2021.4.0/linux/bin/intel64/icc CXXFLAGS=-fPIC CFLAGS=-fPIC  ./configure  --enable-experimental --enable-staticmode --enable-openmp  --with-wx-config=wx-config && rm config.status
     - name: configure
       run: mkdir -p build/icpc && cd build/icpc && CXX=/opt/intel/oneapi/compiler/2021.4.0/linux/bin/intel64/icpc CC=/opt/intel/oneapi/compiler/2021.4.0/linux/bin/intel64/icc CXXFLAGS=-fPIC CFLAGS=-fPIC  ../../configure  --enable-experimental --enable-staticmode --enable-openmp  --with-wx-config=wx-config 
     - name: make
       run: cd build/icpc && make -j4
-    - name: Archive ressults
+    - name: Create binary artifact
       uses: actions/upload-artifact@v2
       with: 
-        name: code-coverage-report
+        name: cistem_binaries
         path: build/icpc/src
