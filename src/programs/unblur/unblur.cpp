@@ -869,7 +869,9 @@ bool UnBlurApp::DoCalculation()
 	//  Shall we write out a scaled image?
 
 	sum_image.BackwardFFT();
-	std::tuple<int, int> crop_location = sum_image.CropAndAddGaussianNoiseToDarkAreas();
+	float original_x = sum_image.logical_x_dimension;
+	float original_y = sum_image.logical_y_dimension;
+	std::tuple<int, int> crop_location = sum_image.CropAndAddGaussianNoiseToDarkAreas(0.01,0.1,20,0.01);
 	float temp_float2[2];
 
 	NumericTextFile crop_output_file(output_filename+".crop", OPEN_TO_WRITE, 2);
@@ -938,8 +940,8 @@ bool UnBlurApp::DoCalculation()
 			result_array[image_counter + number_of_input_images] = y_shifts[image_counter] * output_pixel_size;
 			result_array[image_counter + 2 * number_of_input_images] = original_x;
 			result_array[image_counter + 3 * number_of_input_images] = original_y;
-			result_array[image_counter + 4 * number_of_input_images] = crop_x;
-			result_array[image_counter + 5 * number_of_input_images] = crop_y;
+			result_array[image_counter + 4 * number_of_input_images] = temp_float2[0];
+			result_array[image_counter + 5 * number_of_input_images] = temp_float2[1];
 		}
 	}
 

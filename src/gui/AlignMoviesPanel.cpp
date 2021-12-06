@@ -1131,7 +1131,7 @@ void MyAlignMoviesPanel::WriteResultToDataBase()
 		main_frame->current_project.database.CreateTable(current_table_name, "prr", "FRAME_NUMBER", "X_SHIFT", "Y_SHIFT");
 		main_frame->current_project.database.BeginBatchInsert(current_table_name, 3, "FRAME_NUMBER", "X_SHIFT", "Y_SHIFT");
 
-		for (frame_counter = 0; frame_counter < buffered_results[counter].result_size / 2; frame_counter++)
+		for (frame_counter = 0; frame_counter < buffered_results[counter].result_size / 6; frame_counter++)
 		{
 			main_frame->current_project.database.AddToBatchInsert("irr", frame_counter + 1, buffered_results[counter].result_data[frame_counter], buffered_results[counter].result_data[frame_counter +  buffered_results[counter].result_size / 2]);
 		}
@@ -1147,7 +1147,7 @@ void MyAlignMoviesPanel::WriteResultToDataBase()
 	int number_of_frames_for_current_movie;
 	for (counter = 0; counter < my_job_tracker.total_number_of_jobs; counter++)
 	{
-		number_of_frames_for_current_movie = buffered_results[counter].result_size / 2;
+		number_of_frames_for_current_movie = buffered_results[counter].result_size / 6;
 		main_frame->current_project.database.UpdateNumberOfFramesForAMovieAsset(movie_asset_panel->ReturnAssetID(active_group.members[counter]),number_of_frames_for_current_movie);
 		movie_asset_panel->all_assets_list->ReturnMovieAssetPointer(active_group.members[counter])->number_of_frames = number_of_frames_for_current_movie;
 	}
