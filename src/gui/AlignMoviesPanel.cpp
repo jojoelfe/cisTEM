@@ -948,7 +948,7 @@ void  MyAlignMoviesPanel::ProcessResult(JobResult *result_to_process) // this wi
 	// ok the result should be x-shifts, followed by y-shifts..
 	//WriteInfoText(wxString::Format("Job #%i finished.", job_number));
 
-	number_of_frames = result_to_process->result_size / 2;
+	number_of_frames = (result_to_process->result_size - 4) / 2;
 
 
 	if (current_time - time_of_last_graph_update > 1)
@@ -1131,9 +1131,9 @@ void MyAlignMoviesPanel::WriteResultToDataBase()
 		main_frame->current_project.database.CreateTable(current_table_name, "prr", "FRAME_NUMBER", "X_SHIFT", "Y_SHIFT");
 		main_frame->current_project.database.BeginBatchInsert(current_table_name, 3, "FRAME_NUMBER", "X_SHIFT", "Y_SHIFT");
 
-		for (frame_counter = 0; frame_counter < buffered_results[counter].result_size / 6; frame_counter++)
+		for (frame_counter = 0; frame_counter < (buffered_results[counter].result_size - 4) / 2; frame_counter++)
 		{
-			main_frame->current_project.database.AddToBatchInsert("irr", frame_counter + 1, buffered_results[counter].result_data[frame_counter], buffered_results[counter].result_data[frame_counter +  buffered_results[counter].result_size / 2]);
+			main_frame->current_project.database.AddToBatchInsert("irr", frame_counter + 1, buffered_results[counter].result_data[frame_counter], buffered_results[counter].result_data[frame_counter +  (buffered_results[counter].result_size - 4) / 2]);
 		}
 
 		main_frame->current_project.database.EndBatchInsert();
@@ -1147,7 +1147,7 @@ void MyAlignMoviesPanel::WriteResultToDataBase()
 	int number_of_frames_for_current_movie;
 	for (counter = 0; counter < my_job_tracker.total_number_of_jobs; counter++)
 	{
-		number_of_frames_for_current_movie = buffered_results[counter].result_size / 6;
+		number_of_frames_for_current_movie = (buffered_results[counter].result_size - 4) / 2;
 		main_frame->current_project.database.UpdateNumberOfFramesForAMovieAsset(movie_asset_panel->ReturnAssetID(active_group.members[counter]),number_of_frames_for_current_movie);
 		movie_asset_panel->all_assets_list->ReturnMovieAssetPointer(active_group.members[counter])->number_of_frames = number_of_frames_for_current_movie;
 	}
@@ -1171,10 +1171,10 @@ void MyAlignMoviesPanel::WriteResultToDataBase()
 				// work out the corrected pixel size
 				// so the bin amount, might not be exactly the specified amount, as it is fixed by integer resizing of the image.
 
-				x_bin_factor = float(movie_asset_panel->all_assets_list->ReturnMovieAssetPointer(active_group.members[counter])->x_size) / float(temp_asset.x_size);
-				y_bin_factor = float(movie_asset_panel->all_assets_list->ReturnMovieAssetPointer(active_group.members[counter])->y_size) / float(temp_asset.y_size);
+				x_bin_factor = float(movie_asset_panel->all_assets_list->ReturnMovieAssetPointer(active_group.members[counter])->x_size) / buffered_results[counter].result_data[buffered_results[counter].result_size - 4];
+				y_bin_factor = float(movie_asset_panel->all_assets_list->ReturnMovieAssetPointer(active_group.members[counter])->y_size) / buffered_results[counter].result_data[buffered_results[counter].result_size - 3];
 				average_bin_factor = (x_bin_factor + y_bin_factor) / 2.0;
-
+				
 				corrected_pixel_size = current_job_package.jobs[counter].arguments[2].ReturnFloatArgument() * average_bin_factor;
 
 				// if we corrected a mag distortion, we have to adjust the pixel size appropriately.
@@ -1202,7 +1202,10 @@ void MyAlignMoviesPanel::WriteResultToDataBase()
 					temp_asset.spherical_aberration = movie_asset_panel->ReturnAssetSphericalAbberation(movie_asset_panel->ReturnArrayPositionFromAssetID(parent_id));
 					temp_asset.protein_is_white = movie_asset_panel->ReturnAssetProteinIsWhite(movie_asset_panel->ReturnArrayPositionFromAssetID(parent_id));
 					image_asset_panel->AddAsset(&temp_asset);
-					main_frame->current_project.database.AddNextImageAsset(temp_asset.asset_id, temp_asset.asset_name, temp_asset.filename.GetFullPath(), temp_asset.position_in_stack, temp_asset.parent_id, alignment_id, -1, temp_asset.x_size, temp_asset.y_size, temp_asset.microscope_voltage, temp_asset.pixel_size, temp_asset.spherical_aberration, temp_asset.protein_is_white);
+					main_frame->current_project.database.AddNextImageAsset(temp_asset.asset_id, temp_asset.asset_name, temp_asset.filename.GetFullPath(), temp_asset.position_in_stack, temp_asset.parent_id, alignment_id, -1, temp_asset.x_size, temp_asset.y_size, temp_asset.microscope_voltage, temp_asset.pixel_size, temp_asset.spherical_aberration, temp_asset.protein_is_white, static_cast<int>(buffered_results[counter].result_data[buffered_results[counter].result_size - 4]),
+					                                                                                                                                                                                                                                                                                                                                                                      static_cast<int>(buffered_results[counter].result_data[buffered_results[counter].result_size - 3]),
+																																																																																														  static_cast<int>(buffered_results[counter].result_data[buffered_results[counter].result_size - 2]),
+																																																																																														  static_cast<int>(buffered_results[counter].result_data[buffered_results[counter].result_size - 1]) );
 
 
 				}
