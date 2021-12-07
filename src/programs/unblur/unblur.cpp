@@ -880,7 +880,7 @@ bool UnBlurApp::DoCalculation()
 	temp_float2[1] = std::get<1>(crop_location);
 
 	crop_output_file.WriteLine(temp_float2);
-
+	sum_image.ForwardFFT();
 	if (write_out_small_sum_image == true)
 	{
 		profile_timing.start("write out small sum image");
@@ -900,6 +900,8 @@ bool UnBlurApp::DoCalculation()
 
 	// now we just need to write out the final sum..
 	profile_timing.start("write out sum image");
+
+	sum_image.BackwardFFT();
 	MRCFile output_file(output_filename, true);
 	
 	
@@ -915,7 +917,7 @@ bool UnBlurApp::DoCalculation()
 
 	profile_timing.start("fill result");
 
-	float *result_array = new float[number_of_input_images * 6];
+	float *result_array = new float[number_of_input_images * 2 + 4];
 
 	if (is_running_locally == true)
 	{
@@ -938,16 +940,19 @@ bool UnBlurApp::DoCalculation()
 		{
 			result_array[image_counter] = x_shifts[image_counter] * output_pixel_size;
 			result_array[image_counter + number_of_input_images] = y_shifts[image_counter] * output_pixel_size;
-			result_array[image_counter + 2 * number_of_input_images] = original_x;
-			result_array[image_counter + 3 * number_of_input_images] = original_y;
-			result_array[image_counter + 4 * number_of_input_images] = temp_float2[0];
-			result_array[image_counter + 5 * number_of_input_images] = temp_float2[1];
+			
 		}
+		result_array[2 * number_of_input_images ] = original_x;
+		result_array[2 * number_of_input_images + 1] = original_y;
+		result_array[2 * number_of_input_images + 2] = temp_float2[0];
+		result_array[2 * number_of_input_images + 3] = temp_float2[1];
 	}
 
-	my_result.SetResult(number_of_input_images * 2, result_array);
 	profile_timing.lap("fill result");
 	profile_timing.start("cleanup");
+
+	my_result.SetResult(number_of_input_images * 2 + 4, result_array);
+
 	delete [] result_array;
 	delete [] x_shifts;
 	delete [] y_shifts;
