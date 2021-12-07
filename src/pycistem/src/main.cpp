@@ -1,13 +1,9 @@
 #include <pybind11/pybind11.h>
+#include <pybind11/numpy.h>
 #include "../../core/core_headers.h"
 
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
-
-int add(int i, int j)
-{
-  return i + j;
-}
 
 namespace py = pybind11;
 
@@ -25,65 +21,68 @@ PYBIND11_MODULE(pycistem, m)
            Image
     )pbdoc";
 
+  // Global Functions
 
-  m.def("GetMRCDetails", [](const char* filename) {
-    int x_size;
-    int y_size;
-    int number_of_images;
-    auto __ret = GetMRCDetails(filename, x_size, y_size, number_of_images);
-    return std::make_tuple(__ret, x_size, y_size, number_of_images);
-  }, "A function which details an mrc?");
+  m.def(
+      "GetMRCDetails", [](const char *filename)
+      {
+        int x_size;
+        int y_size;
+        int number_of_images;
+        auto __ret = GetMRCDetails(filename, x_size, y_size, number_of_images);
+        return std::make_tuple(__ret, x_size, y_size, number_of_images);
+      },
+      "A function which details an mrc?");
 
+  // Asset classes
 
-    py::class_<Asset> asset(m, "Asset");
-    asset
+  py::class_<Asset> asset(m, "Asset");
+  asset
       .def(py::init<>())
       .def("ReturnFullPathString", &Asset::ReturnFullPathString)
       .def("ReturnShortNameString", &Asset::ReturnShortNameString);
-    
-    py::class_<MovieAsset> movieasset(m, "MovieAsset");
-    movieasset
+
+  py::class_<MovieAsset> movieasset(m, "MovieAsset");
+  movieasset
       .def(py::init<>())
       .def(py::init<wxString>())
       .def("Update", &MovieAsset::Update)
       .def("CopyFrom", &MovieAsset::CopyFrom);
-    
-    py::class_<MovieMetadataAsset> moviemetadataasset(m, "MovieMetadataAsset");
-    moviemetadataasset
+
+  py::class_<MovieMetadataAsset> moviemetadataasset(m, "MovieMetadataAsset");
+  moviemetadataasset
       .def(py::init<>());
-    
-    py::class_<ImageAsset> imageasset(m, "ImageAsset");
-    imageasset
+
+  py::class_<ImageAsset> imageasset(m, "ImageAsset");
+  imageasset
       .def(py::init<>())
       .def(py::init<wxString>())
       .def("Update", &ImageAsset::Update)
       .def("CopyFrom", &ImageAsset::CopyFrom);
-    
-    py::class_<ParticlePositionAsset> particlepositionasset(m, "ParticlePositionAsset");
-    particlepositionasset
+
+  py::class_<ParticlePositionAsset> particlepositionasset(m, "ParticlePositionAsset");
+  particlepositionasset
       .def(py::init<>())
-      .def(py::init<float,float>())
+      .def(py::init<float, float>())
       .def("Reset", &ParticlePositionAsset::Reset)
       .def("CopyFrom", &ParticlePositionAsset::CopyFrom);
-    
-    py::class_<VolumeAsset> volumeasset(m, "VolumeAsset");
-    volumeasset
+
+  py::class_<VolumeAsset> volumeasset(m, "VolumeAsset");
+  volumeasset
       .def(py::init<>())
       .def(py::init<wxString>())
       .def("Update", &VolumeAsset::Update)
       .def("CopyFrom", &VolumeAsset::CopyFrom);
-    
-    py::class_<AtomicCoordinatesAsset> atomiccoordinatesasset(m, "AtomicCoordinatesAsset");
-    atomiccoordinatesasset
+
+  py::class_<AtomicCoordinatesAsset> atomiccoordinatesasset(m, "AtomicCoordinatesAsset");
+  atomiccoordinatesasset
       .def(py::init<>())
       .def(py::init<wxString>())
       .def("Update", &AtomicCoordinatesAsset::Update)
       .def("CopyFrom", &AtomicCoordinatesAsset::CopyFrom);
-    
-    
-    
-    py::class_<MovieAssetList> movieassetlist(m, "MovieAssetList");
-    movieassetlist
+
+  py::class_<MovieAssetList> movieassetlist(m, "MovieAssetList");
+  movieassetlist
       .def(py::init<>())
       .def("ReturnAssetPointer", &MovieAssetList::ReturnAssetPointer)
       .def("ReturnMovieAssetPointer", &MovieAssetList::ReturnMovieAssetPointer)
@@ -98,9 +97,9 @@ PYBIND11_MODULE(pycistem, m)
       .def("RemoveAll", &MovieAssetList::RemoveAll)
       .def("FindFile", &MovieAssetList::FindFile)
       .def("CheckMemory", &MovieAssetList::CheckMemory);
-    
-    py::class_<ImageAssetList> imageassetlist(m, "ImageAssetList");
-    imageassetlist
+
+  py::class_<ImageAssetList> imageassetlist(m, "ImageAssetList");
+  imageassetlist
       .def(py::init<>())
       .def("ReturnAssetPointer", &ImageAssetList::ReturnAssetPointer)
       .def("ReturnImageAssetPointer", &ImageAssetList::ReturnImageAssetPointer)
@@ -115,9 +114,9 @@ PYBIND11_MODULE(pycistem, m)
       .def("RemoveAll", &ImageAssetList::RemoveAll)
       .def("FindFile", &ImageAssetList::FindFile)
       .def("CheckMemory", &ImageAssetList::CheckMemory);
-    
-    py::class_<ParticlePositionAssetList> particlepositionassetlist(m, "ParticlePositionAssetList");
-    particlepositionassetlist
+
+  py::class_<ParticlePositionAssetList> particlepositionassetlist(m, "ParticlePositionAssetList");
+  particlepositionassetlist
       .def(py::init<>())
       .def("ReturnAssetPointer", &ParticlePositionAssetList::ReturnAssetPointer)
       .def("ReturnParticlePositionAssetPointer", &ParticlePositionAssetList::ReturnParticlePositionAssetPointer)
@@ -132,9 +131,9 @@ PYBIND11_MODULE(pycistem, m)
       .def("RemoveAssetsWithGivenParentImageID", &ParticlePositionAssetList::RemoveAssetsWithGivenParentImageID)
       .def("RemoveAll", &ParticlePositionAssetList::RemoveAll)
       .def("CheckMemory", &ParticlePositionAssetList::CheckMemory);
-    
-    py::class_<VolumeAssetList> volumeassetlist(m, "VolumeAssetList");
-    volumeassetlist
+
+  py::class_<VolumeAssetList> volumeassetlist(m, "VolumeAssetList");
+  volumeassetlist
       .def(py::init<>())
       .def("ReturnAssetPointer", &VolumeAssetList::ReturnAssetPointer)
       .def("ReturnVolumeAssetPointer", &VolumeAssetList::ReturnVolumeAssetPointer)
@@ -149,9 +148,9 @@ PYBIND11_MODULE(pycistem, m)
       .def("RemoveAll", &VolumeAssetList::RemoveAll)
       .def("FindFile", &VolumeAssetList::FindFile)
       .def("CheckMemory", &VolumeAssetList::CheckMemory);
-    
-    py::class_<AtomicCoordinatesAssetList> atomiccoordinatesassetlist(m, "AtomicCoordinatesAssetList");
-    atomiccoordinatesassetlist
+
+  py::class_<AtomicCoordinatesAssetList> atomiccoordinatesassetlist(m, "AtomicCoordinatesAssetList");
+  atomiccoordinatesassetlist
       .def(py::init<>())
       .def("ReturnAssetPointer", &AtomicCoordinatesAssetList::ReturnAssetPointer)
       .def("ReturnAtomicCoordinatesAssetPointer", &AtomicCoordinatesAssetList::ReturnAtomicCoordinatesAssetPointer)
@@ -166,9 +165,108 @@ PYBIND11_MODULE(pycistem, m)
       .def("RemoveAll", &AtomicCoordinatesAssetList::RemoveAll)
       .def("FindFile", &AtomicCoordinatesAssetList::FindFile)
       .def("CheckMemory", &AtomicCoordinatesAssetList::CheckMemory);
+
+  // Curve
+
+
+
+  py::class_<Curve> curve(m, "Curve");
+    curve
+      .def(py::init<>())
+      .def(py::init<::Curve>())
+      /*.def("operator=", [](Curve &__inst) {
+        ::Curve other_curve;
+        auto __ret = __inst.operator=(other_curve);
+        return std::make_tuple(__ret, other_curve);
+      })*/
+      .def_property_readonly("data_x", [](Curve &__inst) {
+            //return 5;
+            py::capsule buffer_handle([](){});
+            return py::array_t<float>(
+              {__inst.number_of_points},
+              {4},
+              __inst.data_x,
+              buffer_handle
+              );
+         }
+      )
+      //.def("operator=", (Curve (Curve::*)(::Curve))&Curve::operator=)
+      .def("ResampleCurve", &Curve::ResampleCurve)
+      .def("ReturnLinearInterpolationFromI", &Curve::ReturnLinearInterpolationFromI)
+      .def("ReturnLinearInterpolationFromX", &Curve::ReturnLinearInterpolationFromX)
+      .def("ReturnValueAtXUsingLinearInterpolation", &Curve::ReturnValueAtXUsingLinearInterpolation)
+      .def("AddValueAtXUsingLinearInterpolation", &Curve::AddValueAtXUsingLinearInterpolation)
+      .def("AddValueAtXUsingNearestNeighborInterpolation", &Curve::AddValueAtXUsingNearestNeighborInterpolation)
+      .def("ReturnIndexOfNearestPreviousBin", &Curve::ReturnIndexOfNearestPreviousBin)
+      .def("PrintToStandardOut", &Curve::PrintToStandardOut)
+      .def("WriteToFile", (void (Curve::*)(wxString))&Curve::WriteToFile)
+      .def("WriteToFile", (void (Curve::*)(wxString,wxString))&Curve::WriteToFile)
+      .def("CopyFrom", &Curve::CopyFrom)
+      .def("CopyDataFromArrays", &Curve::CopyDataFromArrays)
+      .def("CopyYValuesFromArray", &Curve::CopyYValuesFromArray)
+      .def("ClearData", &Curve::ClearData)
+      .def("MultiplyByConstant", &Curve::MultiplyByConstant)
+      .def("MultiplyXByConstant", &Curve::MultiplyXByConstant)
+      .def("AddPoint", &Curve::AddPoint)
+      .def("FitPolynomialToData", &Curve::FitPolynomialToData)
+      .def("FitGaussianToData", &Curve::FitGaussianToData)
+      .def("FitSavitzkyGolayToData", &Curve::FitSavitzkyGolayToData)
+      .def("ReturnSavitzkyGolayInterpolationFromX", &Curve::ReturnSavitzkyGolayInterpolationFromX)
+      .def("ReturnIndexOfNearestPointFromX", &Curve::ReturnIndexOfNearestPointFromX)
+      .def("DeleteSavitzkyGolayCoefficients", &Curve::DeleteSavitzkyGolayCoefficients)
+      .def("AllocateSavitzkyGolayCoefficients", &Curve::AllocateSavitzkyGolayCoefficients)
+      .def("CheckMemory", &Curve::CheckMemory)
+      .def("AllocateMemory", &Curve::AllocateMemory)
+      .def("AddWith", &Curve::AddWith)
+      /*.def("DivideBy", (void (Curve::*)(::Curve))&Curve::DivideBy)
+      .def("DivideBy", [](Curve &__inst) {
+        ::Curve other_curve;
+        __inst.DivideBy(other_curve);
+        return other_curve;
+      })*/
+      .def("SetupXAxis", &Curve::SetupXAxis)
+      .def("ReturnMaximumValue", &Curve::ReturnMaximumValue)
+      .def("ReturnMode", &Curve::ReturnMode)
+      .def("ComputeMaximumValueAndMode", [](Curve &__inst) {
+        float maximum_value; float mode;
+        __inst.ComputeMaximumValueAndMode(maximum_value, mode);
+        return std::make_tuple(maximum_value, mode);
+      })
+      .def("ReturnFullWidthAtGivenValue", [](Curve &__inst) {
+        float wanted_value;
+        auto __ret = __inst.ReturnFullWidthAtGivenValue(wanted_value);
+        return std::make_tuple(__ret, wanted_value);
+      })
+      .def("NormalizeMaximumValue", &Curve::NormalizeMaximumValue)
+      .def("Logarithm", &Curve::Logarithm)
+      .def("ZeroYData", &Curve::ZeroYData)
+      .def("ApplyCTF", &Curve::ApplyCTF)
+      .def("SquareRoot", &Curve::SquareRoot)
+      .def("Reciprocal", &Curve::Reciprocal)
+      .def("MultiplyBy", [](Curve &__inst) {
+        ::Curve other_curve;
+        __inst.MultiplyBy(other_curve);
+        return other_curve;
+      })
+      .def("ZeroAfterIndex", &Curve::ZeroAfterIndex)
+      .def("FlattenBeforeIndex", &Curve::FlattenBeforeIndex)
+      .def("ReturnAverageValue", &Curve::ReturnAverageValue)
+      .def("ApplyCosineMask", &Curve::ApplyCosineMask)
+      .def("ApplyGaussianLowPassFilter", &Curve::ApplyGaussianLowPassFilter)
+      .def("GetXMinMax", [](Curve &__inst) {
+        float min_value; float max_value;
+        __inst.GetXMinMax(min_value, max_value);
+        return std::make_tuple(min_value, max_value);
+      })
+      .def("GetYMinMax", [](Curve &__inst) {
+        float min_value; float max_value;
+        __inst.GetYMinMax(min_value, max_value);
+        return std::make_tuple(min_value, max_value);
+      })
+      .def("SetYToConstant", &Curve::SetYToConstant);
     
 
- 
+  // Database
 
   py::class_<Database> database(m, "Database");
   database
@@ -318,7 +416,7 @@ PYBIND11_MODULE(pycistem, m)
       .def("DeleteRunProfile", &Database::DeleteRunProfile)
       .def("BeginMovieAssetInsert", &Database::BeginMovieAssetInsert)
       .def("AddNextMovieAsset", [](Database &__inst, int movie_asset_id, std::string name, std::string filename, int position_in_stack, int x_size, int y_size, int number_of_frames, double voltage, double pixel_size, double dose_per_frame, double spherical_aberration, std::string gain_filename, std::string dark_reference, double output_binning_factor, int correct_mag_distortion, float mag_distortion_angle, float mag_distortion_major_scale, float mag_distortion_minor_scale, int protein_is_white, int eer_super_res_factor, int eer_frames_per_imag)
-           { return __inst.AddNextMovieAsset(movie_asset_id, name, filename, position_in_stack, x_size, y_size, number_of_frames,  voltage,  pixel_size,  dose_per_frame,  spherical_aberration,  gain_filename,  dark_reference,  output_binning_factor,  correct_mag_distortion,  mag_distortion_angle,  mag_distortion_major_scale,  mag_distortion_minor_scale,  protein_is_white,  eer_super_res_factor,  eer_frames_per_imag); })
+           { return __inst.AddNextMovieAsset(movie_asset_id, name, filename, position_in_stack, x_size, y_size, number_of_frames, voltage, pixel_size, dose_per_frame, spherical_aberration, gain_filename, dark_reference, output_binning_factor, correct_mag_distortion, mag_distortion_angle, mag_distortion_major_scale, mag_distortion_minor_scale, protein_is_white, eer_super_res_factor, eer_frames_per_imag); })
       .def("EndMovieAssetInsert", &Database::EndMovieAssetInsert)
       .def("UpdateNumberOfFramesForAMovieAsset", &Database::UpdateNumberOfFramesForAMovieAsset)
       .def("BeginImageAssetInsert", &Database::BeginImageAssetInsert)
@@ -527,6 +625,8 @@ PYBIND11_MODULE(pycistem, m)
       .def("GetClassificationByID", &Database::GetClassificationByID)
       .def("AddClassificationSelection", &Database::AddClassificationSelection);
 
+  // Project
+
   py::class_<Project> project(m, "Project");
   project
       .def(py::init<>())
@@ -545,23 +645,25 @@ PYBIND11_MODULE(pycistem, m)
       .def("ReadMasterSettings", &Project::ReadMasterSettings)
       .def("WriteProjectStatisticsToDatabase", &Project::WriteProjectStatisticsToDatabase);
 
- py::class_<Image> image(m, "Image", py::buffer_protocol());
-    image
+  // Image
+
+  py::class_<Image> image(m, "Image", py::buffer_protocol());
+  image
       .def(py::init<>())
       .def(py::init<::Image>())
       .def_readonly("logical_x_dimensions", &Image::logical_x_dimension)
       .def_readonly("logical_y_dimensions", &Image::logical_y_dimension)
-      .def_buffer([](Image &m) -> py::buffer_info {
-        return py::buffer_info(
-            m.real_values,                               /* Pointer to buffer */
-            sizeof(float),                          /* Size of one scalar */
-            py::format_descriptor<float>::format(), /* Python struct-style format descriptor */
-            2,                                      /* Number of dimensions */
-            { m.logical_y_dimension, m.logical_x_dimension },                 /* Buffer dimensions */
-            { sizeof(float) * (m.logical_x_dimension + m.padding_jump_value),             /* Strides (in bytes) for each index */
-              sizeof(float) }
-        );
-    })
+      .def_buffer([](Image &m) -> py::buffer_info
+                  {
+                    return py::buffer_info(
+                        m.real_values,                                                   /* Pointer to buffer */
+                        sizeof(float),                                                   /* Size of one scalar */
+                        py::format_descriptor<float>::format(),                          /* Python struct-style format descriptor */
+                        2,                                                               /* Number of dimensions */
+                        {m.logical_y_dimension, m.logical_x_dimension},                  /* Buffer dimensions */
+                        {sizeof(float) * (m.logical_x_dimension + m.padding_jump_value), /* Strides (in bytes) for each index */
+                         sizeof(float)});
+                  })
       /* .def("operator=", [](Image &__inst) {
         ::Image t;
         auto __ret = __inst.operator=(t);
@@ -569,74 +671,85 @@ PYBIND11_MODULE(pycistem, m)
       })
       .def("operator=", (Image (Image::*)(::Image))&Image::operator=) */
       .def("SetupInitialValues", &Image::SetupInitialValues)
-      .def("Allocate", (void (Image::*)(int,int,int,bool,bool))&Image::Allocate)
-      .def("Allocate", (void (Image::*)(int,int,bool))&Image::Allocate)
+      .def("Allocate", (void (Image::*)(int, int, int, bool, bool)) & Image::Allocate)
+      .def("Allocate", (void (Image::*)(int, int, bool)) & Image::Allocate)
       //.def("Allocate", (void (Image::*)(::Image))&Image::Allocate)
       .def("AllocateAsPointingToSliceIn3D", &Image::AllocateAsPointingToSliceIn3D)
       .def("Deallocate", &Image::Deallocate)
       .def("ReturnSmallestLogicalDimension", &Image::ReturnSmallestLogicalDimension)
       .def("ReturnLargestLogicalDimension", &Image::ReturnLargestLogicalDimension)
-      .def("SampleFFT", [](Image &__inst, int sample_rate) {
-        ::Image sampled_image;
-        __inst.SampleFFT(sampled_image, sample_rate);
-        return sampled_image;
-      })
+      .def("SampleFFT", [](Image &__inst, int sample_rate)
+           {
+             ::Image sampled_image;
+             __inst.SampleFFT(sampled_image, sample_rate);
+             return sampled_image;
+           })
       .def("ReturnSumOfSquares", &Image::ReturnSumOfSquares)
       .def("ReturnSumOfRealValues", &Image::ReturnSumOfRealValues)
-      .def("ReturnSigmaNoise", (float (Image::*)())&Image::ReturnSigmaNoise)
-      .def("ReturnSigmaNoise", [](Image &__inst, float mask_radius) {
-        ::Image matching_projection;
-        auto __ret = __inst.ReturnSigmaNoise(matching_projection, mask_radius);
-        return std::make_tuple(__ret, matching_projection);
-      })
-      .def("ReturnImageScale", [](Image &__inst, float mask_radius) {
-        ::Image matching_projection;
-        auto __ret = __inst.ReturnImageScale(matching_projection, mask_radius);
-        return std::make_tuple(__ret, matching_projection);
-      })
-      .def("ReturnCorrelationCoefficientUnnormalized", [](Image &__inst, float wanted_mask_radius) {
-        ::Image other_image;
-        auto __ret = __inst.ReturnCorrelationCoefficientUnnormalized(other_image, wanted_mask_radius);
-        return std::make_tuple(__ret, other_image);
-      })
+      .def("ReturnSigmaNoise", (float (Image::*)()) & Image::ReturnSigmaNoise)
+      .def("ReturnSigmaNoise", [](Image &__inst, float mask_radius)
+           {
+             ::Image matching_projection;
+             auto __ret = __inst.ReturnSigmaNoise(matching_projection, mask_radius);
+             return std::make_tuple(__ret, matching_projection);
+           })
+      .def("ReturnImageScale", [](Image &__inst, float mask_radius)
+           {
+             ::Image matching_projection;
+             auto __ret = __inst.ReturnImageScale(matching_projection, mask_radius);
+             return std::make_tuple(__ret, matching_projection);
+           })
+      .def("ReturnCorrelationCoefficientUnnormalized", [](Image &__inst, float wanted_mask_radius)
+           {
+             ::Image other_image;
+             auto __ret = __inst.ReturnCorrelationCoefficientUnnormalized(other_image, wanted_mask_radius);
+             return std::make_tuple(__ret, other_image);
+           })
       .def("ReturnBeamTiltSignificanceScore", &Image::ReturnBeamTiltSignificanceScore)
-      .def("ReturnPixelWiseProduct", [](Image &__inst) {
-        ::Image other_image;
-        auto __ret = __inst.ReturnPixelWiseProduct(other_image);
-        return std::make_tuple(__ret, other_image);
-      })
-      .def("GetWeightedCorrelationWithImage", [](Image &__inst, int * bins, float signed_CC_limit) {
-        ::Image projection_image;
-        auto __ret = __inst.GetWeightedCorrelationWithImage(projection_image, bins, signed_CC_limit);
-        return std::make_tuple(__ret, projection_image);
-      })
-      .def("PhaseFlipPixelWise", [](Image &__inst) {
-        ::Image other_image;
-        __inst.PhaseFlipPixelWise(other_image);
-        return other_image;
-      })
-      .def("MultiplyPixelWiseReal", [](Image &__inst, bool absolute) {
-        ::Image other_image;
-        __inst.MultiplyPixelWiseReal(other_image, absolute);
-        return other_image;
-      })
-      .def("MultiplyPixelWise", [](Image &__inst) {
-        ::Image other_image;
-        __inst.MultiplyPixelWise(other_image);
-        return other_image;
-      })
-      .def("ConjugateMultiplyPixelWise", [](Image &__inst) {
-        ::Image other_image;
-        __inst.ConjugateMultiplyPixelWise(other_image);
-        return other_image;
-      })
+      .def("ReturnPixelWiseProduct", [](Image &__inst)
+           {
+             ::Image other_image;
+             auto __ret = __inst.ReturnPixelWiseProduct(other_image);
+             return std::make_tuple(__ret, other_image);
+           })
+      .def("GetWeightedCorrelationWithImage", [](Image &__inst, int *bins, float signed_CC_limit)
+           {
+             ::Image projection_image;
+             auto __ret = __inst.GetWeightedCorrelationWithImage(projection_image, bins, signed_CC_limit);
+             return std::make_tuple(__ret, projection_image);
+           })
+      .def("PhaseFlipPixelWise", [](Image &__inst)
+           {
+             ::Image other_image;
+             __inst.PhaseFlipPixelWise(other_image);
+             return other_image;
+           })
+      .def("MultiplyPixelWiseReal", [](Image &__inst, bool absolute)
+           {
+             ::Image other_image;
+             __inst.MultiplyPixelWiseReal(other_image, absolute);
+             return other_image;
+           })
+      .def("MultiplyPixelWise", [](Image &__inst)
+           {
+             ::Image other_image;
+             __inst.MultiplyPixelWise(other_image);
+             return other_image;
+           })
+      .def("ConjugateMultiplyPixelWise", [](Image &__inst)
+           {
+             ::Image other_image;
+             __inst.ConjugateMultiplyPixelWise(other_image);
+             return other_image;
+           })
       .def("ComputeFSCVectorized", &Image::ComputeFSCVectorized)
       .def("ComputeFSC", &Image::ComputeFSC)
-      .def("DividePixelWise", [](Image &__inst) {
-        ::Image other_image;
-        __inst.DividePixelWise(other_image);
-        return other_image;
-      })
+      .def("DividePixelWise", [](Image &__inst)
+           {
+             ::Image other_image;
+             __inst.DividePixelWise(other_image);
+             return other_image;
+           })
       .def("AddGaussianNoise", &Image::AddGaussianNoise)
       .def("ZeroFloat", &Image::ZeroFloat)
       .def("ZeroFloatAndNormalize", &Image::ZeroFloatAndNormalize)
@@ -649,68 +762,82 @@ PYBIND11_MODULE(pycistem, m)
       .def("UpdateDistributionOfRealValues", &Image::UpdateDistributionOfRealValues)
       .def("ApplySqrtNFilter", &Image::ApplySqrtNFilter)
       .def("Whiten", &Image::Whiten)
-      .def("OptimalFilterBySNRImage", [](Image &__inst, int include_reference_weighting) {
-        ::Image SNR_image;
-        __inst.OptimalFilterBySNRImage(SNR_image, include_reference_weighting);
-        return SNR_image;
-      })
-      .def("MultiplyByWeightsCurve", [](Image &__inst, float scale_factor) {
-        Curve weights;
-        __inst.MultiplyByWeightsCurve(weights, scale_factor);
-        return weights;
-      })
-      .def("WeightBySSNR", [](Image &__inst, float molecular_mass_kDa, float pixel_size, bool weight_particle_image, bool weight_projection_image) {
-        ::Image ctf_image; Curve SSNR; ::Image projection_image;
-        __inst.WeightBySSNR(ctf_image, molecular_mass_kDa, pixel_size, SSNR, projection_image, weight_particle_image, weight_projection_image);
-        return std::make_tuple(ctf_image, SSNR, projection_image);
-      })
-      .def("OptimalFilterSSNR", [](Image &__inst) {
-        Curve SSNR;
-        __inst.OptimalFilterSSNR(SSNR);
-        return SSNR;
-      })
-      .def("OptimalFilterFSC", [](Image &__inst) {
-        Curve FSC;
-        __inst.OptimalFilterFSC(FSC);
-        return FSC;
-      })
+      .def("OptimalFilterBySNRImage", [](Image &__inst, int include_reference_weighting)
+           {
+             ::Image SNR_image;
+             __inst.OptimalFilterBySNRImage(SNR_image, include_reference_weighting);
+             return SNR_image;
+           })
+      .def("MultiplyByWeightsCurve", [](Image &__inst, float scale_factor)
+           {
+             Curve weights;
+             __inst.MultiplyByWeightsCurve(weights, scale_factor);
+             return weights;
+           })
+      .def("WeightBySSNR", [](Image &__inst, float molecular_mass_kDa, float pixel_size, bool weight_particle_image, bool weight_projection_image)
+           {
+             ::Image ctf_image;
+             Curve SSNR;
+             ::Image projection_image;
+             __inst.WeightBySSNR(ctf_image, molecular_mass_kDa, pixel_size, SSNR, projection_image, weight_particle_image, weight_projection_image);
+             return std::make_tuple(ctf_image, SSNR, projection_image);
+           })
+      .def("OptimalFilterSSNR", [](Image &__inst)
+           {
+             Curve SSNR;
+             __inst.OptimalFilterSSNR(SSNR);
+             return SSNR;
+           })
+      .def("OptimalFilterFSC", [](Image &__inst)
+           {
+             Curve FSC;
+             __inst.OptimalFilterFSC(FSC);
+             return FSC;
+           })
       .def("OptimalFilterWarp", &Image::OptimalFilterWarp)
       .def("CorrectSinc", &Image::CorrectSinc)
-      .def("MirrorXFourier2D", [](Image &__inst) {
-        ::Image mirrored_image;
-        __inst.MirrorXFourier2D(mirrored_image);
-        return mirrored_image;
-      })
-      .def("MirrorYFourier2D", [](Image &__inst) {
-        ::Image mirrored_image;
-        __inst.MirrorYFourier2D(mirrored_image);
-        return mirrored_image;
-      })
-      .def("RotateQuadrants", [](Image &__inst, int quad_i) {
-        ::Image rotated_image;
-        __inst.RotateQuadrants(rotated_image, quad_i);
-        return rotated_image;
-      })
-      .def("Rotate3DByRotationMatrixAndOrApplySymmetry", [](Image &__inst, float wanted_max_radius_in_pixels, wxString wanted_symmetry) {
-        RotationMatrix wanted_matrix;
-        __inst.Rotate3DByRotationMatrixAndOrApplySymmetry(wanted_matrix, wanted_max_radius_in_pixels, wanted_symmetry);
-        return wanted_matrix;
-      })
-      .def("Rotate3DByRotationMatrixAndOrApplySymmetryThenShift", [](Image &__inst, float wanted_x_shift, float wanted_y_shift, float wanted_z_shift, float wanted_max_radius_in_pixels, wxString wanted_symmetry) {
-        RotationMatrix wanted_matrix;
-        __inst.Rotate3DByRotationMatrixAndOrApplySymmetryThenShift(wanted_matrix, wanted_x_shift, wanted_y_shift, wanted_z_shift, wanted_max_radius_in_pixels, wanted_symmetry);
-        return wanted_matrix;
-      })
-      .def("Rotate3DThenShiftThenApplySymmetry", [](Image &__inst, float wanted_x_shift, float wanted_y_shift, float wanted_z_shift, float wanted_max_radius_in_pixels, wxString wanted_symmetry) {
-        RotationMatrix wanted_matrix;
-        __inst.Rotate3DThenShiftThenApplySymmetry(wanted_matrix, wanted_x_shift, wanted_y_shift, wanted_z_shift, wanted_max_radius_in_pixels, wanted_symmetry);
-        return wanted_matrix;
-      })
-      .def("GenerateReferenceProjections", [](Image &__inst, Image * projections, float resolution) {
-        EulerSearch parameters;
-        __inst.GenerateReferenceProjections(projections, parameters, resolution);
-        return parameters;
-      })
+      .def("MirrorXFourier2D", [](Image &__inst)
+           {
+             ::Image mirrored_image;
+             __inst.MirrorXFourier2D(mirrored_image);
+             return mirrored_image;
+           })
+      .def("MirrorYFourier2D", [](Image &__inst)
+           {
+             ::Image mirrored_image;
+             __inst.MirrorYFourier2D(mirrored_image);
+             return mirrored_image;
+           })
+      .def("RotateQuadrants", [](Image &__inst, int quad_i)
+           {
+             ::Image rotated_image;
+             __inst.RotateQuadrants(rotated_image, quad_i);
+             return rotated_image;
+           })
+      .def("Rotate3DByRotationMatrixAndOrApplySymmetry", [](Image &__inst, float wanted_max_radius_in_pixels, wxString wanted_symmetry)
+           {
+             RotationMatrix wanted_matrix;
+             __inst.Rotate3DByRotationMatrixAndOrApplySymmetry(wanted_matrix, wanted_max_radius_in_pixels, wanted_symmetry);
+             return wanted_matrix;
+           })
+      .def("Rotate3DByRotationMatrixAndOrApplySymmetryThenShift", [](Image &__inst, float wanted_x_shift, float wanted_y_shift, float wanted_z_shift, float wanted_max_radius_in_pixels, wxString wanted_symmetry)
+           {
+             RotationMatrix wanted_matrix;
+             __inst.Rotate3DByRotationMatrixAndOrApplySymmetryThenShift(wanted_matrix, wanted_x_shift, wanted_y_shift, wanted_z_shift, wanted_max_radius_in_pixels, wanted_symmetry);
+             return wanted_matrix;
+           })
+      .def("Rotate3DThenShiftThenApplySymmetry", [](Image &__inst, float wanted_x_shift, float wanted_y_shift, float wanted_z_shift, float wanted_max_radius_in_pixels, wxString wanted_symmetry)
+           {
+             RotationMatrix wanted_matrix;
+             __inst.Rotate3DThenShiftThenApplySymmetry(wanted_matrix, wanted_x_shift, wanted_y_shift, wanted_z_shift, wanted_max_radius_in_pixels, wanted_symmetry);
+             return wanted_matrix;
+           })
+      .def("GenerateReferenceProjections", [](Image &__inst, Image *projections, float resolution)
+           {
+             EulerSearch parameters;
+             __inst.GenerateReferenceProjections(projections, parameters, resolution);
+             return parameters;
+           })
       /* .def("RotateFourier2DGenerateIndex", [](Image &__inst, float psi_max, float psi_step, float psi_start, bool invert_angle) {
         Kernel2D kernel_index;
         __inst.RotateFourier2DGenerateIndex(kernel_index, psi_max, psi_step, psi_start, invert_angle);
@@ -721,88 +848,121 @@ PYBIND11_MODULE(pycistem, m)
         __inst.RotateFourier2DDeleteIndex(kernel_index, psi_max, psi_step);
         return kernel_index;
       }) */
-      .def("RotateFourier2DFromIndex", [](Image &__inst, Kernel2D * kernel_index) {
-        ::Image rotated_image;
-        __inst.RotateFourier2DFromIndex(rotated_image, kernel_index);
-        return rotated_image;
-      })
-      .def("RotateFourier2DIndex", [](Image &__inst, Kernel2D * kernel_index, float resolution_limit, float padding_factor) {
-        AnglesAndShifts rotation_angle;
-        __inst.RotateFourier2DIndex(kernel_index, rotation_angle, resolution_limit, padding_factor);
-        return rotation_angle;
-      })
-      .def("ReturnLinearInterpolatedFourierKernel2D", [](Image &__inst) {
-        float x; float y;
-        auto __ret = __inst.ReturnLinearInterpolatedFourierKernel2D(x, y);
-        return std::make_tuple(__ret, x, y);
-      })
-      .def("RotateFourier2D", [](Image &__inst, float resolution_limit_in_reciprocal_pixels, bool use_nearest_neighbor) {
-        ::Image rotated_image; AnglesAndShifts rotation_angle;
-        __inst.RotateFourier2D(rotated_image, rotation_angle, resolution_limit_in_reciprocal_pixels, use_nearest_neighbor);
-        return std::make_tuple(rotated_image, rotation_angle);
-      })
-      .def("Rotate2D", [](Image &__inst, float mask_radius_in_pixels) {
-        ::Image rotated_image; AnglesAndShifts rotation_angle;
-        __inst.Rotate2D(rotated_image, rotation_angle, mask_radius_in_pixels);
-        return std::make_tuple(rotated_image, rotation_angle);
-      })
+      .def("RotateFourier2DFromIndex", [](Image &__inst, Kernel2D *kernel_index)
+           {
+             ::Image rotated_image;
+             __inst.RotateFourier2DFromIndex(rotated_image, kernel_index);
+             return rotated_image;
+           })
+      .def("RotateFourier2DIndex", [](Image &__inst, Kernel2D *kernel_index, float resolution_limit, float padding_factor)
+           {
+             AnglesAndShifts rotation_angle;
+             __inst.RotateFourier2DIndex(kernel_index, rotation_angle, resolution_limit, padding_factor);
+             return rotation_angle;
+           })
+      .def("ReturnLinearInterpolatedFourierKernel2D", [](Image &__inst)
+           {
+             float x;
+             float y;
+             auto __ret = __inst.ReturnLinearInterpolatedFourierKernel2D(x, y);
+             return std::make_tuple(__ret, x, y);
+           })
+      .def("RotateFourier2D", [](Image &__inst, float resolution_limit_in_reciprocal_pixels, bool use_nearest_neighbor)
+           {
+             ::Image rotated_image;
+             AnglesAndShifts rotation_angle;
+             __inst.RotateFourier2D(rotated_image, rotation_angle, resolution_limit_in_reciprocal_pixels, use_nearest_neighbor);
+             return std::make_tuple(rotated_image, rotation_angle);
+           })
+      .def("Rotate2D", [](Image &__inst, float mask_radius_in_pixels)
+           {
+             ::Image rotated_image;
+             AnglesAndShifts rotation_angle;
+             __inst.Rotate2D(rotated_image, rotation_angle, mask_radius_in_pixels);
+             return std::make_tuple(rotated_image, rotation_angle);
+           })
       .def("Rotate2DInPlace", &Image::Rotate2DInPlace)
       .def("Rotate2DInPlaceBy90Degrees", &Image::Rotate2DInPlaceBy90Degrees)
-      .def("Rotate2DSample", [](Image &__inst, float mask_radius_in_pixels) {
-        ::Image rotated_image; AnglesAndShifts rotation_angle;
-        __inst.Rotate2DSample(rotated_image, rotation_angle, mask_radius_in_pixels);
-        return std::make_tuple(rotated_image, rotation_angle);
-      })
-      .def("Skew2D", [](Image &__inst, float height_offset, float minimum_height, float skew_axis, float skew_angle, bool adjust_signal) {
-        ::Image skewed_image;
-        auto __ret = __inst.Skew2D(skewed_image, height_offset, minimum_height, skew_axis, skew_angle, adjust_signal);
-        return std::make_tuple(__ret, skewed_image);
-      })
-      .def("ReturnLinearInterpolated2D", [](Image &__inst) {
-        float wanted_physical_x_coordinate; float wanted_physical_y_coordinate;
-        auto __ret = __inst.ReturnLinearInterpolated2D(wanted_physical_x_coordinate, wanted_physical_y_coordinate);
-        return std::make_tuple(__ret, wanted_physical_x_coordinate, wanted_physical_y_coordinate);
-      })
-      .def("ReturnNearest2D", [](Image &__inst) {
-        float wanted_physical_x_coordinate; float wanted_physical_y_coordinate;
-        auto __ret = __inst.ReturnNearest2D(wanted_physical_x_coordinate, wanted_physical_y_coordinate);
-        return std::make_tuple(__ret, wanted_physical_x_coordinate, wanted_physical_y_coordinate);
-      })
-      .def("ExtractSlice", [](Image &__inst, float resolution_limit, bool apply_resolution_limit) {
-        ::Image image_to_extract; AnglesAndShifts angles_and_shifts_of_image;
-        __inst.ExtractSlice(image_to_extract, angles_and_shifts_of_image, resolution_limit, apply_resolution_limit);
-        return std::make_tuple(image_to_extract, angles_and_shifts_of_image);
-      })
-      .def("ExtractSliceByRotMatrix", [](Image &__inst, float resolution_limit, bool apply_resolution_limit) {
-        ::Image image_to_extract; RotationMatrix wanted_matrix;
-        __inst.ExtractSliceByRotMatrix(image_to_extract, wanted_matrix, resolution_limit, apply_resolution_limit);
-        return std::make_tuple(image_to_extract, wanted_matrix);
-      })
-      .def("ReturnNearestFourier2D", [](Image &__inst) {
-        float x; float y;
-        auto __ret = __inst.ReturnNearestFourier2D(x, y);
-        return std::make_tuple(__ret, x, y);
-      })
-      .def("ReturnLinearInterpolatedFourier2D", [](Image &__inst) {
-        float x; float y;
-        auto __ret = __inst.ReturnLinearInterpolatedFourier2D(x, y);
-        return std::make_tuple(__ret, x, y);
-      })
-      .def("ReturnLinearInterpolatedFourier", [](Image &__inst) {
-        float x; float y; float z;
-        auto __ret = __inst.ReturnLinearInterpolatedFourier(x, y, z);
-        return std::make_tuple(__ret, x, y, z);
-      })
-      .def("AddByLinearInterpolationReal", [](Image &__inst) {
-        float wanted_x_coordinate; float wanted_y_coordinate; float wanted_z_coordinate; float wanted_value;
-        __inst.AddByLinearInterpolationReal(wanted_x_coordinate, wanted_y_coordinate, wanted_z_coordinate, wanted_value);
-        return std::make_tuple(wanted_x_coordinate, wanted_y_coordinate, wanted_z_coordinate, wanted_value);
-      })
-      .def("AddByLinearInterpolationFourier2D", [](Image &__inst) {
-        float wanted_x_coordinate; float wanted_y_coordinate; std::complex<float> wanted_value;
-        __inst.AddByLinearInterpolationFourier2D(wanted_x_coordinate, wanted_y_coordinate, wanted_value);
-        return std::make_tuple(wanted_x_coordinate, wanted_y_coordinate, wanted_value);
-      })
+      .def("Rotate2DSample", [](Image &__inst, float mask_radius_in_pixels)
+           {
+             ::Image rotated_image;
+             AnglesAndShifts rotation_angle;
+             __inst.Rotate2DSample(rotated_image, rotation_angle, mask_radius_in_pixels);
+             return std::make_tuple(rotated_image, rotation_angle);
+           })
+      .def("Skew2D", [](Image &__inst, float height_offset, float minimum_height, float skew_axis, float skew_angle, bool adjust_signal)
+           {
+             ::Image skewed_image;
+             auto __ret = __inst.Skew2D(skewed_image, height_offset, minimum_height, skew_axis, skew_angle, adjust_signal);
+             return std::make_tuple(__ret, skewed_image);
+           })
+      .def("ReturnLinearInterpolated2D", [](Image &__inst)
+           {
+             float wanted_physical_x_coordinate;
+             float wanted_physical_y_coordinate;
+             auto __ret = __inst.ReturnLinearInterpolated2D(wanted_physical_x_coordinate, wanted_physical_y_coordinate);
+             return std::make_tuple(__ret, wanted_physical_x_coordinate, wanted_physical_y_coordinate);
+           })
+      .def("ReturnNearest2D", [](Image &__inst)
+           {
+             float wanted_physical_x_coordinate;
+             float wanted_physical_y_coordinate;
+             auto __ret = __inst.ReturnNearest2D(wanted_physical_x_coordinate, wanted_physical_y_coordinate);
+             return std::make_tuple(__ret, wanted_physical_x_coordinate, wanted_physical_y_coordinate);
+           })
+      .def("ExtractSlice", [](Image &__inst, float resolution_limit, bool apply_resolution_limit)
+           {
+             ::Image image_to_extract;
+             AnglesAndShifts angles_and_shifts_of_image;
+             __inst.ExtractSlice(image_to_extract, angles_and_shifts_of_image, resolution_limit, apply_resolution_limit);
+             return std::make_tuple(image_to_extract, angles_and_shifts_of_image);
+           })
+      .def("ExtractSliceByRotMatrix", [](Image &__inst, float resolution_limit, bool apply_resolution_limit)
+           {
+             ::Image image_to_extract;
+             RotationMatrix wanted_matrix;
+             __inst.ExtractSliceByRotMatrix(image_to_extract, wanted_matrix, resolution_limit, apply_resolution_limit);
+             return std::make_tuple(image_to_extract, wanted_matrix);
+           })
+      .def("ReturnNearestFourier2D", [](Image &__inst)
+           {
+             float x;
+             float y;
+             auto __ret = __inst.ReturnNearestFourier2D(x, y);
+             return std::make_tuple(__ret, x, y);
+           })
+      .def("ReturnLinearInterpolatedFourier2D", [](Image &__inst)
+           {
+             float x;
+             float y;
+             auto __ret = __inst.ReturnLinearInterpolatedFourier2D(x, y);
+             return std::make_tuple(__ret, x, y);
+           })
+      .def("ReturnLinearInterpolatedFourier", [](Image &__inst)
+           {
+             float x;
+             float y;
+             float z;
+             auto __ret = __inst.ReturnLinearInterpolatedFourier(x, y, z);
+             return std::make_tuple(__ret, x, y, z);
+           })
+      .def("AddByLinearInterpolationReal", [](Image &__inst)
+           {
+             float wanted_x_coordinate;
+             float wanted_y_coordinate;
+             float wanted_z_coordinate;
+             float wanted_value;
+             __inst.AddByLinearInterpolationReal(wanted_x_coordinate, wanted_y_coordinate, wanted_z_coordinate, wanted_value);
+             return std::make_tuple(wanted_x_coordinate, wanted_y_coordinate, wanted_z_coordinate, wanted_value);
+           })
+      .def("AddByLinearInterpolationFourier2D", [](Image &__inst)
+           {
+             float wanted_x_coordinate;
+             float wanted_y_coordinate;
+             std::complex<float> wanted_value;
+             __inst.AddByLinearInterpolationFourier2D(wanted_x_coordinate, wanted_y_coordinate, wanted_value);
+             return std::make_tuple(wanted_x_coordinate, wanted_y_coordinate, wanted_value);
+           })
       .def("CosineRingMask", &Image::CosineRingMask)
       .def("CosineMask", &Image::CosineMask)
       .def("CosineRectangularMask", &Image::CosineRectangularMask)
@@ -810,46 +970,59 @@ PYBIND11_MODULE(pycistem, m)
       .def("LocalResSignificanceFilter", &Image::LocalResSignificanceFilter)
       .def("GaussianLowPassFilter", &Image::GaussianLowPassFilter)
       .def("GaussianHighPassFilter", &Image::GaussianHighPassFilter)
-      .def("ApplyLocalResolutionFilter", [](Image &__inst, float pixel_size, int wanted_number_of_levels) {
-        ::Image local_resolution_map;
-        __inst.ApplyLocalResolutionFilter(local_resolution_map, pixel_size, wanted_number_of_levels);
-        return local_resolution_map;
-      })
+      .def("ApplyLocalResolutionFilter", [](Image &__inst, float pixel_size, int wanted_number_of_levels)
+           {
+             ::Image local_resolution_map;
+             __inst.ApplyLocalResolutionFilter(local_resolution_map, pixel_size, wanted_number_of_levels);
+             return local_resolution_map;
+           })
       .def("CircleMask", &Image::CircleMask)
       .def("CircleMaskWithValue", &Image::CircleMaskWithValue)
       .def("SquareMaskWithValue", &Image::SquareMaskWithValue)
       .def("TriangleMask", &Image::TriangleMask)
-      .def("CalculateCTFImage", [](Image &__inst, bool calculate_complex_ctf, bool apply_coherence_envelope) {
-        CTF ctf_of_image;
-        __inst.CalculateCTFImage(ctf_of_image, calculate_complex_ctf, apply_coherence_envelope);
-        return ctf_of_image;
-      })
-      .def("CalculateBeamTiltImage", [](Image &__inst, bool output_phase_shifts) {
-        CTF ctf_of_image;
-        __inst.CalculateBeamTiltImage(ctf_of_image, output_phase_shifts);
-        return ctf_of_image;
-      })
+      .def("CalculateCTFImage", [](Image &__inst, bool calculate_complex_ctf, bool apply_coherence_envelope)
+           {
+             CTF ctf_of_image;
+             __inst.CalculateCTFImage(ctf_of_image, calculate_complex_ctf, apply_coherence_envelope);
+             return ctf_of_image;
+           })
+      .def("CalculateBeamTiltImage", [](Image &__inst, bool output_phase_shifts)
+           {
+             CTF ctf_of_image;
+             __inst.CalculateBeamTiltImage(ctf_of_image, output_phase_shifts);
+             return ctf_of_image;
+           })
       .def("ContainsBlankEdges", &Image::ContainsBlankEdges)
       .def("CorrectMagnificationDistortion", &Image::CorrectMagnificationDistortion)
-      .def("ApplyMask", [](Image &__inst, float cosine_edge_width, float weight_outside_mask, float low_pass_filter_outside, float filter_cosine_edge_width, float outside_mask_value, bool use_outside_mask_value) {
-        ::Image mask_file;
-        auto __ret = __inst.ApplyMask(mask_file, cosine_edge_width, weight_outside_mask, low_pass_filter_outside, filter_cosine_edge_width, outside_mask_value, use_outside_mask_value);
-        return std::make_tuple(__ret, mask_file);
-      })
+      .def("ApplyMask", [](Image &__inst, float cosine_edge_width, float weight_outside_mask, float low_pass_filter_outside, float filter_cosine_edge_width, float outside_mask_value, bool use_outside_mask_value)
+           {
+             ::Image mask_file;
+             auto __ret = __inst.ApplyMask(mask_file, cosine_edge_width, weight_outside_mask, low_pass_filter_outside, filter_cosine_edge_width, outside_mask_value, use_outside_mask_value);
+             return std::make_tuple(__ret, mask_file);
+           })
       .def("CenterOfMass", &Image::CenterOfMass)
       .def("StandardDeviationOfMass", &Image::StandardDeviationOfMass)
       .def("ReturnAverageOfMaxN", &Image::ReturnAverageOfMaxN)
       .def("ReturnAverageOfMinN", &Image::ReturnAverageOfMinN)
-      .def("AddSlices", [](Image &__inst, int first_slice, int last_slice, bool calculate_average) {
-        ::Image sum_of_slices;
-        __inst.AddSlices(sum_of_slices, first_slice, last_slice, calculate_average);
-        return sum_of_slices;
-      })
-      .def("FindBeamTilt", [](Image &__inst, float pixel_size, float phase_multiplier, bool progress_bar, int first_position_to_search, int last_position_to_search, MyApp * app_for_result) {
-        CTF input_ctf; ::Image phase_error_output; ::Image beamtilt_output; ::Image difference_image; float beamtilt_x; float beamtilt_y; float particle_shift_x; float particle_shift_y;
-        auto __ret = __inst.FindBeamTilt(input_ctf, pixel_size, phase_error_output, beamtilt_output, difference_image, beamtilt_x, beamtilt_y, particle_shift_x, particle_shift_y, phase_multiplier, progress_bar, first_position_to_search, last_position_to_search, app_for_result);
-        return std::make_tuple(__ret, input_ctf, phase_error_output, beamtilt_output, difference_image, beamtilt_x, beamtilt_y, particle_shift_x, particle_shift_y);
-      })
+      .def("AddSlices", [](Image &__inst, int first_slice, int last_slice, bool calculate_average)
+           {
+             ::Image sum_of_slices;
+             __inst.AddSlices(sum_of_slices, first_slice, last_slice, calculate_average);
+             return sum_of_slices;
+           })
+      .def("FindBeamTilt", [](Image &__inst, float pixel_size, float phase_multiplier, bool progress_bar, int first_position_to_search, int last_position_to_search, MyApp *app_for_result)
+           {
+             CTF input_ctf;
+             ::Image phase_error_output;
+             ::Image beamtilt_output;
+             ::Image difference_image;
+             float beamtilt_x;
+             float beamtilt_y;
+             float particle_shift_x;
+             float particle_shift_y;
+             auto __ret = __inst.FindBeamTilt(input_ctf, pixel_size, phase_error_output, beamtilt_output, difference_image, beamtilt_x, beamtilt_y, particle_shift_x, particle_shift_y, phase_multiplier, progress_bar, first_position_to_search, last_position_to_search, app_for_result);
+             return std::make_tuple(__ret, input_ctf, phase_error_output, beamtilt_output, difference_image, beamtilt_x, beamtilt_y, particle_shift_x, particle_shift_y);
+           })
       .def("ReturnVolumeInRealSpace", &Image::ReturnVolumeInRealSpace)
       .def("ReturnReal1DAddressFromPhysicalCoord", &Image::ReturnReal1DAddressFromPhysicalCoord)
       .def("ReturnRealPixelFromPhysicalCoord", &Image::ReturnRealPixelFromPhysicalCoord)
@@ -859,11 +1032,13 @@ PYBIND11_MODULE(pycistem, m)
       .def("HasSameDimensionsAs", &Image::HasSameDimensionsAs)
       .def("IsCubic", &Image::IsCubic)
       .def("IsSquare", &Image::IsSquare)
-      .def("ReturnCosineMaskBandpassResolution", [](Image &__inst, float pixel_size_in_angstrom) {
-        float wanted_cutoff_in_angstrom; float wanted_falloff_in_number_of_fourier_space_voxels;
-        __inst.ReturnCosineMaskBandpassResolution(pixel_size_in_angstrom, wanted_cutoff_in_angstrom, wanted_falloff_in_number_of_fourier_space_voxels);
-        return std::make_tuple(wanted_cutoff_in_angstrom, wanted_falloff_in_number_of_fourier_space_voxels);
-      })
+      .def("ReturnCosineMaskBandpassResolution", [](Image &__inst, float pixel_size_in_angstrom)
+           {
+             float wanted_cutoff_in_angstrom;
+             float wanted_falloff_in_number_of_fourier_space_voxels;
+             __inst.ReturnCosineMaskBandpassResolution(pixel_size_in_angstrom, wanted_cutoff_in_angstrom, wanted_falloff_in_number_of_fourier_space_voxels);
+             return std::make_tuple(wanted_cutoff_in_angstrom, wanted_falloff_in_number_of_fourier_space_voxels);
+           })
       .def("IsBinary", &Image::IsBinary)
       .def("SetLogicalDimensions", &Image::SetLogicalDimensions)
       .def("UpdateLoopingAndAddressing", &Image::UpdateLoopingAndAddressing)
@@ -930,11 +1105,12 @@ PYBIND11_MODULE(pycistem, m)
       .def("SubtractImage", &Image::SubtractImage)
       .def("SubtractSquaredImage", &Image::SubtractSquaredImage)
       .def("ApplyBFactor", &Image::ApplyBFactor)
-      .def("ApplyBFactorAndWhiten", [](Image &__inst, float bfactor_low, float bfactor_high, float bfactor_res_limit) {
-        Curve power_spectrum;
-        __inst.ApplyBFactorAndWhiten(power_spectrum, bfactor_low, bfactor_high, bfactor_res_limit);
-        return power_spectrum;
-      })
+      .def("ApplyBFactorAndWhiten", [](Image &__inst, float bfactor_low, float bfactor_high, float bfactor_res_limit)
+           {
+             Curve power_spectrum;
+             __inst.ApplyBFactorAndWhiten(power_spectrum, bfactor_low, bfactor_high, bfactor_res_limit);
+             return power_spectrum;
+           })
       .def("CalculateDerivative", &Image::CalculateDerivative)
       .def("SharpenMap", &Image::SharpenMap)
       .def("InvertHandedness", &Image::InvertHandedness)
@@ -947,20 +1123,24 @@ PYBIND11_MODULE(pycistem, m)
       .def("CalculateCrossCorrelationImageWith", &Image::CalculateCrossCorrelationImageWith)
       .def("SwapRealSpaceQuadrants", &Image::SwapRealSpaceQuadrants)
       .def("ComputeAmplitudeSpectrumFull2D", &Image::ComputeAmplitudeSpectrumFull2D)
-      .def("ComputeFilteredAmplitudeSpectrumFull2D", [](Image &__inst, Image * average_spectrum_masked, Image * current_power_spectrum, float minimum_resolution, float maximum_resolution, float pixel_size_for_fitting) {
-        float average; float sigma;
-        __inst.ComputeFilteredAmplitudeSpectrumFull2D(average_spectrum_masked, current_power_spectrum, average, sigma, minimum_resolution, maximum_resolution, pixel_size_for_fitting);
-        return std::make_tuple(average, sigma);
-      })
+      .def("ComputeFilteredAmplitudeSpectrumFull2D", [](Image &__inst, Image *average_spectrum_masked, Image *current_power_spectrum, float minimum_resolution, float maximum_resolution, float pixel_size_for_fitting)
+           {
+             float average;
+             float sigma;
+             __inst.ComputeFilteredAmplitudeSpectrumFull2D(average_spectrum_masked, current_power_spectrum, average, sigma, minimum_resolution, maximum_resolution, pixel_size_for_fitting);
+             return std::make_tuple(average, sigma);
+           })
       .def("ComputeAmplitudeSpectrum", &Image::ComputeAmplitudeSpectrum)
       .def("ComputeHistogramOfRealValuesCurve", &Image::ComputeHistogramOfRealValuesCurve)
       .def("Compute1DAmplitudeSpectrumCurve", &Image::Compute1DAmplitudeSpectrumCurve)
       .def("Compute1DPowerSpectrumCurve", &Image::Compute1DPowerSpectrumCurve)
-      .def("Compute1DRotationalAverage", [](Image &__inst, bool fractional_radius_in_real_space, bool average_real_parts) {
-        Curve average; Curve number_of_values;
-        __inst.Compute1DRotationalAverage(average, number_of_values, fractional_radius_in_real_space, average_real_parts);
-        return std::make_tuple(average, number_of_values);
-      })
+      .def("Compute1DRotationalAverage", [](Image &__inst, bool fractional_radius_in_real_space, bool average_real_parts)
+           {
+             Curve average;
+             Curve number_of_values;
+             __inst.Compute1DRotationalAverage(average, number_of_values, fractional_radius_in_real_space, average_real_parts);
+             return std::make_tuple(average, number_of_values);
+           })
       .def("ComputeSpatialFrequencyAtEveryVoxel", &Image::ComputeSpatialFrequencyAtEveryVoxel)
       .def("AverageRadially", &Image::AverageRadially)
       .def("ComputeLocalMeanAndVarianceMaps", &Image::ComputeLocalMeanAndVarianceMaps)
@@ -980,36 +1160,46 @@ PYBIND11_MODULE(pycistem, m)
       .def("SetMinimumAndMaximumValues", &Image::SetMinimumAndMaximumValues)
       .def("Binarise", &Image::Binarise)
       .def("BinariseInverse", &Image::BinariseInverse)
-      .def("ComputeAverageAndSigmaOfValuesInSpectrum", [](Image &__inst, float minimum_radius, float maximum_radius, int cross_half_width) {
-        float average; float sigma;
-        __inst.ComputeAverageAndSigmaOfValuesInSpectrum(minimum_radius, maximum_radius, average, sigma, cross_half_width);
-        return std::make_tuple(average, sigma);
-      })
+      .def("ComputeAverageAndSigmaOfValuesInSpectrum", [](Image &__inst, float minimum_radius, float maximum_radius, int cross_half_width)
+           {
+             float average;
+             float sigma;
+             __inst.ComputeAverageAndSigmaOfValuesInSpectrum(minimum_radius, maximum_radius, average, sigma, cross_half_width);
+             return std::make_tuple(average, sigma);
+           })
       .def("SetMaximumValueOnCentralCross", &Image::SetMaximumValueOnCentralCross)
       .def("ApplyMirrorAlongY", &Image::ApplyMirrorAlongY)
       .def("InvertPixelOrder", &Image::InvertPixelOrder)
-      .def("GetMinMax", [](Image &__inst) {
-        float min_value; float max_value;
-        __inst.GetMinMax(min_value, max_value);
-        return std::make_tuple(min_value, max_value);
-      })
+      .def("GetMinMax", [](Image &__inst)
+           {
+             float min_value;
+             float max_value;
+             __inst.GetMinMax(min_value, max_value);
+             return std::make_tuple(min_value, max_value);
+           })
       .def("RandomisePhases", &Image::RandomisePhases)
       .def("ReturnCorrelationBetweenTwoHorizontalLines", &Image::ReturnCorrelationBetweenTwoHorizontalLines)
       .def("ReturnCorrelationBetweenTwoVerticalLines", &Image::ReturnCorrelationBetweenTwoVerticalLines)
       .def("ContainsRepeatedLineEdges", &Image::ContainsRepeatedLineEdges)
       .def("GetCorrelationWithCTF", &Image::GetCorrelationWithCTF)
-      .def("SetupQuickCorrelationWithCTF", [](Image &__inst, CTF ctf, int * addresses, float * spatial_frequency_squared, float * azimuth) {
-        int number_of_values; double norm_image; double image_mean;
-        __inst.SetupQuickCorrelationWithCTF(ctf, number_of_values, norm_image, image_mean, addresses, spatial_frequency_squared, azimuth);
-        return std::make_tuple(number_of_values, norm_image, image_mean);
-      })
+      .def("SetupQuickCorrelationWithCTF", [](Image &__inst, CTF ctf, int *addresses, float *spatial_frequency_squared, float *azimuth)
+           {
+             int number_of_values;
+             double norm_image;
+             double image_mean;
+             __inst.SetupQuickCorrelationWithCTF(ctf, number_of_values, norm_image, image_mean, addresses, spatial_frequency_squared, azimuth);
+             return std::make_tuple(number_of_values, norm_image, image_mean);
+           })
       .def("QuickCorrelationWithCTF", &Image::QuickCorrelationWithCTF)
       .def("ReturnIcinessOfSpectrum", &Image::ReturnIcinessOfSpectrum)
-      .def("GetRealValueByLinearInterpolationNoBoundsCheckImage", [](Image &__inst) {
-        float x; float y; float interpolated_value;
-        __inst.GetRealValueByLinearInterpolationNoBoundsCheckImage(x, y, interpolated_value);
-        return std::make_tuple(x, y, interpolated_value);
-      })
+      .def("GetRealValueByLinearInterpolationNoBoundsCheckImage", [](Image &__inst)
+           {
+             float x;
+             float y;
+             float interpolated_value;
+             __inst.GetRealValueByLinearInterpolationNoBoundsCheckImage(x, y, interpolated_value);
+             return std::make_tuple(x, y, interpolated_value);
+           })
       .def("FindPeakAtOriginFast2D", &Image::FindPeakAtOriginFast2D)
       .def("FindPeakWithIntegerCoordinates", &Image::FindPeakWithIntegerCoordinates)
       .def("FindPeakWithParabolaFit", &Image::FindPeakWithParabolaFit)
