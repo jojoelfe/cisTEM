@@ -166,9 +166,63 @@ PYBIND11_MODULE(pycistem, m)
       .def("FindFile", &AtomicCoordinatesAssetList::FindFile)
       .def("CheckMemory", &AtomicCoordinatesAssetList::CheckMemory);
 
+  // CTF
+
+  py::class_<CTF> ctf(m, "CTF");
+    ctf
+      .def(py::init<>())
+      //.def(py::init<float,float,float,float,float,float,float,float,float,float,float,float,float,float,float>())
+      //.def(py::init<float,float,float,float,float,float,float,float,float,float,float,float>())
+      .def("Init", (void (CTF::*)(float,float,float,float,float,float,float,float,float,float,float,float,float,float,float))&CTF::Init)
+      .def("Init", (void (CTF::*)(float,float,float,float,float,float,float,float))&CTF::Init)
+      .def("SetDefocus", &CTF::SetDefocus)
+      .def("SetAdditionalPhaseShift", &CTF::SetAdditionalPhaseShift)
+      .def("SetEnvelope", &CTF::SetEnvelope)
+      .def("SetBeamTilt", &CTF::SetBeamTilt)
+      .def("SetHighestFrequencyForFitting", &CTF::SetHighestFrequencyForFitting)
+      .def("SetLowResolutionContrast", &CTF::SetLowResolutionContrast)
+      .def("SetHighestFrequencyWithGoodFit", &CTF::SetHighestFrequencyWithGoodFit)
+      .def("EvaluateComplex", &CTF::EvaluateComplex)
+      .def("Evaluate", &CTF::Evaluate)
+      .def("EvaluateWithEnvelope", &CTF::EvaluateWithEnvelope)
+      .def("PhaseShiftGivenSquaredSpatialFrequencyAndAzimuth", &CTF::PhaseShiftGivenSquaredSpatialFrequencyAndAzimuth)
+      .def("EvaluateBeamTiltPhaseShift", &CTF::EvaluateBeamTiltPhaseShift)
+      .def("PhaseShiftGivenBeamTiltAndShift", &CTF::PhaseShiftGivenBeamTiltAndShift)
+      .def("PhaseShiftGivenSquaredSpatialFrequencyAndDefocus", &CTF::PhaseShiftGivenSquaredSpatialFrequencyAndDefocus)
+      .def("DefocusGivenAzimuth", &CTF::DefocusGivenAzimuth)
+      .def("BeamTiltGivenAzimuth", &CTF::BeamTiltGivenAzimuth)
+      .def("ParticleShiftGivenAzimuth", &CTF::ParticleShiftGivenAzimuth)
+      .def("WavelengthGivenAccelerationVoltage", &CTF::WavelengthGivenAccelerationVoltage)
+      .def("GetLowestFrequencyForFitting", &CTF::GetLowestFrequencyForFitting)
+      .def("GetHighestFrequencyForFitting", &CTF::GetHighestFrequencyForFitting)
+      .def("GetHighestFrequencyWithGoodFit", &CTF::GetHighestFrequencyWithGoodFit)
+      .def("GetAstigmatismTolerance", &CTF::GetAstigmatismTolerance)
+      .def("GetAstigmatism", &CTF::GetAstigmatism)
+      .def("IsAlmostEqualTo", &CTF::IsAlmostEqualTo)
+      .def("BeamTiltIsAlmostEqualTo", &CTF::BeamTiltIsAlmostEqualTo)
+      .def("EnforceConvention", &CTF::EnforceConvention)
+      //.def("PrintInfo", &CTF::PrintInfo)
+      .def("CopyFrom", &CTF::CopyFrom)
+      .def("ChangePixelSize", &CTF::ChangePixelSize)
+      .def("GetDefocus1", &CTF::GetDefocus1)
+      .def("GetDefocus2", &CTF::GetDefocus2)
+      .def("GetBeamTiltX", &CTF::GetBeamTiltX)
+      .def("GetBeamTiltY", &CTF::GetBeamTiltY)
+      .def("GetSphericalAberration", &CTF::GetSphericalAberration)
+      .def("GetAmplitudeContrast", &CTF::GetAmplitudeContrast)
+      .def("GetAstigmatismAzimuth", &CTF::GetAstigmatismAzimuth)
+      .def("GetAdditionalPhaseShift", &CTF::GetAdditionalPhaseShift)
+      .def("GetWavelength", &CTF::GetWavelength)
+      .def("ReturnNumberOfExtremaBeforeSquaredSpatialFrequency", &CTF::ReturnNumberOfExtremaBeforeSquaredSpatialFrequency)
+      .def("ReturnSquaredSpatialFrequencyGivenPhaseShiftAndAzimuth", &CTF::ReturnSquaredSpatialFrequencyGivenPhaseShiftAndAzimuth)
+      .def("ReturnSquaredSpatialFrequencyOfAZero", &CTF::ReturnSquaredSpatialFrequencyOfAZero)
+      .def("ReturnSquaredSpatialFrequencyOfPhaseShiftExtremumGivenAzimuth", &CTF::ReturnSquaredSpatialFrequencyOfPhaseShiftExtremumGivenAzimuth)
+      .def("ReturnSquaredSpatialFrequencyOfPhaseShiftExtremumGivenDefocus", &CTF::ReturnSquaredSpatialFrequencyOfPhaseShiftExtremumGivenDefocus)
+      .def("ReturnPhaseAberrationMaximum", &CTF::ReturnPhaseAberrationMaximum)
+      .def("ReturnPhaseAberrationMaximumGivenDefocus", &CTF::ReturnPhaseAberrationMaximumGivenDefocus);
+    
+
   // Curve
-
-
 
   py::class_<Curve> curve(m, "Curve");
     curve
@@ -179,6 +233,7 @@ PYBIND11_MODULE(pycistem, m)
         auto __ret = __inst.operator=(other_curve);
         return std::make_tuple(__ret, other_curve);
       })*/
+      .def_readonly("number_of_points", &Curve::number_of_points)
       .def_property_readonly("data_x", [](Curve &__inst) {
             //return 5;
             py::capsule buffer_handle([](){});
@@ -186,6 +241,17 @@ PYBIND11_MODULE(pycistem, m)
               {__inst.number_of_points},
               {4},
               __inst.data_x,
+              buffer_handle
+              );
+         }
+      )
+      .def_property_readonly("data_y", [](Curve &__inst) {
+            //return 5;
+            py::capsule buffer_handle([](){});
+            return py::array_t<float>(
+              {__inst.number_of_points},
+              {4},
+              __inst.data_y,
               buffer_handle
               );
          }
@@ -1138,6 +1204,9 @@ PYBIND11_MODULE(pycistem, m)
            {
              Curve average;
              Curve number_of_values;
+             average.SetupXAxis(0.0, 0.5 * sqrtf(2.0), int((__inst.logical_x_dimension / 2.0 + 1.0) * sqrtf(2.0) + 1.0));
+	           number_of_values.SetupXAxis(0.0, 0.5 * sqrtf(2.0), int((__inst.logical_x_dimension / 2.0 + 1.0) * sqrtf(2.0) + 1.0));
+
              __inst.Compute1DRotationalAverage(average, number_of_values, fractional_radius_in_real_space, average_real_parts);
              return std::make_tuple(average, number_of_values);
            })
