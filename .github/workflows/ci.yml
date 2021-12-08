@@ -25,20 +25,30 @@ jobs:
         echo "$PATH"
         mkdir -p build/icpc 
         cd build/icpc 
-        CXX=icpc CC=icc ../../configure  --enable-experimental --enable-staticmode --enable-openmp  --with-wx-config=wx-config 
+        CXX=icpc CC=icc ../../configure  --enable-experimental --enable-staticmode --enable-openmp  --with-wx-config=wx-config  --enable-samples
     - name: make
       run: |
         cd build/icpc
         make -j4
     - name: setup python
       run: |
-        cd src/pycistem
-        bash setup_python.sh
-    #- name: build python extension
-    #  run: |
-    #    cp src/pycistem/setup.py build/icpc/ 
-    #    cd build/icpc 
-    #    ../../src/pycistem/pycistem-venv/bin/python setup.py build_ext --inplace
+        cd build/icpc
+        PYTHON_BUILD_DEFINITIONS="../../src/pycistem/pybuild/" bash ../../src/pycistem/pybuild/python-build 3.9.6  ./python/
+        ./python/bin/python -m venv pycistem-venv
+        pycistem-venv/bin/python -m pip install -r ../../src/pycistem/requirements.txt 
+    - name: build python extension
+      run: |
+        cd build/icpc
+        cp ../../src/pycistem/setup.py ./ 
+        cp ../../src/pycistem/src/main.cpp ./src/
+        pycistem-venv/bin/python setup.py build_ext --inplace
+
+    - name: test console_test
+      run: build/icpc/src/console_test
+    - name: test samples_functional_testing
+      run: build/icpc/samples_functional_testing
+    - name: test pytest
+      run: build/icpc/pycistem-venv/bin/python -m pytest test/
     - name: Create binary artifact
       uses: actions/upload-artifact@v2
       with: 
