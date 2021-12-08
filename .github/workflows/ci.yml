@@ -34,11 +34,11 @@ jobs:
       run: |
         cd src/pycistem
         bash setup_python.sh
-    - name: build python extension
-      run: |
-        cp src/pycistem/setup.py build/icpc/ 
-        cd build/icpc 
-        ../../src/pycistem/pycistem-venv/bin/python setup.py build_ext --inplace
+    #- name: build python extension
+    #  run: |
+    #    cp src/pycistem/setup.py build/icpc/ 
+    #    cd build/icpc 
+    #    ../../src/pycistem/pycistem-venv/bin/python setup.py build_ext --inplace
     - name: Create binary artifact
       uses: actions/upload-artifact@v2
       with: 

@@ -8,7 +8,7 @@ RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
 
 ENV LANG en_US.UTF-8 
 
-RUN apt-get --allow-releaseinfo-change update && apt-get install -y gtk2.0-dev fftw3-dev libtiff-dev software-properties-common 
+RUN apt-get --allow-releaseinfo-change update && apt-get install -y gtk2.0-dev fftw3-dev libtiff-dev software-properties-common libffi-dev libbz2-dev libsqlite3-dev zlib1g-dev libjpeg-dev libtiff-dev 
 
 #Need newer git for Github actions
 RUN add-apt-repository ppa:git-core/ppa -y && apt-get --allow-releaseinfo-change update && apt-get install -y git
