@@ -19,9 +19,13 @@ jobs:
     - name: regenerate_project
       run: ./regenerate_project.b
     - name: configure
-      run: mkdir -p build/icpc && cd build/icpc && CXX=/opt/intel/oneapi/compiler/2021.4.0/linux/bin/intel64/icpc CC=/opt/intel/oneapi/compiler/2021.4.0/linux/bin/intel64/icc CXXFLAGS=-fPIC CFLAGS=-fPIC  ../../configure  --enable-experimental --enable-staticmode --enable-openmp  --with-wx-config=wx-config 
+      run: mkdir -p build/icpc && cd build/icpc && CXX=icpc CC=icc ../../configure  --enable-experimental --enable-staticmode --enable-openmp  --with-wx-config=wx-config 
     - name: make
       run: cd build/icpc && make -j4
+    - name: setup python
+      run: cd src/pycistem && bash setup_python.sh
+    - name: build python extension
+      run: cp src/pycistem/setup.py build/icpc/ && cd build/icpc && ../../src/pycistem/pycistem-venv/bin/python setup.py build_ext --inplace
     - name: Create binary artifact
       uses: actions/upload-artifact@v2
       with: 
