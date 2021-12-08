@@ -691,6 +691,19 @@ PYBIND11_MODULE(pycistem, m)
       .def("GetClassificationByID", &Database::GetClassificationByID)
       .def("AddClassificationSelection", &Database::AddClassificationSelection);
 
+  // ElectronDose
+
+   py::class_<ElectronDose> electrondose(m, "ElectronDose");
+    electrondose
+      .def(py::init<>())
+      .def(py::init<float,float>())
+      .def("Init", &ElectronDose::Init)
+      .def("ReturnCriticalDose", &ElectronDose::ReturnCriticalDose)
+      .def("ReturnDoseFilter", &ElectronDose::ReturnDoseFilter)
+      .def("ReturnCummulativeDoseFilter", &ElectronDose::ReturnCummulativeDoseFilter)
+      .def("CalculateCummulativeDoseFilterAs1DArray", &ElectronDose::CalculateCummulativeDoseFilterAs1DArray)
+      .def("CalculateDoseFilterAs1DArray", &ElectronDose::CalculateDoseFilterAs1DArray);
+
   // Project
 
   py::class_<Project> project(m, "Project");
