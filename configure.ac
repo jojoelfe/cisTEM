@@ -22,8 +22,8 @@ if test "x$TOPSRCDIR" = "x." ; then
 fi
 # don't let the AC_PROG_CXX set default flags, set them back to input..
 
-CXXFLAGS="$INPUT_CXXFLAGS"
-CPPFLAGS="$INPUT_CPPFLAGS"
+CXXFLAGS="$INPUT_CXXFLAGS -fPIC"
+CPPFLAGS="$INPUT_CPPFLAGS -fPIC"
 
 # set up initial flags
 AC_MSG_NOTICE([Setting up initial flags])
@@ -233,19 +233,6 @@ AC_ARG_ENABLE(samples, [  --enable-samples      Compile with samples [[default=n
   ]) 
 AM_CONDITIONAL([ENABLESAMPLES_AM], [test x$want_samples = xtrue])
 
-# Compile python module
-want_python="no"  
-AC_ARG_ENABLE(python, [  --enable-python      Compile python module [[default=no]]],[
-  if test "$enableval" = yes; then
-    CXXFLAGS="$CXXFLAGS -DPYTHON"
-    CPPFLAGS="$CPPFLAGS -DPYTHON"
-  	want_python="true"
-  	AC_MSG_NOTICE([Compiling python module])	
-  fi
-  ]) 
-AM_CONDITIONAL([ENABLEPYTHON_AM], [test x$want_python = xtrue])
-
-
 # experimental
 compile_experimental="false"
 AC_ARG_ENABLE(experimental, AS_HELP_STRING([--enable-experimental],[Compile with experimental [default=no]]),[
@@ -352,8 +339,8 @@ if test "x$HAVE_MKL" = "xyes"; then
 	CPPFLAGS="$CPPFLAGS -DMKL"
 
 	if test "x$CXX" = "xicpc"; then
-		CPPFLAGS="$CPPFLAGS -mkl=sequential -fPIC"
-		LIBS="$LIBS -mkl=sequential -lz"
+		CPPFLAGS="$CPPFLAGS -mkl=sequential"
+		LIBS="$LIBS -mkl=sequential"
 	else
 		LDFLAGS="$LDFLAGS -L\$(MKLROOT)/lib/intel64"
 		if test "x$static_link" = "xtrue"; then
