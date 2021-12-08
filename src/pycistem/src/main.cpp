@@ -1,6 +1,6 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
-#include "../../core/core_headers.h"
+#include "../../../../core/core_headers.h"
 
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
@@ -701,8 +701,34 @@ PYBIND11_MODULE(pycistem, m)
       .def("ReturnCriticalDose", &ElectronDose::ReturnCriticalDose)
       .def("ReturnDoseFilter", &ElectronDose::ReturnDoseFilter)
       .def("ReturnCummulativeDoseFilter", &ElectronDose::ReturnCummulativeDoseFilter)
-      .def("CalculateCummulativeDoseFilterAs1DArray", &ElectronDose::CalculateCummulativeDoseFilterAs1DArray)
-      .def("CalculateDoseFilterAs1DArray", &ElectronDose::CalculateDoseFilterAs1DArray);
+      .def("CalculateCummulativeDoseFilterAs1DArray", [](ElectronDose &__inst, Image &ref_image, float dose_start, float dose_end)
+        {
+          float dose_filter[ref_image.real_memory_allocated / 2];
+
+			    ZeroFloatArray(dose_filter, ref_image.real_memory_allocated / 2);
+          __inst.CalculateCummulativeDoseFilterAs1DArray(&ref_image, dose_filter, dose_start, dose_end);
+          py::capsule buffer_handle([](){});
+            return py::array_t<float>(
+              {ref_image.real_memory_allocated / 2},
+              {4},
+              dose_filter,
+              buffer_handle
+              ); 
+        })
+      .def("CalculateDoseFilterAs1DArray",  [](ElectronDose &__inst, Image &ref_image, float dose_start, float dose_end)
+        {
+          float dose_filter[ref_image.real_memory_allocated / 2];
+
+			    ZeroFloatArray(dose_filter, ref_image.real_memory_allocated / 2);
+          __inst.CalculateCummulativeDoseFilterAs1DArray(&ref_image, dose_filter, dose_start, dose_end);
+          py::capsule buffer_handle([](){});
+            return py::array_t<float>(
+              {ref_image.real_memory_allocated / 2},
+              {4},
+              dose_filter,
+              buffer_handle
+              ); 
+        });
 
   // Project
 

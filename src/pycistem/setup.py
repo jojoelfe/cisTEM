@@ -5,11 +5,13 @@ from pybind11.setup_helpers import Pybind11Extension
 from setuptools import setup
 from setuptools.command.build_ext import build_ext
 
+
+# This code pulls come key compile info out of the config.log file
 __version__ = "0.0.1"
 __compiler__ = "g++"
 __WX_FLAGS__ = ""
 __CPP_FLAGS__ = ""
-
+__WX_LIBS_BASE__ = ""
 
 with open("config.log","r") as config_log:
     configs = config_log.readlines()
@@ -23,9 +25,11 @@ for line in configs:
         __WX_FLAGS__ = line[18:-2]
     if line.startswith("CPPFLAGS="):
         __CPP_FLAGS__ = line[10:-2]
+    if line.startswith("WX_LIBS_BASE="):
+        __WX_LIBS_BASE__ = line[14:-2]
         
 
-
+# Overwrite default compiler flags. It's kind of a hack to add the import flgs to the compiler string, but I think its the only way.
 class custom_build_ext(build_ext):
     def build_extensions(self):
         # Override the compiler executables. Importantly, this
@@ -34,15 +38,16 @@ class custom_build_ext(build_ext):
         # distutils.sysconfig.get_var("CFLAGS").
         self.compiler.set_executable("compiler_so", __compiler__ + " " + __WX_FLAGS__ + " " + __CPP_FLAGS__)
         self.compiler.set_executable("compiler_cxx", __compiler__ + " " + __WX_FLAGS__ + " " + __CPP_FLAGS__)
-        self.compiler.set_executable("linker_so", __compiler__ + " " + __WX_FLAGS__ + " " + __CPP_FLAGS__)
+        self.compiler.set_executable("linker_so", __compiler__  + " " + __CPP_FLAGS__ +" -shared -static-intel")
         build_ext.build_extensions(self)
 
 ext_modules = [
-    Pybind11Extension("python_example",
-        ["../../src/pycistem/src/main.cpp"],
+    Pybind11Extension("pycistem",
+        ["src/main.cpp"],
         # Example: passing in the version to the compiled code
         define_macros = [('VERSION_INFO', __version__)],
-        extra_compile_args = ["-fPIC"],
+        extra_objects = [ "src/libcore.a"],
+        extra_link_args = __WX_LIBS_BASE__.split(' ') + ['-fopenmp']
         ),
 ]
 
