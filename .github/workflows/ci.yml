@@ -54,16 +54,19 @@ jobs:
         pycistem-venv/bin/python -m pip install .
 
     - name: test console_test
+      continue-on-error: true
       run: "! build/icpc/src/console_test | grep FAILED"
 
     - name: test samples_functional_testing
-      run: "! build/icpc/samples_functional_testing"
+      continue-on-error: true
+      run: "! build/icpc/src/samples_functional_testing"
 
     - name: test pytest
+      continue-on-error: true
       run: build/icpc/pycistem-venv/bin/python -m pytest -p no:napari -p no:napari-plugin-engine test/
-
+  
     - name: Create binary artifact
       uses: actions/upload-artifact@v2
       with: 
         name: cistem_binaries
-        path: build/icpc/src
+        path: build/icpc
