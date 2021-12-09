@@ -44,9 +44,9 @@ jobs:
         pycistem-venv/bin/python setup.py build_ext --inplace
 
     - name: test console_test
-      run: build/icpc/src/console_test
+      run: ! build/icpc/src/console_test | grep FAILED
     - name: test samples_functional_testing
-      run: build/icpc/samples_functional_testing
+      run: ! build/icpc/samples_functional_testing
     - name: test pytest
       run: build/icpc/pycistem-venv/bin/python -m pytest test/
     - name: Create binary artifact
