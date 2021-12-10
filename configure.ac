@@ -22,8 +22,8 @@ if test "x$TOPSRCDIR" = "x." ; then
 fi
 # don't let the AC_PROG_CXX set default flags, set them back to input..
 
-CXXFLAGS="$INPUT_CXXFLAGS -fPIC"
-CPPFLAGS="$INPUT_CPPFLAGS -fPIC"
+CXXFLAGS="$INPUT_CXXFLAGS"
+CPPFLAGS="$INPUT_CPPFLAGS"
 
 # set up initial flags
 AC_MSG_NOTICE([Setting up initial flags])
@@ -66,11 +66,11 @@ AC_ARG_ENABLE([disable-warnings], AS_HELP_STRING([--disable compiler warnings], 
 
 
 if test "x$CXX" = "xicpc"; then		
-	CXXFLAGS="$CXXFLAGS -O3 -no-prec-div -no-prec-sqrt $WARNINGS_ON -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -std=c++${CPP_STANDARD} -wd1125"
-	CPPFLAGS="$CPPFLAGS -O3 -no-prec-div -no-prec-sqrt $WARNINGS_ON -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE"
+	CXXFLAGS="$CXXFLAGS -O3 -no-prec-div -no-prec-sqrt -fPIC $WARNINGS_ON -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -std=c++${CPP_STANDARD} -wd1125"
+	CPPFLAGS="$CPPFLAGS -O3 -no-prec-div -no-prec-sqrt -fPIC $WARNINGS_ON -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE"
 else
-	CXXFLAGS="$CXXFLAGS -DNDEBUG -funroll-loops -O3 -pipe $WARNINGS_ON -fexpensive-optimizations -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -std=c++${CPP_STANDARD}"		
-	CPPFLAGS="$CPPFLAGS -DNDEBUG -funroll-loops -O3 -pipe $WARNINGS_ON -fexpensive-optimizations -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE"
+	CXXFLAGS="$CXXFLAGS -DNDEBUG -funroll-loops -O3 -fPIC -pipe $WARNINGS_ON -fexpensive-optimizations -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -std=c++${CPP_STANDARD}"		
+	CPPFLAGS="$CPPFLAGS -DNDEBUG -funroll-loops -O3 -fPIC -pipe $WARNINGS_ON -fexpensive-optimizations -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE"
 
 	#sqlite needs dl on gcc
 	
@@ -166,11 +166,11 @@ AC_ARG_ENABLE(debugmode, AS_HELP_STRING([--enable-debugmode],[Compile in debug m
 [
   if test "$enableval" = yes; then
   if test "x$CXX" = "xicpc"; then   
-    CXXFLAGS="-O2 -debug -no-prec-div -no-prec-sqrt $WARNINGS_ON -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -DDEBUG -std=c++${CPP_STANDARD} -wd1125"
-    CPPFLAGS="-O2 -debug -no-prec-div -no-prec-sqrt $WARNINGS_ON -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -DDEBUG"
+    CXXFLAGS="-O2 -debug -no-prec-div -fPIC -no-prec-sqrt $WARNINGS_ON -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -DDEBUG -std=c++${CPP_STANDARD} -wd1125"
+    CPPFLAGS="-O2 -debug -no-prec-div -fPIC -no-prec-sqrt $WARNINGS_ON -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -DDEBUG"
   else
-    CPPFLAGS="-O2 -g -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -DDEBUG $WARNINGS_ON $INPUT_CPPFLAGS"
-    CXXFLAGS="-O2 -g -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -DDEBUG -std=c++${CPP_STANDARD} $WARNINGS_ON $INPUT_CXXFLAGS"
+    CPPFLAGS="-O2 -g -D_FILE_OFFSET_BITS=64 -fPIC -D_LARGEFILE_SOURCE -DDEBUG $WARNINGS_ON $INPUT_CPPFLAGS"
+    CXXFLAGS="-O2 -g -D_FILE_OFFSET_BITS=64 -fPIC -D_LARGEFILE_SOURCE -DDEBUG -std=c++${CPP_STANDARD} $WARNINGS_ON $INPUT_CXXFLAGS"
   fi
   fi
  ])

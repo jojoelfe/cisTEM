@@ -170,11 +170,65 @@ PYBIND11_MODULE(pycistem, m)
 
   py::class_<CTF> ctf(m, "CTF");
     ctf
-      .def(py::init<>())
+      .def(py::init([](		float wanted_acceleration_voltage_in_kV, // keV
+				float wanted_spherical_aberration_in_mm, // mm
+				float wanted_amplitude_contrast,
+				float wanted_defocus_1_in_angstroms, // A
+				float wanted_defocus_2_in_angstroms, //A
+				float wanted_astigmatism_azimuth_in_degrees, // degrees
+				float wanted_lowest_frequency_for_fitting_in_reciprocal_angstroms, // 1/A
+				float wanted_highest_frequency_for_fitting_in_reciprocal_angstroms, // 1/A
+				float wanted_astigmatism_tolerance_in_angstroms, // A. Set to negative to indicate no restraint on astigmatism.
+				float pixel_size_in_angstroms, // A
+				float wanted_additional_phase_shift_in_radians, //rad
+				float wanted_beam_tilt_x_in_radians, // rad
+				float wanted_beam_tilt_y_in_radians, // rad
+				float wanted_particle_shift_x_in_angstroms, // A
+				float wanted_particle_shift_y_in_angstroms, // A
+				float wanted_thickness_in_nm) {
+          CTF ctf = CTF();
+          if (wanted_highest_frequency_for_fitting_in_reciprocal_angstroms <= 0.0f) {
+            wanted_highest_frequency_for_fitting_in_reciprocal_angstroms = 1.0/(2.0*pixel_size_in_angstroms);
+          }
+          ctf.Init(wanted_acceleration_voltage_in_kV,
+                   wanted_spherical_aberration_in_mm,
+                   wanted_amplitude_contrast,
+                   wanted_defocus_1_in_angstroms,
+                   wanted_defocus_2_in_angstroms,
+                   wanted_astigmatism_azimuth_in_degrees,
+                   wanted_lowest_frequency_for_fitting_in_reciprocal_angstroms,
+                   wanted_highest_frequency_for_fitting_in_reciprocal_angstroms,
+                   wanted_astigmatism_tolerance_in_angstroms,
+                   pixel_size_in_angstroms,
+                   wanted_additional_phase_shift_in_radians,
+                   wanted_beam_tilt_x_in_radians,
+                   wanted_beam_tilt_y_in_radians,
+                   wanted_particle_shift_x_in_angstroms,
+                   wanted_particle_shift_y_in_angstroms,
+                   wanted_thickness_in_nm);
+          return ctf;
+        }), py::arg("kV") = 300.0,
+            py::arg("cs") = 2.7,
+            py::arg("ac") = 0.07,
+            py::arg("defocus1") = 0.0,
+            py::arg("defocus2") = 0.0,
+            py::arg("astig_angle") = 0.0,
+            py::arg("low_freq") = 0.0,
+            py::arg("high_freq") = 0.0,
+            py::arg("astig_tol") = -10.0,
+            py::arg("pixel_size") = 1.0,
+            py::arg("phase_shift") = 0.0,
+            py::arg("beam_tilt_x") = 0.0,
+            py::arg("beam_tilt_y") = 0.0,
+            py::arg("particle_shift_x") = 0.0,
+            py::arg("particle_shift_y") = 0.0,
+            py::arg("thickness") = 0.0
+            )
+      //.def_readonly("thickness", &CTF::thickness)
       //.def(py::init<float,float,float,float,float,float,float,float,float,float,float,float,float,float,float>())
       //.def(py::init<float,float,float,float,float,float,float,float,float,float,float,float>())
-      .def("Init", (void (CTF::*)(float,float,float,float,float,float,float,float,float,float,float,float,float,float,float))&CTF::Init)
-      .def("Init", (void (CTF::*)(float,float,float,float,float,float,float,float))&CTF::Init)
+      //.def("Init", (void (CTF::*)(float,float,float,float,float,float,float,float,float,float,float,float,float,float,float,float))&CTF::Init)
+      //.def("Init", (void (CTF::*)(float,float,float,float,float,float,float,float,float))&CTF::Init)
       .def("SetDefocus", &CTF::SetDefocus)
       .def("SetAdditionalPhaseShift", &CTF::SetAdditionalPhaseShift)
       .def("SetEnvelope", &CTF::SetEnvelope)
@@ -185,6 +239,7 @@ PYBIND11_MODULE(pycistem, m)
       .def("EvaluateComplex", &CTF::EvaluateComplex)
       .def("Evaluate", &CTF::Evaluate)
       .def("EvaluateWithEnvelope", &CTF::EvaluateWithEnvelope)
+      .def("EvaluateWithThickness", &CTF::EvaluateWithThickness)
       .def("PhaseShiftGivenSquaredSpatialFrequencyAndAzimuth", &CTF::PhaseShiftGivenSquaredSpatialFrequencyAndAzimuth)
       .def("EvaluateBeamTiltPhaseShift", &CTF::EvaluateBeamTiltPhaseShift)
       .def("PhaseShiftGivenBeamTiltAndShift", &CTF::PhaseShiftGivenBeamTiltAndShift)
@@ -198,6 +253,7 @@ PYBIND11_MODULE(pycistem, m)
       .def("GetHighestFrequencyWithGoodFit", &CTF::GetHighestFrequencyWithGoodFit)
       .def("GetAstigmatismTolerance", &CTF::GetAstigmatismTolerance)
       .def("GetAstigmatism", &CTF::GetAstigmatism)
+      .def("GetThickness", &CTF::GetThickness)
       .def("IsAlmostEqualTo", &CTF::IsAlmostEqualTo)
       .def("BeamTiltIsAlmostEqualTo", &CTF::BeamTiltIsAlmostEqualTo)
       .def("EnforceConvention", &CTF::EnforceConvention)

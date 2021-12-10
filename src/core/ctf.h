@@ -51,7 +51,7 @@ public:
 				float beam_tilt_y = 0.0f,
 				float particle_shift_x = 0.0f,
 				float particle_shift_y = 0.0f,
-				float thickness = 0.0f;);
+				float thickness = 0.0f);
 
 	CTF(		float wanted_acceleration_voltage, // keV
 				float wanted_spherical_aberration, // mm
@@ -84,7 +84,7 @@ public:
 				float wanted_beam_tilt_y_in_radians = 0.0f, // rad
 				float wanted_particle_shift_x_in_angstroms = 0.0f, // A
 				float wanted_particle_shift_y_in_angstroms = 0.0f, // A
-				float wanted_thickness_in_nm); // nm
+				float wanted_thickness_in_nm = 0.0f); // nm
 
 	void Init(	float wanted_acceleration_voltage_in_kV, // keV
 				float wanted_spherical_aberration_in_mm, // mm
@@ -94,7 +94,7 @@ public:
 				float wanted_astigmatism_azimuth_in_degrees, // degrees
 				float pixel_size_in_angstroms, // A
 				float wanted_additional_phase_shift_in_radians, // rad
-				float wanted_thickness_in_nm); //nm
+				float wanted_thickness_in_nm = 0.0f); //nm
 
 
 	void SetDefocus(float wanted_defocus_1_pixels, float wanted_defocus_2_pixels, float wanted_astigmatism_angle_radians);
@@ -109,6 +109,7 @@ public:
 	std::complex<float> EvaluateComplex(float squared_spatial_frequency, float azimuth);
 	float Evaluate(float squared_spatial_frequency, float azimuth);
 	float EvaluateWithEnvelope(float squared_spatial_frequency, float azimuth);
+	float EvaluateWithThickness(float squared_spatial_frequency, float azimuth);
 	float PhaseShiftGivenSquaredSpatialFrequencyAndAzimuth(float squared_spatial_frequency, float azimuth);
 	std::complex<float> EvaluateBeamTiltPhaseShift(float squared_spatial_frequency, float azimuth);
 	float PhaseShiftGivenBeamTiltAndShift(float squared_spatial_frequency, float beam_tilt, float particle_shift = 0.0f);
@@ -122,6 +123,8 @@ public:
 	inline float GetHighestFrequencyWithGoodFit() {return highest_frequency_with_good_fit;};
 	inline float GetAstigmatismTolerance() { return astigmatism_tolerance; };
 	inline float GetAstigmatism(){ return defocus_1 - defocus_2; };
+	inline float GetThickness(){ return thickness; };
+	
 	bool IsAlmostEqualTo(CTF *wanted_ctf, float delta_defocus = 100.0f);
 	bool BeamTiltIsAlmostEqualTo(CTF *wanted_ctf, float delta_beam_tilt = 0.00001f);
 	void EnforceConvention();

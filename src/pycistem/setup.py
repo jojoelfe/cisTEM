@@ -36,7 +36,7 @@ class custom_build_ext(build_ext):
         # removes the "default" compiler flags that would
         # otherwise get passed on to to the compiler, i.e.,
         # distutils.sysconfig.get_var("CFLAGS").
-        self.compiler.set_executable("compiler_so", __compiler__ + " " + __WX_FLAGS__ + " " + __CPP_FLAGS__ +" -DMKL -static-intel -qopenmp-link=static")
+        self.compiler.set_executable("compiler_so", __compiler__ + " " + __WX_FLAGS__ + " " + __CPP_FLAGS__ +" -fPIC -DMKL -static-intel -qopenmp-link=static")
         self.compiler.set_executable("compiler_cxx", __compiler__ + " " + __WX_FLAGS__ + " " + __CPP_FLAGS__)
         self.compiler.set_executable("linker_so", __compiler__  + " " + __CPP_FLAGS__ +" -shared -DMKL -static-intel -qopenmp-link=static")
         build_ext.build_extensions(self)
