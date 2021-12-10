@@ -9,6 +9,7 @@ private:
 	float defocus_half_range;
 	float astigmatism_azimuth;
 	float additional_phase_shift;
+	float thickness; // nm
 	float beam_tilt_x; // rad
 	float beam_tilt_y; // rad
 	float beam_tilt; // rad
@@ -49,7 +50,8 @@ public:
 				float beam_tilt_x = 0.0f,
 				float beam_tilt_y = 0.0f,
 				float particle_shift_x = 0.0f,
-				float particle_shift_y = 0.0f);
+				float particle_shift_y = 0.0f,
+				float thickness = 0.0f;);
 
 	CTF(		float wanted_acceleration_voltage, // keV
 				float wanted_spherical_aberration, // mm
@@ -58,11 +60,12 @@ public:
 				float wanted_defocus_2_in_angstroms, // A
 				float wanted_astigmatism_azimuth, // degrees
 				float pixel_size, // A
-				float wanted_additional_phase_shift_in_radians, // rad
+				float wanted_additional_phase_shift_in_radians, // rad		
 				float wanted_beam_tilt_x_in_radians = 0.0f, // rad
 				float wanted_beam_tilt_y_in_radians = 0.0f, // rad
 				float wanted_particle_shift_x_in_angstroms = 0.0f, // A
-				float wanted_particle_shift_y_in_angstroms = 0.0f); // A
+				float wanted_particle_shift_y_in_angstroms = 0.0f, // A
+				float wanted_thickness_in_nm = 0.0f); //nm
 
 	~CTF();
 
@@ -80,7 +83,8 @@ public:
 				float wanted_beam_tilt_x_in_radians = 0.0f, // rad
 				float wanted_beam_tilt_y_in_radians = 0.0f, // rad
 				float wanted_particle_shift_x_in_angstroms = 0.0f, // A
-				float wanted_particle_shift_y_in_angstroms = 0.0f); // A
+				float wanted_particle_shift_y_in_angstroms = 0.0f, // A
+				float wanted_thickness_in_nm); // nm
 
 	void Init(	float wanted_acceleration_voltage_in_kV, // keV
 				float wanted_spherical_aberration_in_mm, // mm
@@ -89,7 +93,8 @@ public:
 				float wanted_defocus_2_in_angstroms, //A
 				float wanted_astigmatism_azimuth_in_degrees, // degrees
 				float pixel_size_in_angstroms, // A
-				float wanted_additional_phase_shift_in_radians); //rad
+				float wanted_additional_phase_shift_in_radians, // rad
+				float wanted_thickness_in_nm); //nm
 
 
 	void SetDefocus(float wanted_defocus_1_pixels, float wanted_defocus_2_pixels, float wanted_astigmatism_angle_radians);
@@ -98,6 +103,7 @@ public:
 	void SetBeamTilt(float wanted_beam_tilt_x_in_radians, float wanted_beam_tilt_y_in_radians, float wanted_particle_shift_x_in_pixels = 0.0f, float wanted_particle_shift_y_in_pixels = 0.0f);
 	void SetHighestFrequencyForFitting(float wanted_highest_frequency_in_reciprocal_pixels);
 	void SetLowResolutionContrast(float wanted_low_resolution_contrast);
+	void SetThickness(float wanted_thickness);
 	inline void SetHighestFrequencyWithGoodFit(float wanted_frequency_in_reciprocal_pixels) {highest_frequency_with_good_fit = wanted_frequency_in_reciprocal_pixels;};
 	//
 	std::complex<float> EvaluateComplex(float squared_spatial_frequency, float azimuth);
