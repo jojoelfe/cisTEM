@@ -33,7 +33,8 @@ jobs:
         mkdir -p build/icpc 
         cd build/icpc 
         CXX=icpc CC=icc ../../configure  --enable-experimental --enable-staticmode --enable-openmp  --with-wx-config=wx-config  --enable-samples
-        echo "CISTEM_VERSION_TEXT=$(cat config.log | grep CISTEM_VERSION_TEXT | cut -d' ' -f3)" >> $GITHUB_ENVS    - name: make
+        echo "CISTEM_VERSION_TEXT=$(cat config.log | grep CISTEM_VERSION_TEXT | cut -d' ' -f3)" >> $GITHUB_ENVS 
+    - name: make
       run: |
         cd build/icpc
         make -j4
