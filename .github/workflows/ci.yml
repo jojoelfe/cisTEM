@@ -33,7 +33,7 @@ jobs:
         mkdir -p build/icpc 
         cd build/icpc 
         CXX=icpc CC=icc ../../configure  --enable-experimental --enable-staticmode --enable-openmp  --with-wx-config=wx-config  --enable-samples
-        echo "CISTEM_VERSION_TEXT=$(cat config.log | grep CISTEM_VERSION_TEXT | cut -d' ' -f3)" >> $GITHUB_ENVS 
+        cat config.log | grep CISTEM_VERSION_TEXT | cut -d' ' -f3 
     - name: make
       run: |
         cd build/icpc
@@ -43,7 +43,6 @@ jobs:
         cd build/icpc
         rm -r src/core
         rm -r src/gui
-        rm -r src/gpu
         rm -r src/programs
     - name: Create binary artifact
       uses: actions/upload-artifact@v2
