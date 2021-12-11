@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-18.04
     container: jojoelfe/cistem_ci
     outputs:
-      version: {{ steps.configure.outputs.version }}
+      version: ${{ steps.configure.outputs.version }}
     steps:
     - uses: actions/checkout@v2
       with:
