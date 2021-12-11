@@ -388,6 +388,11 @@ void CTF::SetDefocus(float wanted_defocus_1_pixels, float wanted_defocus_2_pixel
 	astigmatism_azimuth = wanted_astigmatism_angle_radians;
 }
 
+void CTF::SetThickness(float wanted_thickness_in_pixels)
+{
+	thickness = wanted_thickness_in_pixels;
+}
+
 // Set the additional phase shift, given in radians
 void CTF::SetAdditionalPhaseShift(float wanted_additional_phase_shift_radians)
 {
