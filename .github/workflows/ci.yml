@@ -11,9 +11,11 @@ jobs:
 
     runs-on: ubuntu-18.04
     container: jojoelfe/cistem_ci
-
+    outputs:
+      version: {{ steps.configure.outputs.version }}
     steps:
     - uses: actions/checkout@v2
+      fetch-depth: 0
     - name: regenerate_project
       run: ./regenerate_project.b
     - name: set path
@@ -33,7 +35,8 @@ jobs:
         mkdir -p build/icpc 
         cd build/icpc 
         CXX=icpc CC=icc ../../configure  --enable-experimental --enable-staticmode --enable-openmp  --with-wx-config=wx-config  --enable-samples
-        cat config.log | grep CISTEM_VERSION_TEXT | cut -d' ' -f3 
+        VERSION=$(cat config.log | grep CISTEM_VERSION_TEXT | cut -d' ' -f3 | tr -d '"')
+        echo "::set-output name=version::$VERSION" 
     - name: make
       run: |
         cd build/icpc
@@ -47,8 +50,37 @@ jobs:
     - name: Create binary artifact
       uses: actions/upload-artifact@v2
       with: 
-        name: cistem_binaries
+        name: cistem_binaries_icpc
         path: build/icpc/src
+    - name: configure_gcc
+      continue-on-error: true
+      run: |
+        echo "$PATH"
+        echo "$CPATH"
+        echo "$LD_LIBRARY_PATH"
+        mkdir -p build/gcc 
+        cd build/gcc
+        CXX=g++ CC=icc ../../configure  --enable-experimental --enable-staticmode --enable-openmp  --with-wx-config=wx-config  --enable-samples
+        VERSION=$(cat config.log | grep CISTEM_VERSION_TEXT | cut -d' ' -f3 | tr -d '"')
+        echo "::set-output name=version::$VERSION" 
+    - name: make_gcc
+      continue-on-error: true
+      run: |
+        cd build/gcc
+        make -j4
+    - name: clean up_gcc
+      continue-on-error: true
+      run: |
+        cd build/gcc
+        rm -r src/core
+        rm -r src/gui
+        rm -r src/programs
+    - name: Create binary artifact_gcc
+      continue-on-error: true
+      uses: actions/upload-artifact@v2
+      with: 
+        name: cistem_binaries_gcc
+        path: build/gcc/src
 
   console_test:
     name: Console test
@@ -61,7 +93,7 @@ jobs:
         name: cistem_binaries
     - name: test console_test
       continue-on-error: true
-      run: build/icpc/src/console_test 
+      run: console_test 
 
   samples_functional_testing:
     name: Samples functional testing
@@ -74,5 +106,5 @@ jobs:
         name: cistem_binaries
     - name: test samples_functional_testing
       continue-on-error: true
-      run: build/icpc/src/samples_functional_testing
+      run: samples_functional_testing
 
