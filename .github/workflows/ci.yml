@@ -2,9 +2,9 @@ name: ICPC compile
 
 on:
   push:
-    branches: test-ci
+    branches: master
   pull_request:
-    branches: test-ci
+    branches: master
 
 jobs:
   build:
