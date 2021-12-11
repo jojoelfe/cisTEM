@@ -64,7 +64,7 @@ jobs:
       continue-on-error: true
       run: build/icpc/src/console_test 
 
-samples_functional_testing:
+  samples_functional_testing:
     name: Samples functional testing
     needs: build
     runs-on: ubuntu-18.04
