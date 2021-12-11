@@ -12,8 +12,6 @@ jobs:
     runs-on: ubuntu-18.04
     container: jojoelfe/cistem_ci
 
-
-
     steps:
     - uses: actions/checkout@v2
     - name: regenerate_project
@@ -35,38 +33,46 @@ jobs:
         mkdir -p build/icpc 
         cd build/icpc 
         CXX=icpc CC=icc ../../configure  --enable-experimental --enable-staticmode --enable-openmp  --with-wx-config=wx-config  --enable-samples
-    - name: make
+        echo "CISTEM_VERSION_TEXT=$(cat config.log | grep CISTEM_VERSION_TEXT | cut -d' ' -f3)" >> $GITHUB_ENVS    - name: make
       run: |
         cd build/icpc
         make -j4
-    - name: setup python
+    - name: clean up
       run: |
         cd build/icpc
-        PYTHON_BUILD_DEFINITIONS="../../src/pycistem/pybuild/" bash ../../src/pycistem/pybuild/python-build 3.9.6  ./python/
-        ./python/bin/python -m venv pycistem-venv
-        pycistem-venv/bin/python -m pip install -r ../../src/pycistem/requirements.txt 
-    - name: build python extension
-      run: |
-        cd build/icpc
-        cp ../../src/pycistem/setup.py ./ 
-        cp ../../src/pycistem/src/main.cpp ./src/
-        pycistem-venv/bin/python setup.py build_ext --inplace
-        pycistem-venv/bin/python -m pip install .
-
-    - name: test console_test
-      continue-on-error: true
-      run: "! build/icpc/src/console_test | grep FAILED"
-
-    - name: test samples_functional_testing
-      continue-on-error: true
-      run: "! build/icpc/src/samples_functional_testing"
-
-    - name: test pytest
-      continue-on-error: true
-      run: build/icpc/pycistem-venv/bin/python -m pytest -p no:napari -p no:napari-plugin-engine test/
-  
+        rm -r src/core
+        rm -r src/gui
+        rm -r src/gpu
+        rm -r src/programs
     - name: Create binary artifact
       uses: actions/upload-artifact@v2
       with: 
         name: cistem_binaries
-        path: build/icpc
+        path: build/icpc/src
+
+  console_test:
+    name: Console test
+    needs: build
+    runs-on: ubuntu-18.04
+    steps:
+    - name: Download artifact
+      uses: actions/download-artifact@v2
+      with:
+        name: cistem_binaries
+    - name: test console_test
+      continue-on-error: true
+      run: build/icpc/src/console_test 
+
+samples_functional_testing:
+    name: Samples functional testing
+    needs: build
+    runs-on: ubuntu-18.04
+    steps:
+    - name: Download artifact
+      uses: actions/download-artifact@v2
+      with:
+        name: cistem_binaries
+    - name: test samples_functional_testing
+      continue-on-error: true
+      run: build/icpc/src/samples_functional_testing
+
