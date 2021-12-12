@@ -149,7 +149,7 @@ void CTF::Init(	float wanted_acceleration_voltage_in_kV, // keV
 	{
 		particle_shift_azimuth = atan2f(particle_shift_y,particle_shift_x);
 	}
-	thickness = wanted_thickness_in_nm * 10000.0 / pixel_size_in_angstroms;
+	thickness = wanted_thickness_in_nm * 10.0 / pixel_size_in_angstroms;
 }
 
 /*
@@ -473,19 +473,7 @@ float CTF::Evaluate(float squared_spatial_frequency, float azimuth)
 // Return the value of the CTF at the given squared spatial frequency and azimuth
 float CTF::EvaluateWithThickness(float squared_spatial_frequency, float azimuth)
 {
-	if (defocus_1 == 0.0f && defocus_2 == 0.0f) return -0.7; // for defocus sweep
-	else
-	{
-		if (low_resolution_contrast == 0.0f) return -sinf( PhaseShiftGivenSquaredSpatialFrequencyAndAzimuth(squared_spatial_frequency,azimuth) );
-		else
-		{
-			float low_res_limit = ReturnSquaredSpatialFrequencyOfPhaseShiftExtremumGivenAzimuth(azimuth);
-			float phase_shift = PhaseShiftGivenSquaredSpatialFrequencyAndAzimuth(squared_spatial_frequency,azimuth);
-			float threshold = PI / 2.0f;
-			if (phase_shift >= threshold) return -sinf(phase_shift);
-			else return -sinf(phase_shift + low_resolution_contrast * (threshold - phase_shift) / threshold);
-		}
-	}
+	return Evaluate(squared_spatial_frequency, azimuth) * sinc_xi(squared_spatial_frequency);
 }
 
 // Return the value of the CTF at the given squared spatial frequency and azimuth

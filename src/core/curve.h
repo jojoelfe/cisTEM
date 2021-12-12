@@ -72,6 +72,7 @@ public:
 	void Logarithm();
 	void ZeroYData();
 	void ApplyCTF(CTF ctf_to_apply, float azimuth_in_radians =  0.0);
+	void ApplyCTFWithThickness(CTF ctf_to_apply, float azimuth_in_radians =  0.0);
 	void SquareRoot();
 	void Reciprocal();
 	void DivideBy(Curve &other_curve);

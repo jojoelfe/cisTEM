@@ -107,6 +107,8 @@ public:
 	inline void SetHighestFrequencyWithGoodFit(float wanted_frequency_in_reciprocal_pixels) {highest_frequency_with_good_fit = wanted_frequency_in_reciprocal_pixels;};
 	//
 	std::complex<float> EvaluateComplex(float squared_spatial_frequency, float azimuth);
+	inline float xi(float squared_spatial_frequency) { return PIf * wavelength * squared_spatial_frequency * thickness; }
+	inline float sinc_xi(float squared_spatial_frequency) { if (squared_spatial_frequency == 0.0f) return 1.0f; return sinf(xi(squared_spatial_frequency))/xi(squared_spatial_frequency); }
 	float Evaluate(float squared_spatial_frequency, float azimuth);
 	float EvaluateWithEnvelope(float squared_spatial_frequency, float azimuth);
 	float EvaluateWithThickness(float squared_spatial_frequency, float azimuth);
