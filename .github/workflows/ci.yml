@@ -51,37 +51,8 @@ jobs:
     - name: Create binary artifact
       uses: actions/upload-artifact@v2
       with: 
-        name: cistem_binaries_icpc
+        name: cistem_binaries
         path: build/icpc/src
-    - name: configure_gcc
-      continue-on-error: true
-      run: |
-        echo "$PATH"
-        echo "$CPATH"
-        echo "$LD_LIBRARY_PATH"
-        mkdir -p build/gcc 
-        cd build/gcc
-        CXX=g++ CC=icc ../../configure  --enable-experimental --enable-staticmode --enable-openmp  --with-wx-config=wx-config  --enable-samples
-        VERSION=$(cat config.log | grep CISTEM_VERSION_TEXT | cut -d' ' -f3 | tr -d '"')
-        echo "::set-output name=version::$VERSION" 
-    - name: make_gcc
-      continue-on-error: true
-      run: |
-        cd build/gcc
-        make -j4
-    - name: clean up_gcc
-      continue-on-error: true
-      run: |
-        cd build/gcc
-        rm -r src/core
-        rm -r src/gui
-        rm -r src/programs
-    - name: Create binary artifact_gcc
-      continue-on-error: true
-      uses: actions/upload-artifact@v2
-      with: 
-        name: cistem_binaries_gcc
-        path: build/gcc/src
 
   console_test:
     name: Console test
@@ -95,6 +66,11 @@ jobs:
     - name: test console_test
       continue-on-error: true
       run: console_test 
+    - name: Create image artifact
+      uses: actions/upload-artifact@v2
+      with: 
+        name: test_images
+        path: /tmp/*.mrc
 
   samples_functional_testing:
     name: Samples functional testing
