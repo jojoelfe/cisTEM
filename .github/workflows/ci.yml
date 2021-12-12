@@ -62,7 +62,9 @@ jobs:
         name: cistem_binaries
     - name: test console_test
       continue-on-error: true
-      run: ./console_test 
+      run: |
+        chmod +x console_test
+        ./console_test 
     - name: Create image artifact
       uses: actions/upload-artifact@v2
       with: 
@@ -80,5 +82,7 @@ jobs:
         name: cistem_binaries
     - name: test samples_functional_testing
       continue-on-error: true
-      run: ./samples_functional_testing
+      run: |
+        chmod +x samples_functional_testing
+        ./samples_functional_testing
 
