@@ -22,6 +22,3 @@ RemoteSystemsTempFiles
 **/build*
 **/.DS_Store
 .vscode
-src/pycistem/*-venv
-src/pycistem/python
-src/pycistem/src/*.egg-info

@@ -22,8 +22,8 @@ if test "x$TOPSRCDIR" = "x." ; then
 fi
 # don't let the AC_PROG_CXX set default flags, set them back to input..
 
-CXXFLAGS="$INPUT_CXXFLAGS -fPIC"
-CPPFLAGS="$INPUT_CPPFLAGS -fPIC"
+CXXFLAGS="$INPUT_CXXFLAGS"
+CPPFLAGS="$INPUT_CPPFLAGS"
 
 # set up initial flags
 AC_MSG_NOTICE([Setting up initial flags])
