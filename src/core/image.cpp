@@ -6599,7 +6599,7 @@ float Image::ReturnIcinessOfSpectrum(float pixel_size_in_Angstroms)
 }
 
 // The image is assumed to be an amplitude spectrum, which we want to correlate with a set of CTF parameters
-float Image::GetCorrelationWithCTF(CTF ctf)
+float Image::GetCorrelationWithCTF(CTF ctf, bool with_thickness, bool use_sine)
 {
 	MyDebugAssertTrue(is_in_memory, "Memory not allocated");
 	MyDebugAssertTrue(is_in_real_space, "Not in real space");
@@ -6645,7 +6645,7 @@ float Image::GetCorrelationWithCTF(CTF ctf)
 				if (current_spatial_frequency_squared > lowest_freq && current_spatial_frequency_squared < highest_freq)
 				{
 					current_azimuth = atan2f(j_logi,i_logi);
-					current_ctf_value = fabsf(ctf.Evaluate(current_spatial_frequency_squared,current_azimuth));
+					current_ctf_value = fabsf(ctf.Evaluate(current_spatial_frequency_squared,current_azimuth,with_thickness,use_sine));
 					// accumulate results
 					number_of_values++;
 					cross_product += real_values[address + i] * current_ctf_value;

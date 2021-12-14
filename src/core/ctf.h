@@ -109,7 +109,8 @@ public:
 	std::complex<float> EvaluateComplex(float squared_spatial_frequency, float azimuth);
 	inline float xi(float squared_spatial_frequency) { return PIf * wavelength * squared_spatial_frequency * thickness; }
 	inline float sinc_xi(float squared_spatial_frequency) { if (squared_spatial_frequency == 0.0f) return 1.0f; return sinf(xi(squared_spatial_frequency))/xi(squared_spatial_frequency); }
-	float Evaluate(float squared_spatial_frequency, float azimuth);
+	inline float sin_xi(float squared_spatial_frequency) { if (squared_spatial_frequency == 0.0f) return 1.0f; return sinf(xi(squared_spatial_frequency)); }
+	float Evaluate(float squared_spatial_frequency, float azimuth, bool with_thickness=false, bool use_sine=false);
 	float EvaluateWithEnvelope(float squared_spatial_frequency, float azimuth);
 	float EvaluateWithThickness(float squared_spatial_frequency, float azimuth);
 	float PhaseShiftGivenSquaredSpatialFrequencyAndAzimuth(float squared_spatial_frequency, float azimuth);

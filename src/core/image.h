@@ -444,7 +444,7 @@ public:
 	float ReturnCorrelationBetweenTwoVerticalLines(int first_line, int second_line);
 	bool  ContainsRepeatedLineEdges();
 
-	float GetCorrelationWithCTF(CTF ctf);
+	float GetCorrelationWithCTF(CTF ctf, bool with_thickness=false, bool use_sine=false);
 	void SetupQuickCorrelationWithCTF(CTF ctf, int &number_of_values, double &norm_image, double &image_mean, int *addresses, float *spatial_frequency_squared, float *azimuth);
 	float QuickCorrelationWithCTF(CTF ctf, int number_of_values, double norm_image, double image_mean, int *addresses, float *spatial_frequency_squared, float *azimuth);
 	float ReturnIcinessOfSpectrum(float pixel_size_in_Angstroms);

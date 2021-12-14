@@ -453,21 +453,30 @@ std::complex<float> CTF::EvaluateComplex(float squared_spatial_frequency, float 
 }
 
 // Return the value of the CTF at the given squared spatial frequency and azimuth
-float CTF::Evaluate(float squared_spatial_frequency, float azimuth)
+float CTF::Evaluate(float squared_spatial_frequency, float azimuth, bool with_thickness, bool use_sine)
 {
+	float return_value = -0.7;
 	if (defocus_1 == 0.0f && defocus_2 == 0.0f) return -0.7; // for defocus sweep
 	else
 	{
-		if (low_resolution_contrast == 0.0f) return -sinf( PhaseShiftGivenSquaredSpatialFrequencyAndAzimuth(squared_spatial_frequency,azimuth) );
+		if (low_resolution_contrast == 0.0f) return_value = -sinf( PhaseShiftGivenSquaredSpatialFrequencyAndAzimuth(squared_spatial_frequency,azimuth) );
 		else
 		{
 			float low_res_limit = ReturnSquaredSpatialFrequencyOfPhaseShiftExtremumGivenAzimuth(azimuth);
 			float phase_shift = PhaseShiftGivenSquaredSpatialFrequencyAndAzimuth(squared_spatial_frequency,azimuth);
 			float threshold = PI / 2.0f;
-			if (phase_shift >= threshold) return -sinf(phase_shift);
-			else return -sinf(phase_shift + low_resolution_contrast * (threshold - phase_shift) / threshold);
+			if (phase_shift >= threshold) return_value = -sinf(phase_shift);
+			else return_value = -sinf(phase_shift + low_resolution_contrast * (threshold - phase_shift) / threshold);
 		}
 	}
+	if (with_thickness) {
+		if (use_sine) {
+			return_value *= sin_xi(squared_spatial_frequency);
+		} else {
+			return_value *= sinc_xi(squared_spatial_frequency);
+		}
+	}
+	return return_value;
 }
 
 // Return the value of the CTF at the given squared spatial frequency and azimuth

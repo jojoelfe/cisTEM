@@ -71,7 +71,7 @@ public:
 	void NormalizeMaximumValue();
 	void Logarithm();
 	void ZeroYData();
-	void ApplyCTF(CTF ctf_to_apply, float azimuth_in_radians =  0.0);
+	void ApplyCTF(CTF ctf_to_apply, float azimuth_in_radians =  0.0, bool with_thickness=false, bool use_sine=false);
 	void ApplyCTFWithThickness(CTF ctf_to_apply, float azimuth_in_radians =  0.0);
 	void SquareRoot();
 	void Reciprocal();
