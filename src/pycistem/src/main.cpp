@@ -813,23 +813,26 @@ PYBIND11_MODULE(pycistem, m)
 
   // Image
 
-  py::class_<Image> image(m, "Image", py::buffer_protocol());
+  py::class_<Image> image(m, "Image");
   image
       .def(py::init<>())
       .def(py::init<::Image>())
-      .def_readonly("logical_x_dimensions", &Image::logical_x_dimension)
-      .def_readonly("logical_y_dimensions", &Image::logical_y_dimension)
-      .def_buffer([](Image &m) -> py::buffer_info
-                  {
-                    return py::buffer_info(
-                        m.real_values,                                                   /* Pointer to buffer */
-                        sizeof(float),                                                   /* Size of one scalar */
-                        py::format_descriptor<float>::format(),                          /* Python struct-style format descriptor */
-                        2,                                                               /* Number of dimensions */
-                        {m.logical_y_dimension, m.logical_x_dimension},                  /* Buffer dimensions */
-                        {sizeof(float) * (m.logical_x_dimension + m.padding_jump_value), /* Strides (in bytes) for each index */
-                         sizeof(float)});
-                  })
+      .def_readonly("logical_x_dimension", &Image::logical_x_dimension)
+      .def_readonly("logical_y_dimension", &Image::logical_y_dimension)
+      .def_readonly("logical_z_dimension", &Image::logical_z_dimension)
+      .def_readonly("is_in_real_space", &Image::is_in_real_space)
+      .def_property_readonly("real_values", [](Image &__inst) {
+            //return 5;
+            py::capsule buffer_handle([](){});
+            return py::array_t<float>(
+              {__inst.logical_y_dimension, __inst.logical_x_dimension},
+              {sizeof(float) * (__inst.logical_x_dimension + __inst.padding_jump_value), /* Strides (in bytes) for each index */
+                         sizeof(float)},
+              __inst.real_values,
+              buffer_handle
+              );
+         }
+      )
       /* .def("operator=", [](Image &__inst) {
         ::Image t;
         auto __ret = __inst.operator=(t);
