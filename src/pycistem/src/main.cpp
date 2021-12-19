@@ -833,6 +833,18 @@ PYBIND11_MODULE(pycistem, m)
               );
          }
       )
+      .def_property_readonly("complex_values", [](Image &__inst) {
+            //return 5;
+            py::capsule buffer_handle([](){});
+            return py::array_t<std::complex<float>>(
+              {__inst.logical_y_dimension, __inst.logical_x_dimension},
+              {sizeof(std::complex<float>) * (__inst.logical_x_dimension + __inst.padding_jump_value), /* Strides (in bytes) for each index */
+                         sizeof(std::complex<float>)},
+              __inst.complex_values,
+              buffer_handle
+              );
+         }
+      )
       /* .def("operator=", [](Image &__inst) {
         ::Image t;
         auto __ret = __inst.operator=(t);
