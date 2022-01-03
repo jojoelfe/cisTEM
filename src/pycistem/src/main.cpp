@@ -820,6 +820,9 @@ PYBIND11_MODULE(pycistem, m)
       .def_readonly("logical_x_dimension", &Image::logical_x_dimension)
       .def_readonly("logical_y_dimension", &Image::logical_y_dimension)
       .def_readonly("logical_z_dimension", &Image::logical_z_dimension)
+      .def_readonly("physical_upper_bound_complex_x", &Image::physical_upper_bound_complex_x)
+      .def_readonly("physical_upper_bound_complex_y", &Image::physical_upper_bound_complex_y)
+      .def_readonly("physical_upper_bound_complex_z", &Image::physical_upper_bound_complex_z)
       .def_readonly("is_in_real_space", &Image::is_in_real_space)
       .def_property_readonly("real_values", [](Image &__inst) {
             //return 5;
@@ -837,8 +840,8 @@ PYBIND11_MODULE(pycistem, m)
             //return 5;
             py::capsule buffer_handle([](){});
             return py::array_t<std::complex<float>>(
-              {__inst.logical_y_dimension, __inst.logical_x_dimension},
-              {sizeof(std::complex<float>) * (__inst.logical_x_dimension + __inst.padding_jump_value), /* Strides (in bytes) for each index */
+              {__inst.physical_upper_bound_complex_y, __inst.physical_upper_bound_complex_x},
+              {sizeof(std::complex<float>) * __inst.physical_upper_bound_complex_x , /* Strides (in bytes) for each index */
                          sizeof(std::complex<float>)},
               __inst.complex_values,
               buffer_handle
