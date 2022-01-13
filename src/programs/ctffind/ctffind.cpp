@@ -1695,7 +1695,7 @@ bool CtffindApp::DoCalculation()
 	const float			maximum_resolution_for_initial_search = 5.0;
 
 	// Debugging
-	const bool			dump_debug_files = false;
+	const bool			dump_debug_files = true;
 
 	/*
 	 *  Scoring function

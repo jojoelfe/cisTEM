@@ -2,7 +2,7 @@ name: ICPC compile
 
 on:
   push:
-    branches: master
+    branches: ctffind_debug
   pull_request:
     branches: master
 
