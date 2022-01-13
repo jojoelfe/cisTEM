@@ -2843,8 +2843,35 @@ bool CtffindApp::DoCalculation()
 		ComputeImagesWithNumberOfExtremaAndCTFValues(current_ctf, number_of_extrema_image, ctf_values_image);
 
 		ComputeRotationalAverageOfPowerSpectrum(average_spectrum, current_ctf, number_of_extrema_image, ctf_values_image, number_of_bins_in_1d_spectra, spatial_frequency, rotational_average_astig, rotational_average_astig_fit, rotational_average_astig_renormalized, number_of_extrema_profile, ctf_values_profile);
+		ComputeEquiPhaseAverageOfPowerSpectrum(average_spectrum, current_ctf, &equiphase_average_pre_max, &equiphase_average_post_max);
+			// Replace the old curve with EPA values
+			{
+				float current_sq_sf;
+				float azimuth_for_1d_plots = ReturnAzimuthToUseFor1DPlots(current_ctf);
+				float defocus_for_1d_plots = current_ctf->DefocusGivenAzimuth(azimuth_for_1d_plots);
+				float sq_sf_of_phase_shift_maximum = current_ctf->ReturnSquaredSpatialFrequencyOfPhaseShiftExtremumGivenDefocus(defocus_for_1d_plots);
+				for (counter=1;counter<number_of_bins_in_1d_spectra;counter++)
+				{
+					current_sq_sf = powf(spatial_frequency[counter],2);
+					if (current_sq_sf <= sq_sf_of_phase_shift_maximum)
+					{
+						rotational_average_astig[counter] = equiphase_average_pre_max.ReturnLinearInterpolationFromX(current_ctf->PhaseShiftGivenSquaredSpatialFrequencyAndDefocus(current_sq_sf,defocus_for_1d_plots));
+					}
+					else
+					{
+						rotational_average_astig[counter] = equiphase_average_post_max.ReturnLinearInterpolationFromX(current_ctf->PhaseShiftGivenSquaredSpatialFrequencyAndDefocus(current_sq_sf,defocus_for_1d_plots));
+					}
+					rotational_average_astig_renormalized[counter] = rotational_average_astig[counter];
+				}
+				Renormalize1DSpectrumForFRC(number_of_bins_in_1d_spectra,rotational_average_astig_renormalized,rotational_average_astig_fit,number_of_extrema_profile);
+			}
+		int first_fit_bin = 0;
+		for (int bin_counter = number_of_bins_in_1d_spectra - 1; bin_counter >= 0; bin_counter -- )
+		{
+			if (spatial_frequency[bin_counter] >= current_ctf->GetLowestFrequencyForFitting()) first_fit_bin = bin_counter;
+		}
+		ComputeFRCBetween1DSpectrumAndFit(number_of_bins_in_1d_spectra,rotational_average_astig_renormalized,rotational_average_astig_fit,number_of_extrema_profile,fit_frc,fit_frc_sigma,first_fit_bin);
 
-		
 
 
 
