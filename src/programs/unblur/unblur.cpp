@@ -833,7 +833,8 @@ bool UnBlurApp::DoCalculation()
 	sum_image.BackwardFFT();
 	float original_x = sum_image.logical_x_dimension;
 	float original_y = sum_image.logical_y_dimension;
-	std::tuple<int, int> crop_location = sum_image.CropAndAddGaussianNoiseToDarkAreas(0.01,0.1,20,0.01);
+	std::string mask_filename = output_filename.substr(0, output_filename.size()-4) + "_mask.mrc";
+	std::tuple<int, int> crop_location = sum_image.CropAndAddGaussianNoiseToDarkAreas(0.01,0.1,20,0.01,true,1.0,0.0,true,mask_filename);
 	float temp_float2[2];
 
 	NumericTextFile crop_output_file(output_filename+".crop", OPEN_TO_WRITE, 2);

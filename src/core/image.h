@@ -429,7 +429,7 @@ public:
 	void SetMinimumAndMaximumValues( float new_minimum_value, float new_maximum_value);
 	void Binarise(float threshold_value);
 	void BinariseInverse(float threshold_value);
-	std::tuple<int, int> CropAndAddGaussianNoiseToDarkAreas(float sigma_for_filter = 0.01, float threshold_percentile = 0.1, float erosion_pixels = 0.0, float sigma_for_soft_edge = 0.01, bool calc_sigma_mean = true, float sigma_for_noise = 1.0, float mean_for_noise = 0.0);
+	std::tuple<int, int> CropAndAddGaussianNoiseToDarkAreas(float sigma_for_filter = 0.01, float threshold_percentile = 0.1, float erosion_pixels = 0.0, float sigma_for_soft_edge = 0.01, bool calc_sigma_mean = true, float sigma_for_noise = 1.0, float mean_for_noise = 0.0, bool save_maks = false, wxString mask_filename = "");
 
 
 	void ComputeAverageAndSigmaOfValuesInSpectrum(float minimum_radius, float maximum_radius, float &average, float &sigma, int cross_half_width = 2);

@@ -1231,7 +1231,11 @@ void MyAlignMoviesPanel::WriteResultToDataBase()
 																											reinterpret_cast <ImageAsset *> (image_asset_panel->all_assets_list->assets)[array_location].microscope_voltage,
 																											reinterpret_cast <ImageAsset *> (image_asset_panel->all_assets_list->assets)[array_location].pixel_size,
 																											reinterpret_cast <ImageAsset *> (image_asset_panel->all_assets_list->assets)[array_location].spherical_aberration,
-																											reinterpret_cast <ImageAsset *> (image_asset_panel->all_assets_list->assets)[array_location].protein_is_white);
+																											reinterpret_cast <ImageAsset *> (image_asset_panel->all_assets_list->assets)[array_location].protein_is_white,
+																											static_cast<int>(buffered_results[counter].result_data[buffered_results[counter].result_size - 4]),
+																											static_cast<int>(buffered_results[counter].result_data[buffered_results[counter].result_size - 3]),
+																											static_cast<int>(buffered_results[counter].result_data[buffered_results[counter].result_size - 2]),
+																											static_cast<int>(buffered_results[counter].result_data[buffered_results[counter].result_size - 1]));
 
 					image_asset_panel->current_asset_number++;
 				}

@@ -5686,7 +5686,7 @@ void Image::BinariseInverse(float threshold_value)
 	}
 }
 
-std::tuple<int,int> Image::CropAndAddGaussianNoiseToDarkAreas(float sigma_for_filter, float threshold_percentile, float erosion_pixels, float sigma_for_soft_edge, bool calc_sigma_mean, float sigma_for_noise, float mean_for_noise)
+std::tuple<int,int> Image::CropAndAddGaussianNoiseToDarkAreas(float sigma_for_filter, float threshold_percentile, float erosion_pixels, float sigma_for_soft_edge, bool calc_sigma_mean, float sigma_for_noise, float mean_for_noise, bool save_mask, wxString mask_filename)
 {
 	MyDebugAssertTrue(is_in_memory, "Memory not allocated");
 	MyDebugAssertTrue(is_in_real_space, "Not in real space");
@@ -5755,6 +5755,7 @@ std::tuple<int,int> Image::CropAndAddGaussianNoiseToDarkAreas(float sigma_for_fi
 	// Apply mask to image and replace dark part with noise
 
 	MultiplyPixelWise(mask_image);
+	
 	mask_image.MultiplyAddConstant(-1.0,1.0);
 	noise_image.MultiplyPixelWise(mask_image);
 
@@ -5769,9 +5770,20 @@ std::tuple<int,int> Image::CropAndAddGaussianNoiseToDarkAreas(float sigma_for_fi
 	Image temp_image2;
 	temp_image2.Allocate(wanted_x_dimension, wanted_y_dimension, logical_z_dimension, true);
 	ClipInto(&temp_image2, 0.0f, false, 1.0f, center_x, center_y);
-
+	if(save_mask) {
+		Image temp_image3;
+		temp_image3.Allocate(wanted_x_dimension, wanted_y_dimension, logical_z_dimension, true);
+		mask_image.MultiplyAddConstant(-1.0,1.0);
+		mask_image.ClipInto(&temp_image3, 0.0f, false, 1.0f, center_x, center_y);
+		MRCFile mask_file = MRCFile(mask_filename.ToStdString(), true);
+		mask_file.my_header.SetMode(0);
+		temp_image3.MultiplyAddConstant(255.0,0.0);
+		temp_image3.WriteSlices(&mask_file,1,1);
+	}
 	Consume(&temp_image2);
-
+	
+	
+	
 	return std::make_tuple(center_x,center_y);
 
 
