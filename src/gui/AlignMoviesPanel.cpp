@@ -1080,7 +1080,7 @@ void MyAlignMoviesPanel::WriteResultToDataBase()
 
 	// loop over all the jobs, and add them..
 
-	main_frame->current_project.database.BeginBatchInsert("MOVIE_ALIGNMENT_LIST", 22, "ALIGNMENT_ID", "DATETIME_OF_RUN", "ALIGNMENT_JOB_ID", "MOVIE_ASSET_ID", "OUTPUT_FILE", "VOLTAGE", "PIXEL_SIZE", "EXPOSURE_PER_FRAME", "PRE_EXPOSURE_AMOUNT", "MIN_SHIFT", "MAX_SHIFT", "SHOULD_DOSE_FILTER", "SHOULD_RESTORE_POWER", "TERMINATION_THRESHOLD", "MAX_ITERATIONS", "BFACTOR", "SHOULD_MASK_CENTRAL_CROSS", "HORIZONTAL_MASK", "VERTICAL_MASK", "SHOULD_INCLUDE_ALL_FRAMES_IN_SUM", "FIRST_FRAME_TO_SUM", "LAST_FRAME_TO_SUM" );
+	main_frame->current_project.database.BeginBatchInsert("MOVIE_ALIGNMENT_LIST", 26, "ALIGNMENT_ID", "DATETIME_OF_RUN", "ALIGNMENT_JOB_ID", "MOVIE_ASSET_ID", "OUTPUT_FILE", "VOLTAGE", "PIXEL_SIZE", "EXPOSURE_PER_FRAME", "PRE_EXPOSURE_AMOUNT", "MIN_SHIFT", "MAX_SHIFT", "SHOULD_DOSE_FILTER", "SHOULD_RESTORE_POWER", "TERMINATION_THRESHOLD", "MAX_ITERATIONS", "BFACTOR", "SHOULD_MASK_CENTRAL_CROSS", "HORIZONTAL_MASK", "VERTICAL_MASK", "SHOULD_INCLUDE_ALL_FRAMES_IN_SUM", "FIRST_FRAME_TO_SUM", "LAST_FRAME_TO_SUM","ORIGINAL_X_SIZE","ORIGINAL_Y_SIZE","CROP_CENTER_X","CROP_CENTER_Y" );
 
 	wxDateTime now = wxDateTime::Now();
 
@@ -1089,7 +1089,7 @@ void MyAlignMoviesPanel::WriteResultToDataBase()
 
 	for (counter = 0; counter < my_job_tracker.total_number_of_jobs; counter++)
 	{
-		main_frame->current_project.database.AddToBatchInsert("iliitrrrrrriiriiiiiiii", alignment_id,
+		main_frame->current_project.database.AddToBatchInsert("iliitrrrrrriiriiiiiiiiiiii", alignment_id,
 				                                                                    (long int) now.GetAsDOS(),
 																					alignment_job_id,
 																					movie_asset_panel->ReturnAssetID(active_group.members[counter]),
@@ -1110,7 +1110,11 @@ void MyAlignMoviesPanel::WriteResultToDataBase()
 																					current_job_package.jobs[counter].arguments[12].ReturnIntegerArgument(), // vertical mask
 																					include_all_frames_checkbox->GetValue(), // include all frames
 																					current_job_package.jobs[counter].arguments[29].ReturnIntegerArgument(), // first_frame
-																					current_job_package.jobs[counter].arguments[30].ReturnIntegerArgument() // last_frame
+																					current_job_package.jobs[counter].arguments[30].ReturnIntegerArgument(), // last_frame
+																					static_cast<int>(buffered_results[counter].result_data[buffered_results[counter].result_size - 4]),  //origin x size
+																					static_cast<int>(buffered_results[counter].result_data[buffered_results[counter].result_size - 3]),  //original y size
+																					static_cast<int>(buffered_results[counter].result_data[buffered_results[counter].result_size - 2]),  // crop x
+																					static_cast<int>(buffered_results[counter].result_data[buffered_results[counter].result_size - 1])   // crop y
 																					);
 
 		alignment_id++;
