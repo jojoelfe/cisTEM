@@ -1,92 +1,81 @@
-#include <arguments.h>
+#include "./arguments.h"
 
-namespace cistem
-{
-    namespace refine_template_arguments
-    {
-        using namespace cistem::arguments;
-        enum
-        {
-            save_movies = 0,
-            max_threads,
-            argument_length // Must stay on the bottom
-        };
+namespace cistem {
+namespace refine_template_arguments {
+using namespace cistem::arguments;
 
-        arguments::cisTEMArgumentDescription RefineTemplateArgumentsDescription[argument_length] = {
-            [save_movies] = {
-                arguments::ArgumentType::BOOLEAN,
-                "Print this help message",
-                false},
-            [max_threads] = {arguments::ArgumentType::INTEGER, "Maximum number of threads to use", 1}};
-        class RefineTemplateArguments
-        {
-            std::array<std::any, argument_length> values;
+enum {
+    input_starfile = 0,
+    max_threads,
+    whiten_image,
+    arguments_length // Must stay on the bottom
+};
 
-        public:
-            RefineTemplateArguments()
-            {
-                // Iterate over ArgumentDescription and set default values
-                for (int i = 0; i < argument_length; i++)
-                {
-                    values[i] = RefineTemplateArgumentsDescription[i].default_value;
-                }
-            }
+arguments::cisTEMArgumentDescription RefineTemplateArgumentsDescription[arguments_length] = {
+        {FilenameArgument,
+         "Input starfile",
+         std::string("input.star")},
+        {IntegerArgument,
+         "Maximum number of threads to use",
+         1},
+        {BooleanArgument,
+         "Should I whiten the image?",
+         false}};
 
-            template <typename T>
-            T get(int x)
-            {
-                return std::any_cast<T>(values[x]);
-            }
+class RefineTemplateArguments {
+    std::array<std::any, arguments_length> values;
 
-            void GetInteractiveInputs()
-            {
-                for (int i = 0; i < argument_length; i++)
-                {
-                    if (RefineTemplateArgumentsDescription[i].type == ArgumentType::BOOLEAN)
-                    {
-                        std::cout << RefineTemplateArgumentsDescription[i].description << " [y/n] ";
-                        std::string input;
-                        std::cin >> input;
-                        if (input == "y" || input == "Y")
-                        {
-                            values[i] = true;
-                        }
-                        else
-                        {
-                            values[i] = false;
-                        }
-                    }
-                    else if (RefineTemplateArgumentsDescription[i].type == ArgumentType::INTEGER)
-                    {
-                        std::cout << RefineTemplateArgumentsDescription[i].description << " [integer] ";
-                        std::string input;
-                        std::cin >> input;
-                        values[i] = std::stoi(input);
-                    }
-                    else if (RefineTemplateArgumentsDescription[i].type == ArgumentType::FLOAT)
-                    {
-                        std::cout << RefineTemplateArgumentsDescription[i].description << " [float] ";
-                        std::string input;
-                        std::cin >> input;
-                        values[i] = std::stof(input);
-                    }
-                    else if (RefineTemplateArgumentsDescription[i].type == ArgumentType::DOUBLE)
-                    {
-                        std::cout << RefineTemplateArgumentsDescription[i].description << " [double] ";
-                        std::string input;
-                        std::cin >> input;
-                        values[i] = std::stod(input);
-                    }
-                    else if (RefineTemplateArgumentsDescription[i].type == ArgumentType::STRING)
-                    {
-                        std::cout << RefineTemplateArgumentsDescription[i].description << " [string] ";
-                        std::string input;
-                        std::cin >> input;
-                        values[i] = input;
-                    }
-                }
-            }
-        };
-
+  public:
+    RefineTemplateArguments( ) {
+        // Iterate over ArgumentDescription and set default values
+        for ( int i = 0; i < arguments_length; i++ ) {
+            values[i] = RefineTemplateArgumentsDescription[i].default_value;
+        }
     }
-}
+
+    template <typename T>
+    T get(int x) {
+        return std::any_cast<T>(values[x]);
+    }
+
+    template <typename T>
+    void set(int x, T value) {
+        values[x] = value;
+    }
+
+    void get_from_current_job(RunJob my_current_job) {
+    }
+
+    void set_manual_arguments(RunJob my_current_job) {
+    }
+
+    void GetInteractiveInputs( ) {
+        UserInput* my_input = new UserInput("RefineTemplateDev", 1.00);
+        for ( int i = 0; i < arguments_length; i++ ) {
+            if ( RefineTemplateArgumentsDescription[i].type == FilenameArgument ) {
+                values[i] = my_input->GetFilenameFromUser(RefineTemplateArgumentsDescription[i].description.c_str( ),
+                                                          RefineTemplateArgumentsDescription[i].description.c_str( ),
+                                                          std::any_cast<std::string>(RefineTemplateArgumentsDescription[i].default_value).c_str( ),
+                                                          true);
+            }
+            else if ( RefineTemplateArgumentsDescription[i].type == BooleanArgument ) {
+                std::stringstream converter;
+                converter << std::boolalpha << std::any_cast<bool>(RefineTemplateArgumentsDescription[i].default_value);
+                values[i] = my_input->GetYesNoFromUser(RefineTemplateArgumentsDescription[i].description.c_str( ),
+                                                       RefineTemplateArgumentsDescription[i].description.c_str( ),
+                                                       converter.str( ).c_str( ));
+            }
+            else if ( RefineTemplateArgumentsDescription[i].type == IntegerArgument ) {
+                std::stringstream converter;
+                converter << std::any_cast<int>(RefineTemplateArgumentsDescription[i].default_value);
+                values[i] = my_input->GetIntFromUser(RefineTemplateArgumentsDescription[i].description.c_str( ),
+                                                     RefineTemplateArgumentsDescription[i].description.c_str( ),
+                                                     converter.str( ).c_str( ));
+            }
+        }
+        delete my_input;
+    }
+};
+
+} // namespace refine_template_arguments
+} // namespace cistem
