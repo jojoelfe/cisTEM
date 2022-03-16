@@ -1242,7 +1242,7 @@ void Database::AddNextAtomicCoordinatesAsset(const AtomicCoordinatesAsset *asset
 	AddToBatchInsert("ittiiiitrrr", asset->asset_id, asset->asset_name.ToUTF8().data(), asset->filename.GetFullPath().ToUTF8().data(), 
 								  asset->simulation_3d_job_id, asset->x_size, asset->y_size, asset->z_size, 
 								  asset->pdb_id.ToUTF8().data(), asset->pdb_avg_bfactor, asset->pdb_std_bfactor, asset->effective_weight);
-
+}
 #endif
 
 void Database::AddNextImageAsset(int image_asset_id,  wxString name, wxString filename, int position_in_stack, int parent_movie_id, int alignment_id, int ctf_estimation_id, int x_size, int y_size, double voltage, double pixel_size, double spherical_aberration, int protein_is_white, int original_x_size, int original_y_size, int crop_center_x, int crop_center_y)

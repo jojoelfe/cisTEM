@@ -678,7 +678,7 @@ bool UnBlurApp::DoCalculation()
 			profile_timing.start("amplitude spectrum");
 			sum_image_no_dose_filter.Allocate(image_stack[0].logical_x_dimension, image_stack[0].logical_y_dimension, false);
 			sum_image_no_dose_filter.SetToConstant(0.0);
-
+		}
 
 		for (image_counter = first_frame - 1; image_counter < last_frame; image_counter++)
 		{
