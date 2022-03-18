@@ -235,6 +235,8 @@ bool Project::OpenProjectFromFile(wxFileName file_to_open) {
     if ( wxDir::Exists(directory_string) == false )
         wxFileName::Mkdir(directory_string);
 
+    // here should be a call to a function that sets the workflow
+    // MainFrame.SetWorkflow(current_workflow );
     is_open = true;
 
     return success;
