@@ -2295,8 +2295,13 @@ bool Database::UpdateSchema(ColumnChanges columns) {
         format        = std::get<COLUMN_CHANGE_TYPE>(column);
         column_format = map_type_char_to_sqlite_string(format);
         ExecuteSQL(wxString::Format("ALTER TABLE %s ADD COLUMN %s %s;", std::get<COLUMN_CHANGE_TABLE>(column), std::get<COLUMN_CHANGE_NAME>(column), column_format));
-        ExecuteSQL(wxString::Format("UPDATE MASTER_SETTINGS SET CURRENT_VERSION = %i, CISTEM_VERSION_TEXT = '%s'", INTEGER_DATABASE_VERSION, CISTEM_VERSION_TEXT));
     }
+    UpdateVersion( );
+    return true;
+}
+
+bool Database::UpdateVersion( ) {
+    ExecuteSQL(wxString::Format("UPDATE MASTER_SETTINGS SET CURRENT_VERSION = %i, CISTEM_VERSION_TEXT = '%s'", INTEGER_DATABASE_VERSION, CISTEM_VERSION_TEXT));
     return true;
 }
 

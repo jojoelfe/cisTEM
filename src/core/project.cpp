@@ -263,6 +263,7 @@ void Project::WriteProjectStatisticsToDatabase( ) {
 void Project::Close(bool remove_lock, bool update_statistics) {
     if ( update_statistics )
         WriteProjectStatisticsToDatabase( );
+    database.UpdateVersion( );
     database.Close(remove_lock);
 
     is_open         = false;

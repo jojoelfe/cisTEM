@@ -358,6 +358,7 @@ class Database {
     using ColumnChanges = std::vector<ColumnChange>;
     std::pair<TableChanges, ColumnChanges> CheckSchema( );
     bool                                   UpdateSchema(ColumnChanges columns);
+    bool                                   UpdateVersion( )
 };
 
 class BeginCommitLocker // just call begin in the contructor, and commit in the destructor, if it hasn't already been called.
