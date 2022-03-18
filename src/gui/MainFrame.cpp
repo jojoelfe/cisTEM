@@ -890,6 +890,7 @@ void MyMainFrame::OnSingleParticleWorkflow(wxCommandEvent& event) {
         switch ( current_workflow ) {
             case cistem::workflow::template_matching: {
                 UpdateWorkflow(actions_panel_tm, actions_panel_spa, "Actions");
+                current_project.SetCurrentWorkflow(static_cast<int>(cistem::workflow::single_particle));
                 // If other panels, e.g. results is a likely next candidate, it should go here.
                 // TODO: if there are multiple panels to switch, we'll need to only do the update and set the icon for the LAST call in this sequence.
                 break;
@@ -908,6 +909,7 @@ void MyMainFrame::OnTemplateMatchingWorkflow(wxCommandEvent& event) {
     if ( current_workflow != cistem::workflow::template_matching ) {
         previous_workflow = current_workflow;
         UpdateWorkflow(actions_panel_spa, actions_panel_tm, "Actions");
+        current_project.SetCurrentWorkflow(static_cast<int>(cistem::workflow::template_matching));
         current_workflow = cistem::workflow::template_matching;
     }
 }

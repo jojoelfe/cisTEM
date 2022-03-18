@@ -25,6 +25,7 @@ class Project {
 
     int      integer_database_version;
     wxString cistem_version_text;
+    int      current_workflow;
 
     Project( );
     ~Project( );
@@ -34,4 +35,6 @@ class Project {
     bool OpenProjectFromFile(wxFileName file_to_open);
     bool ReadMasterSettings( );
     void WriteProjectStatisticsToDatabase( );
+
+    inline bool SetCurrentWorkflow(int workflow) { return database.SetCurrentWorkflow(workflow); }
 };

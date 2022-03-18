@@ -785,7 +785,7 @@ bool Database::InsertOrReplace(const char* table_name, const char* column_format
     return true;
 }
 
-bool Database::GetMasterSettings(wxFileName& project_directory, wxString& project_name, int& imported_integer_version, double& total_cpu_hours, int& total_jobs_run, wxString& cistem_version_text) {
+bool Database::GetMasterSettings(wxFileName& project_directory, wxString& project_name, int& imported_integer_version, double& total_cpu_hours, int& total_jobs_run, wxString& cistem_version_text, int& current_workflow) {
     MyDebugAssertTrue(is_open == true, "database not open!");
 
     sqlite3_stmt* sqlite_statement;
@@ -800,6 +800,7 @@ bool Database::GetMasterSettings(wxFileName& project_directory, wxString& projec
     total_cpu_hours          = sqlite3_column_double(sqlite_statement, 4);
     total_jobs_run           = sqlite3_column_int(sqlite_statement, 5);
     cistem_version_text      = sqlite3_column_text(sqlite_statement, 6);
+    current_workflow         = sqlite3_column_int(sqlite_statement, 7);
 
     Finalize(sqlite_statement);
     return true;
