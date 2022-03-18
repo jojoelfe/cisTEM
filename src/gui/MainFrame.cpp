@@ -644,6 +644,18 @@ void MyMainFrame::OpenProject(wxString project_filename) {
         AddProjectToRecentProjects(project_filename);
         ClearScratchDirectory( );
         overview_panel->SetProjectInfo( );
+
+        // Set the Workflow
+        switch ( static_cast<cistem::workflow>(current_project.current_workflow) ) {
+            case cistem::workflow::template_matching: {
+                current_workflow = cistem::workflow::template_matching;
+                WorkflowSingleParticle->Check(false);
+                WorkflowTemplateMatching->Check(true);
+                break;
+            }
+            default: {
+            }
+        }
     }
     else {
         wxMessageBox(wxString::Format("Error Opening database :- \n%s\n\nDoes the file exist?", project_filename), "Cannot open database!", wxICON_ERROR);

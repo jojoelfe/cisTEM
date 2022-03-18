@@ -99,11 +99,13 @@ class MainFrame : public wxFrame {
   private:
 
   protected:
-    wxPanel*   LeftPanel;
-    wxMenuBar* m_menubar1;
-    wxMenu*    FileMenu;
-    wxMenu*    WorkflowMenu;
-    wxMenu*    HelpMenu;
+    wxPanel*    LeftPanel;
+    wxMenuBar*  m_menubar1;
+    wxMenu*     FileMenu;
+    wxMenu*     WorkflowMenu;
+    wxMenuItem* WorkflowTemplateMatching;
+    wxMenuItem* WorkflowSingleParticle;
+    wxMenu*     HelpMenu;
 
     // Virtual event handlers, overide them in your derived class
     virtual void OnMenuBookChange(wxListbookEvent& event) { event.Skip( ); }

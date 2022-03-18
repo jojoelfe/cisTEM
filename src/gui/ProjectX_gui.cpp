@@ -79,13 +79,11 @@ MainFrame::MainFrame(wxWindow* parent, wxWindowID id, const wxString& title, con
 
     m_menubar1->Append(FileMenu, wxT("Project"));
 
-    WorkflowMenu = new wxMenu( );
-    wxMenuItem* WorkflowSingleParticle;
+    WorkflowMenu           = new wxMenu( );
     WorkflowSingleParticle = new wxMenuItem(WorkflowMenu, wxID_ANY, wxString(wxT("Single Particle ")), wxEmptyString, wxITEM_RADIO);
     WorkflowMenu->Append(WorkflowSingleParticle);
     WorkflowSingleParticle->Check(true);
 
-    wxMenuItem* WorkflowTemplateMatching;
     WorkflowTemplateMatching = new wxMenuItem(WorkflowMenu, wxID_ANY, wxString(wxT("Template Matching")), wxEmptyString, wxITEM_RADIO);
     WorkflowMenu->Append(WorkflowTemplateMatching);
 
