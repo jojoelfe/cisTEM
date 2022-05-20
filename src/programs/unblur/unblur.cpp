@@ -1,5 +1,5 @@
 #include "../../core/core_headers.h"
-
+// #include "unblur.h"
 // The timing that unblur originally tracks is always on, by direct reference to cistem_timer::StopWatch
 // The profiling for development is under conrtol of --enable-profiling.
 #ifdef PROFILING
@@ -17,6 +17,12 @@ class
     void DoInteractiveUserInput( );
 
   private:
+    enum args {
+        input_starfile = 0,
+        max_threads,
+        whiten_image,
+        arguments_length // Must stay on the bottom
+    };
 };
 
 void unblur_refine_alignment(Image* input_stack, int number_of_images, int max_iterations, float unitless_bfactor, bool mask_central_cross, int width_of_vertical_line, int width_of_horizontal_line, float inner_radius_for_peak_search, float outer_radius_for_peak_search, float max_shift_convergence_threshold, float pixel_size, int number_of_frames_for_running_average, int savitzy_golay_window_size, int max_threads, float* x_shifts, float* y_shifts, StopWatch& profile_timing_refinement_method);
