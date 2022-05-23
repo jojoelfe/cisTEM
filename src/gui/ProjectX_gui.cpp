@@ -39,20 +39,11 @@ MainFrame::MainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 	wxBoxSizer* bSizer8;
 	bSizer8 = new wxBoxSizer( wxVERTICAL );
 
-	MenuBook = new wxListbook( LeftPanel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLB_LEFT );
-	MenuBook->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOWTEXT ) );
+	MenuBook
+	= new wxToolbook( LeftPanel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxNB_LEFT );
 
-	#ifdef __WXGTK__ // Small icon style not supported in GTK
-	wxListView* MenuBookListView = MenuBook->GetListView();
-	long MenuBookFlags = MenuBookListView->GetWindowStyleFlag();
-	if( MenuBookFlags & wxLC_SMALL_ICON )
-	{
-		MenuBookFlags = ( MenuBookFlags & ~wxLC_SMALL_ICON ) | wxLC_ICON;
-	}
-	MenuBookListView->SetWindowStyleFlag( MenuBookFlags );
-	#endif
-
-	bSizer8->Add( MenuBook, 1, wxEXPAND | wxALL, 5 );
+	bSizer8->Add( MenuBook
+	, 1, wxEXPAND | wxALL, 5 );
 
 
 	LeftPanel->SetSizer( bSizer8 );
@@ -114,7 +105,8 @@ MainFrame::MainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 	this->Centre( wxBOTH );
 
 	// Connect Events
-	MenuBook->Connect( wxEVT_COMMAND_LISTBOOK_PAGE_CHANGED, wxListbookEventHandler( MainFrame::OnMenuBookChange ), NULL, this );
+	MenuBook
+	->Connect( wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGED, wxNotebookEventHandler( MainFrame::OnMenuBookChange ), NULL, this );
 	m_menubar1->Connect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( MainFrame::OnFileMenuUpdate ), NULL, this );
 	FileMenu->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainFrame::OnFileNewProject ), this, FileNewProject->GetId());
 	FileMenu->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainFrame::OnFileOpenProject ), this, FileOpenProject->GetId());
@@ -129,7 +121,8 @@ MainFrame::MainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 MainFrame::~MainFrame()
 {
 	// Disconnect Events
-	MenuBook->Disconnect( wxEVT_COMMAND_LISTBOOK_PAGE_CHANGED, wxListbookEventHandler( MainFrame::OnMenuBookChange ), NULL, this );
+	MenuBook
+	->Disconnect( wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGED, wxNotebookEventHandler( MainFrame::OnMenuBookChange ), NULL, this );
 	m_menubar1->Disconnect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( MainFrame::OnFileMenuUpdate ), NULL, this );
 
 }
@@ -4372,16 +4365,7 @@ AssetsPanel::AssetsPanel( wxWindow* parent, wxWindowID id, const wxPoint& pos, c
 	m_staticline68 = new wxStaticLine( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_VERTICAL );
 	bSizer76->Add( m_staticline68, 0, wxEXPAND | wxALL, 5 );
 
-	AssetsBook = new wxListbook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLB_TOP );
-	#ifdef __WXGTK__ // Small icon style not supported in GTK
-	wxListView* AssetsBookListView = AssetsBook->GetListView();
-	long AssetsBookFlags = AssetsBookListView->GetWindowStyleFlag();
-	if( AssetsBookFlags & wxLC_SMALL_ICON )
-	{
-		AssetsBookFlags = ( AssetsBookFlags & ~wxLC_SMALL_ICON ) | wxLC_ICON;
-	}
-	AssetsBookListView->SetWindowStyleFlag( AssetsBookFlags );
-	#endif
+	AssetsBook = new wxToolbook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
 
 	bSizer76->Add( AssetsBook, 1, wxEXPAND | wxALL, 5 );
 
@@ -4390,13 +4374,13 @@ AssetsPanel::AssetsPanel( wxWindow* parent, wxWindowID id, const wxPoint& pos, c
 	this->Layout();
 
 	// Connect Events
-	AssetsBook->Connect( wxEVT_COMMAND_LISTBOOK_PAGE_CHANGED, wxListbookEventHandler( AssetsPanel::OnAssetsBookPageChanged ), NULL, this );
+	AssetsBook->Connect( wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGED, wxNotebookEventHandler( AssetsPanel::OnAssetsBookPageChanged ), NULL, this );
 }
 
 AssetsPanel::~AssetsPanel()
 {
 	// Disconnect Events
-	AssetsBook->Disconnect( wxEVT_COMMAND_LISTBOOK_PAGE_CHANGED, wxListbookEventHandler( AssetsPanel::OnAssetsBookPageChanged ), NULL, this );
+	AssetsBook->Disconnect( wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGED, wxNotebookEventHandler( AssetsPanel::OnAssetsBookPageChanged ), NULL, this );
 
 }
 

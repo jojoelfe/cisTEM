@@ -30,9 +30,9 @@ RUN apt-get --allow-releaseinfo-change update && apt-get install -y libgtk2.0-de
     build-essential git xauth zip unzip parallel sqlite3 python3 python3-pip curl  \
     && rm -rf /var/lib/apt/lists/*
 
-# Install wxWidgets 3.1.5
+# Install wxWidgets 3.1.6
 RUN wget -qO - https://repos.codelite.org/CodeLite.asc | apt-key add - && \
-    apt-add-repository 'deb https://repos.codelite.org/wx3.1.5/ubuntu/ groovy universe' && \
+    apt-add-repository 'deb https://repos.codelite.org/wx3.1.6/ubuntu/ focal universe' && \
     apt-get update && apt-get install -y libwxbase3.1-0-unofficial \
     libwxbase3.1unofficial-dev \
     libwxgtk3.1-0-unofficial \

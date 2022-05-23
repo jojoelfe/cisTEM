@@ -48,10 +48,10 @@ class ShowTemplateMatchResultsPanel;
 class UnblurResultsPanel;
 class VolumeAssetPickerComboPanel;
 
+#include "wx/toolbook.h"
 #include "job_panel.h"
 #include <wx/gdicmn.h>
-#include <wx/listbook.h>
-#include <wx/listctrl.h>
+#include <wx/notebook.h>
 #include <wx/font.h>
 #include <wx/colour.h>
 #include <wx/settings.h>
@@ -76,8 +76,10 @@ class VolumeAssetPickerComboPanel;
 #include <wx/gauge.h>
 #include <wx/bmpbuttn.h>
 #include <wx/splitter.h>
+#include <wx/listctrl.h>
 #include <wx/checkbox.h>
 #include <wx/dataview.h>
+#include <wx/listbook.h>
 #include <wx/choice.h>
 #include <wx/dialog.h>
 #include <wx/filepicker.h>
@@ -109,7 +111,7 @@ class MainFrame : public wxFrame
 		wxMenu* HelpMenu;
 
 		// Virtual event handlers, override them in your derived class
-		virtual void OnMenuBookChange( wxListbookEvent& event ) { event.Skip(); }
+		virtual void OnMenuBookChange( wxNotebookEvent& event ) { event.Skip(); }
 		virtual void OnFileMenuUpdate( wxUpdateUIEvent& event ) { event.Skip(); }
 		virtual void OnFileNewProject( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnFileOpenProject( wxCommandEvent& event ) { event.Skip(); }
@@ -122,7 +124,8 @@ class MainFrame : public wxFrame
 
 
 	public:
-		wxListbook* MenuBook;
+		wxToolbook* MenuBook
+		;
 
 		MainFrame( wxWindow* parent, wxWindowID id = wxID_OPEN, const wxString& title = wxT("cisTEM"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 1366,768 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL|wxWANTS_CHARS );
 
@@ -1237,11 +1240,11 @@ class AssetsPanel : public wxPanel
 		wxStaticLine* m_staticline68;
 
 		// Virtual event handlers, override them in your derived class
-		virtual void OnAssetsBookPageChanged( wxListbookEvent& event ) { event.Skip(); }
+		virtual void OnAssetsBookPageChanged( wxNotebookEvent& event ) { event.Skip(); }
 
 
 	public:
-		wxListbook* AssetsBook;
+		wxToolbook* AssetsBook;
 
 		AssetsPanel( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxEmptyString );
 

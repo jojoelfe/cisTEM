@@ -60,12 +60,13 @@ MyRefinementResultsPanel* refinement_results_panel;
 
 MyRunProfilesPanel* run_profiles_panel;
 
-wxImageList* MenuBookIconImages;
-wxImageList* ActionsSpaBookIconImages;
-wxImageList* ActionsTmBookIconImages;
-wxImageList* AssetsBookIconImages;
-wxImageList* ResultsBookIconImages;
-wxImageList* SettingsBookIconImages;
+wxVector<wxBitmapBundle> MenuBookIconImages;
+wxImageList*             ActionsSpaBookIconImages;
+wxImageList*             ActionsTmBookIconImages;
+wxImageList*             AssetsBookIconImages;
+wxVector<wxBitmapBundle> AssetsBookIconImages_b;
+wxImageList*             ResultsBookIconImages;
+wxImageList*             SettingsBookIconImages;
 
 wxConfig* cistem_config;
 SETUP_SOCKET_CODES
@@ -103,13 +104,16 @@ bool MyGuiApp::OnInit( ) {
 #include "../../gui/icons/run_profiles_icon.cpp"
 #include "../../gui/icons/match_template_icon.cpp"
 #include "../../gui/icons/refine_template_icon.cpp"
+#include "../../gui/icons/svg_icon.cpp"
 
     wxImage::AddHandler(new wxPNGHandler);
 
-    wxImageList* MenuBookIconImages;
-    wxImageList* ActionsSpaBookIconImages;
-    wxImageList* ActionsTmBookIconImages;
-    wxImageList* AssetsBookIconImages;
+    wxVector<wxBitmapBundle> MenuBookIconImages;
+    wxImageList*             ActionsSpaBookIconImages;
+    wxImageList*             ActionsTmBookIconImages;
+    wxImageList*             AssetsBookIconImages;
+    wxVector<wxBitmapBundle> AssetsBookIconImages_b;
+
     wxImageList* SettingsBookIconImages;
 
 #ifdef EXPERIMENTAL
@@ -177,7 +181,7 @@ bool MyGuiApp::OnInit( ) {
     // Setup list books
     // Since wx 3.1 the resolution of the images needs to be declared when creating the image list
 
-    MenuBookIconImages       = new wxImageList(80, 80);
+    // MenuBookIconImages       = new wxImageList(80, 80);
     ActionsSpaBookIconImages = new wxImageList(48, 48);
     ActionsTmBookIconImages  = new wxImageList(48, 48);
     AssetsBookIconImages     = new wxImageList(48, 48);
@@ -224,14 +228,14 @@ bool MyGuiApp::OnInit( ) {
 
     delete suppress_png_warnings;
 
-    MenuBookIconImages->Add(overview_icon_bmp);
-    MenuBookIconImages->Add(assets_icon_bmp);
-    MenuBookIconImages->Add(action_icon_bmp);
-    MenuBookIconImages->Add(results_icon_bmp);
-    MenuBookIconImages->Add(settings_icon_bmp);
+    MenuBookIconImages.push_back(wxBitmapBundle::FromSVG(overview_icon_svg, main_frame->FromDIP(wxSize(64, 64))));
+    MenuBookIconImages.push_back(wxBitmapBundle::FromSVG(assets_icon_svg, main_frame->FromDIP(wxSize(64, 64))));
+    MenuBookIconImages.push_back(wxBitmapBundle::FromSVG(action_icon_svg, main_frame->FromDIP(wxSize(64, 64))));
+    MenuBookIconImages.push_back(wxBitmapBundle::FromSVG(results_icon_svg, main_frame->FromDIP(wxSize(64, 64))));
+    MenuBookIconImages.push_back(wxBitmapBundle::FromSVG(settings_icon_svg, main_frame->FromDIP(wxSize(64, 64))));
 
 #ifdef EXPERIMENTAL
-    MenuBookIconImages->Add(experimental_icon_bmp);
+    MenuBookIconImages.push_back(wxBitmapBundle::FromSVG(experimental_icon_svg, main_frame->FromDIP(wxSize(64, 64))));
 #endif
 
     ActionsSpaBookIconImages->Add(movie_align_icon_bmp);
@@ -253,6 +257,14 @@ bool MyGuiApp::OnInit( ) {
 #ifdef EXPERIMENTAL
     AssetsBookIconImages->Add(generate3d_icon_bmp);
 #endif
+    AssetsBookIconImages_b.push_back(wxBitmapBundle::FromSVG(movie_icon_svg, main_frame->FromDIP(wxSize(48, 48))));
+    AssetsBookIconImages_b.push_back(wxBitmapBundle::FromSVG(image_icon_svg, main_frame->FromDIP(wxSize(48, 48))));
+    AssetsBookIconImages_b.push_back(wxBitmapBundle::FromSVG(particle_position_icon_svg, main_frame->FromDIP(wxSize(48, 48))));
+    AssetsBookIconImages_b.push_back(wxBitmapBundle::FromSVG(virus_icon_svg, main_frame->FromDIP(wxSize(48, 48))));
+    AssetsBookIconImages_b.push_back(wxBitmapBundle::FromSVG(refinement_package_icon_svg, main_frame->FromDIP(wxSize(48, 48))));
+#ifdef EXPERIMENTAL
+    AssetsBookIconImages_b.push_back(wxBitmapBundle::FromSVG(generate3d_icon_svg, main_frame->FromDIP(wxSize(48, 48))));
+#endif
 
     ResultsBookIconImages->Add(movie_align_icon_bmp);
     ResultsBookIconImages->Add(ctf_icon_bmp);
@@ -269,10 +281,12 @@ bool MyGuiApp::OnInit( ) {
     ActionsTmBookIconImages->Add(generate3d_icon_bmp);
     ActionsTmBookIconImages->Add(sharpen_map_icon_bmp);
 
-    main_frame->MenuBook->AssignImageList(MenuBookIconImages);
+    main_frame->MenuBook->SetImages(MenuBookIconImages);
     actions_panel_spa->ActionsBook->AssignImageList(ActionsSpaBookIconImages);
     actions_panel_tm->ActionsBook->AssignImageList(ActionsTmBookIconImages);
-    assets_panel->AssetsBook->AssignImageList(AssetsBookIconImages);
+    //assets_panel->AssetsBook->AssignImageList(AssetsBookIconImages);
+    assets_panel->AssetsBook->SetImages(AssetsBookIconImages_b);
+
     results_panel->ResultsBook->AssignImageList(ResultsBookIconImages);
     settings_panel->SettingsBook->AssignImageList(SettingsBookIconImages);
 
