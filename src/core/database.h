@@ -301,6 +301,11 @@ class Database {
 
     void EndAllVolumeGroupsSelect( ) { EndBatchSelect( ); };
 
+    void       BeginAllAtomicCoordinatesGroupsSelect( );
+    AssetGroup GetNextAtomicCoordinatesGroup( );
+
+    void EndAllAtomicCoordinatesGroupsSelect( ) { EndBatchSelect( ); };
+
     void       BeginAllRunProfilesSelect( );
     RunProfile GetNextRunProfile( );
 

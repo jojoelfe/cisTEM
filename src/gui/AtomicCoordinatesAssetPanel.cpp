@@ -21,8 +21,6 @@ AtomicCoordinatesAssetPanel::AtomicCoordinatesAssetPanel(wxWindow* parent)
 
     UpdateInfo( );
 
-    SplitterWindow->Unsplit(LeftPanel);
-
     AssetTypeText->SetLabel("Atomic Coordinates (PDBx/mmCIF)");
 
     all_groups_list->groups[0].SetName("All AtomicCoordinates");
@@ -68,12 +66,12 @@ AtomicCoordinatesAsset* AtomicCoordinatesAssetPanel::ReturnAssetPointer(long wan
 }
 
 int AtomicCoordinatesAssetPanel::ShowDeleteMessageDialog( ) {
-    wxMessageDialog check_dialog(this, "This will remove the selected volume(s) from your ENTIRE project!\n\nNote that this is only a database deletion, no data files are deleted.\n\nAre you sure you want to continue?", "Are you sure?", wxYES_NO | wxICON_WARNING);
+    wxMessageDialog check_dialog(this, "This will remove the selected atomic coordinates(s) from your ENTIRE project!\n\nNote that this is only a database deletion, no data files are deleted.\n\nAre you sure you want to continue?", "Are you sure?", wxYES_NO | wxICON_WARNING);
     return check_dialog.ShowModal( );
 }
 
 int AtomicCoordinatesAssetPanel::ShowDeleteAllMessageDialog( ) {
-    wxMessageDialog check_dialog(this, "This will remove the ALL volumes from your ENTIRE project!\n\nNote that this is only a database deletion, no data files are deleted.\n\nAre you sure you want to continue?", "Are you sure?", wxYES_NO | wxICON_WARNING);
+    wxMessageDialog check_dialog(this, "This will remove the ALL atomic coordinates from your ENTIRE project!\n\nNote that this is only a database deletion, no data files are deleted.\n\nAre you sure you want to continue?", "Are you sure?", wxYES_NO | wxICON_WARNING);
     return check_dialog.ShowModal( );
 }
 
@@ -117,20 +115,20 @@ void AtomicCoordinatesAssetPanel::CompletelyRemoveAssetByID(long wanted_asset_id
 
     // delete from in memory refinement package assets
 
-    refinement_package_asset_panel->RemoveVolumeFromAllRefinementPackages(wanted_asset_id);
+    // refinement_package_asset_panel->RemoveAtomicCoordinatesFromAllRefinementPackages(wanted_asset_id);
 
-    // now delete from volume_assets
+    // now delete from atomic_coordinates_assets
 
     main_frame->current_project.database.ExecuteSQL(wxString::Format("DELETE FROM ATOMIC_COORDINATES_ASSETS WHERE ATOMIC_COORDINATES_ASSET_ID=%li", wanted_asset_id).ToUTF8( ).data( ));
 
     asset_array_position = all_assets_list->ReturnArrayPositionFromID(wanted_asset_id);
     all_assets_list->RemoveAsset(asset_array_position);
     RemoveAssetFromGroups(asset_array_position);
-    main_frame->DirtyVolumes( );
+    main_frame->DirtyAtomicCoordinates( );
 }
 
 void AtomicCoordinatesAssetPanel::DoAfterDeletionCleanup( ) {
-    main_frame->DirtyVolumes( );
+    main_frame->DirtyAtomicCoordinates( );
 }
 
 void AtomicCoordinatesAssetPanel::RemoveAssetFromDatabase(long wanted_asset) {
@@ -174,12 +172,12 @@ void AtomicCoordinatesAssetPanel::RemoveAllFromDatabase( ) {
 
 void AtomicCoordinatesAssetPanel::RemoveAllGroupMembersFromDatabase(int wanted_group_id) {
     main_frame->current_project.database.ExecuteSQL(wxString::Format("DROP TABLE ATOMIC_COORDINATES_GROUP_%i", wanted_group_id).ToUTF8( ).data( ));
-    main_frame->current_project.database.CreateTable(wxString::Format("ATOMIC_COORDINATES_GROUP_%i", wanted_group_id).ToUTF8( ).data( ), "ii", "MEMBER_NUMBER", "ATOMIC_COORDINATES_POSITION_ASSET_ID");
+    main_frame->current_project.database.CreateTable(wxString::Format("ATOMIC_COORDINATES_GROUP_%i", wanted_group_id).ToUTF8( ).data( ), "ii", "MEMBER_NUMBER", "ATOMIC_COORDINATES_ASSET_ID");
 }
 
 void AtomicCoordinatesAssetPanel::AddGroupToDatabase(int wanted_group_id, const char* wanted_group_name, int wanted_list_id) {
     main_frame->current_project.database.InsertOrReplace("ATOMIC_COORDINATES_GROUP_LIST", "iti", "GROUP_ID", "GROUP_NAME", "LIST_ID", wanted_group_id, wanted_group_name, wanted_list_id);
-    main_frame->current_project.database.CreateTable(wxString::Format("ATOMIC_COORDINATES_GROUP_%i", wanted_list_id).ToUTF8( ).data( ), "ii", "MEMBER_NUMBER", "ATOMIC_COORDINATES_POSITION_ASSET_ID");
+    main_frame->current_project.database.CreateTable(wxString::Format("ATOMIC_COORDINATES_GROUP_%i", wanted_list_id).ToUTF8( ).data( ), "ii", "MEMBER_NUMBER", "ATOMIC_COORDINATES_ASSET_ID");
 }
 
 void AtomicCoordinatesAssetPanel::RemoveGroupFromDatabase(int wanted_group_id) {
@@ -200,7 +198,7 @@ void AtomicCoordinatesAssetPanel::RenameAsset(long wanted_asset, wxString wanted
     all_assets_list->ReturnAtomicCoordinatesAssetPointer(wanted_asset)->asset_name = wanted_name;
     wxString sql_command                                                           = wxString::Format("UPDATE ATOMIC_COORDINATES_ASSETS SET NAME='%s' WHERE ATOMIC_COORDINATES_ASSET_ID=%i", name, all_assets_list->ReturnAtomicCoordinatesAssetPointer(wanted_asset)->asset_id);
     main_frame->current_project.database.ExecuteSQL(sql_command.ToUTF8( ).data( ));
-    main_frame->DirtyVolumes( );
+    main_frame->DirtyAtomicCoordinates( );
 }
 
 void AtomicCoordinatesAssetPanel::ImportAllFromDatabase( ) {
@@ -225,10 +223,10 @@ void AtomicCoordinatesAssetPanel::ImportAllFromDatabase( ) {
 
     // Now the groups..
 
-    main_frame->current_project.database.BeginAllVolumeGroupsSelect( );
+    main_frame->current_project.database.BeginAllAtomicCoordinatesGroupsSelect( );
 
     while ( main_frame->current_project.database.last_return_code == SQLITE_ROW ) {
-        temp_group = main_frame->current_project.database.GetNextVolumeGroup( );
+        temp_group = main_frame->current_project.database.GetNextAtomicCoordinatesGroup( );
 
         // the members of this group are referenced by asset id's, we need to translate this to array position..
 
@@ -241,9 +239,9 @@ void AtomicCoordinatesAssetPanel::ImportAllFromDatabase( ) {
             current_group_number = temp_group.id;
     }
 
-    main_frame->current_project.database.EndAllVolumeGroupsSelect( );
+    main_frame->current_project.database.EndAllAtomicCoordinatesGroupsSelect( );
 
-    main_frame->DirtyVolumes( );
+    main_frame->DirtyAtomicCoordinates( );
 }
 
 void AtomicCoordinatesAssetPanel::FillAssetSpecificContentsList( ) {

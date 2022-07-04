@@ -21,8 +21,6 @@ MyVolumeAssetPanel::MyVolumeAssetPanel(wxWindow* parent)
 
     UpdateInfo( );
 
-    SplitterWindow->Unsplit(LeftPanel);
-
     AssetTypeText->SetLabel("Volumes");
 
     all_groups_list->groups[0].SetName("All Volumes");
@@ -174,12 +172,12 @@ void MyVolumeAssetPanel::RemoveAllFromDatabase( ) {
 
 void MyVolumeAssetPanel::RemoveAllGroupMembersFromDatabase(int wanted_group_id) {
     main_frame->current_project.database.ExecuteSQL(wxString::Format("DROP TABLE VOLUME_GROUP_%i", wanted_group_id).ToUTF8( ).data( ));
-    main_frame->current_project.database.CreateTable(wxString::Format("VOLUME_GROUP_%i", wanted_group_id).ToUTF8( ).data( ), "ii", "MEMBER_NUMBER", "VOLUME_POSITION_ASSET_ID");
+    main_frame->current_project.database.CreateTable(wxString::Format("VOLUME_GROUP_%i", wanted_group_id).ToUTF8( ).data( ), "ii", "MEMBER_NUMBER", "VOLUME_ASSET_ID");
 }
 
 void MyVolumeAssetPanel::AddGroupToDatabase(int wanted_group_id, const char* wanted_group_name, int wanted_list_id) {
     main_frame->current_project.database.InsertOrReplace("VOLUME_GROUP_LIST", "iti", "GROUP_ID", "GROUP_NAME", "LIST_ID", wanted_group_id, wanted_group_name, wanted_list_id);
-    main_frame->current_project.database.CreateTable(wxString::Format("VOLUME_GROUP_%i", wanted_list_id).ToUTF8( ).data( ), "ii", "MEMBER_NUMBER", "VOLUME_POSITION_ASSET_ID");
+    main_frame->current_project.database.CreateTable(wxString::Format("VOLUME_GROUP_%i", wanted_list_id).ToUTF8( ).data( ), "ii", "MEMBER_NUMBER", "VOLUME_ASSET_ID");
 }
 
 void MyVolumeAssetPanel::RemoveGroupFromDatabase(int wanted_group_id) {
