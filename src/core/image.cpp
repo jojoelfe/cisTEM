@@ -823,6 +823,36 @@ void Image::DividePixelWise(Image& other_image) {
     }
 }
 
+bool Image::IsAlmostEqual(Image& other_image, bool print_if_failed, float epsilon) {
+    MyDebugAssertTrue(is_in_memory, "Image memory not allocated");
+    MyDebugAssertTrue(other_image.is_in_memory, "Other image memory not allocated");
+    MyDebugAssertTrue(is_in_real_space == other_image.is_in_real_space, "Both images need to be in same space");
+    MyDebugAssertTrue(HasSameDimensionsAs(&other_image), "Images should have same dimensions, but they don't: %i %i %i        %i %i %i", logical_x_dimension, logical_y_dimension, logical_z_dimension, other_image.logical_x_dimension, other_image.logical_y_dimension, other_image.logical_z_dimension);
+
+    long pixel_counter;
+
+    if ( is_in_real_space ) {
+        for ( pixel_counter = 0; pixel_counter < real_memory_allocated; pixel_counter++ ) {
+            if ( ! RelativeErrorIsLessThanEpsilon(real_values[pixel_counter], other_image.real_values[pixel_counter], epsilon, print_if_failed) ) {
+                return false;
+            }
+        }
+    }
+    else {
+        // Iterate through forier space
+        for ( pixel_counter = 0; pixel_counter < real_memory_allocated / 2; pixel_counter++ ) {
+            if ( ! RelativeErrorIsLessThanEpsilon(real(complex_values[pixel_counter]), real(other_image.complex_values[pixel_counter]), epsilon, print_if_failed) ) {
+                return false;
+            }
+            if ( ! RelativeErrorIsLessThanEpsilon(imag(complex_values[pixel_counter]), imag(other_image.complex_values[pixel_counter]), epsilon, print_if_failed) ) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
 void Image::AddGaussianNoise(float wanted_sigma_value, RandomNumberGenerator* provided_generator) {
     MyDebugAssertTrue(is_in_real_space == true, "Image must be in real space");
 
@@ -6377,8 +6407,9 @@ void Image::Compute1DPowerSpectrumCurve(Curve* curve_with_average_power, Curve* 
     MyDebugAssertFalse(is_in_real_space, "Image not in Fourier space");
     MyDebugAssertTrue(curve_with_average_power->number_of_points > 0, "Curve not setup");
     MyDebugAssertTrue(curve_with_average_power->data_x[0] == 0.0, "Curve does not start at x = 0\n");
-   // Using the FloatsAreAlmostEqual criterion |a-b| < 0.0001, otherwise, errors like Curve does not go to at least x = 0.5 (it goes to 0.5)
-    MyDebugAssertTrue(curve_with_average_power->data_x[curve_with_average_power->number_of_points - 1] >= 0.49999, "Curve does not go to at least x = 0.5 (it goes to %f)\n", curve_with_average_power->data_x[curve_with_average_power->number_of_points - 1]);    MyDebugAssertTrue(curve_with_average_power->number_of_points == curve_with_number_of_values->number_of_points, "Curves need to have the same number of points");
+    // Using the FloatsAreAlmostEqual criterion |a-b| < 0.0001, otherwise, errors like Curve does not go to at least x = 0.5 (it goes to 0.5)
+    MyDebugAssertTrue(curve_with_average_power->data_x[curve_with_average_power->number_of_points - 1] >= 0.49999, "Curve does not go to at least x = 0.5 (it goes to %f)\n", curve_with_average_power->data_x[curve_with_average_power->number_of_points - 1]);
+    MyDebugAssertTrue(curve_with_average_power->number_of_points == curve_with_number_of_values->number_of_points, "Curves need to have the same number of points");
     MyDebugAssertTrue(curve_with_average_power->data_x[0] == curve_with_number_of_values->data_x[0], "Curves need to have the same starting point");
     MyDebugAssertTrue(curve_with_average_power->data_x[curve_with_average_power->number_of_points - 1] == curve_with_number_of_values->data_x[curve_with_number_of_values->number_of_points - 1], "Curves need to have the same ending point");
 
@@ -8406,6 +8437,43 @@ void Image::ApplyCTF(CTF ctf_to_apply, bool absolute, bool apply_beam_tilt, bool
     //	ComputeAmplitudeSpectrumFull2D(&temp_image, true);
     //	temp_image.QuickAndDirtyWriteSlice("junk.mrc", 1);
     //	exit(0);
+}
+
+// This function assumes the image is in real space and multiplies it with the
+// power spectrum of the CTF taking thon ring modulation caused by thick samples
+// into account.
+
+void Image::ApplyPowerspectrumWithThickness(CTF ctf_to_apply) {
+    MyDebugAssertTrue(is_in_memory, "Memory not allocated");
+    MyDebugAssertTrue(is_in_real_space == true, "image not in real space");
+    MyDebugAssertTrue(logical_z_dimension == 1, "Volumes not supported");
+
+    int         i, j;
+    float       j_logi, j_logi_sq, i_logi, i_logi_sq;
+    float       current_spatial_frequency_squared;
+    long        address                     = 0;
+    const float inverse_logical_x_dimension = 1.0 / float(logical_x_dimension);
+    const float inverse_logical_y_dimension = 1.0 / float(logical_y_dimension);
+    float       current_azimuth;
+    float       current_ctf_value;
+
+    for ( j = 0; j < logical_y_dimension; j++ ) {
+        address   = j * (padding_jump_value + 2 * physical_address_of_box_center_x);
+        j_logi    = float(j - physical_address_of_box_center_y) * inverse_logical_y_dimension;
+        j_logi_sq = powf(j_logi, 2);
+        for ( i = 0; i < logical_x_dimension; i++ ) {
+            i_logi    = float(i - physical_address_of_box_center_x) * inverse_logical_x_dimension;
+            i_logi_sq = powf(i_logi, 2);
+
+            // Where are we?
+            current_spatial_frequency_squared = j_logi_sq + i_logi_sq;
+
+            current_azimuth   = atan2f(j_logi, i_logi);
+            current_ctf_value = ctf_to_apply.EvaluatePowerspectrumWithThickness(current_spatial_frequency_squared, current_azimuth);
+            // Apply powespectrum
+            real_values[address + i] *= current_ctf_value;
+        }
+    }
 }
 
 void Image::SharpenMap(float pixel_size, float resolution_limit, bool invert_hand, float inner_mask_radius, float outer_mask_radius, float start_res_for_whitening, float additional_bfactor_low, float additional_bfactor_high, float filter_edge, bool should_auto_mask, Image* input_mask, ResolutionStatistics* input_resolution_statistics, float statistics_scale_factor, Curve* original_log_plot, Curve* sharpened_log_plot) {

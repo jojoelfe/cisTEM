@@ -101,6 +101,8 @@ class
     void TestRandomVariableFunctions( );
     void TestIntegerShifts( );
     void TestDatabase( );
+    void TestRunProfileDiskOperations( );
+    void TestCTFNodes( );
 
     void BeginTest(const char* test_name);
     void EndTest( );
@@ -156,6 +158,8 @@ bool MyTestApp::DoCalculation( ) {
     TestSumOfSquaresFourierAndFFTNormalization( );
     TestRandomVariableFunctions( );
     TestIntegerShifts( );
+    TestRunProfileDiskOperations( );
+    TestCTFNodes( );
 
     wxPrintf("\n\n\n");
 
@@ -458,7 +462,7 @@ void MyTestApp::TestClipIntoFourier( ) {
 void MyTestApp::TestDatabase( ) {
     BeginTest("Database");
 
-    temp_directory = wxFileName::GetTempDir( );
+    temp_directory             = wxFileName::GetTempDir( );
     wxString database_filename = temp_directory + "/1_0_test/1_0_test.db";
     Project  project;
     Database database;
@@ -1722,6 +1726,157 @@ void MyTestApp::TestFFTFunctions( ) {
     for ( counter = 0; counter < test_image.logical_x_dimension * test_image.logical_y_dimension; counter++ ) {
         if ( DoublesAreAlmostTheSame(test_image.real_values[counter], 1.0) == false )
             FailTest;
+    }
+
+    EndTest( );
+}
+
+void MyTestApp::TestRunProfileDiskOperations( ) {
+    BeginTest("RunProfileManager Disk Operations");
+
+    RunProfileManager run_profile_manager;
+
+    // Add run profiles
+    run_profile_manager.AddDefaultLocalProfile( );
+    run_profile_manager.AddBlankProfile( );
+
+    int num                                                   = run_profile_manager.number_of_run_profiles;
+    run_profile_manager.run_profiles[num - 1].name            = wxString::Format("This_is_a_name_string_with_a_random_number_:_%f", global_random_number_generator.GetUniformRandom( ) * 100000);
+    run_profile_manager.run_profiles[num - 1].manager_command = wxString::Format("This_is_a $command string_with_a_random_number_:_%f", global_random_number_generator.GetUniformRandom( ) * 100000);
+    run_profile_manager.run_profiles[num - 1].name            = wxString::Format("This_is_a_name_string_with_a_random_number_:_%f", global_random_number_generator.GetUniformRandom( ) * 100000);
+    run_profile_manager.run_profiles[num - 1].AddCommand("$command", 2, 1, false, 0, 10);
+
+    // Write out to disk
+    temp_directory = wxFileName::GetTempDir( );
+
+    wxArrayInt to_write;
+    to_write.Add(0);
+    to_write.Add(1);
+
+    run_profile_manager.WriteRunProfilesToDisk(temp_directory + "/run_profiles.txt", to_write);
+
+    // Ensure that run profiles are equal upon reading them back in
+    RunProfileManager run_profile_manager2;
+    run_profile_manager2.ImportRunProfilesFromDisk(temp_directory + "/run_profiles.txt");
+
+    if ( run_profile_manager2.number_of_run_profiles != run_profile_manager.number_of_run_profiles ) {
+        FailTest;
+    }
+
+    if ( run_profile_manager2.run_profiles[0] != run_profile_manager.run_profiles[0] ) {
+        FailTest;
+    }
+
+    if ( run_profile_manager2.run_profiles[1] != run_profile_manager.run_profiles[1] ) {
+        FailTest;
+    }
+
+    // Ensure that the equality operator works by changing the run profiles
+    run_profile_manager2.run_profiles[0].name = "This is a new name";
+    run_profile_manager2.run_profiles[1].AddCommand("$command", 2, 1, false, 0, 10);
+
+    if ( run_profile_manager2.run_profiles[0] == run_profile_manager.run_profiles[0] ) {
+        FailTest;
+    }
+
+    if ( run_profile_manager2.run_profiles[1] == run_profile_manager.run_profiles[1] ) {
+        FailTest;
+    }
+
+    run_profile_manager2.AddBlankProfile( );
+    run_profile_manager2.AddBlankProfile( );
+    run_profile_manager2.AddBlankProfile( );
+    run_profile_manager2.AddBlankProfile( );
+
+    EndTest( );
+}
+
+void MyTestApp::TestCTFNodes( ) {
+    BeginTest("CTF Nodes");
+
+    Curve ctf_curve1;
+    Curve ctf_curve2;
+    ctf_curve1.SetupXAxis(0.0, 0.5, 500);
+    ctf_curve2.SetupXAxis(0.0, 0.5, 500);
+
+    CTF ctf1(300, 2.7, 0.07, 5000, 5000, 0, 1.0, 0.0);
+
+    ctf_curve1.SetYToConstant(1.0);
+    ctf_curve2.SetYToConstant(1.0);
+    ctf_curve1.ApplyCTF(ctf1);
+    // Generate Powerspectrum
+    ctf_curve1.MultiplyBy(ctf_curve1);
+    ctf_curve2.ApplyPowerspectrumWithThickness(ctf1);
+
+    if ( ctf_curve1.YIsAlmostEqual(ctf_curve2, true, 0.005) == false ) {
+        FailTest;
+    }
+
+    CTF ctf2;
+    // CTF with a sample thickness parameter of 100.0
+    ctf2.Init(300, 2.7, 0.07, 5000, 5000, 0, 1.0, 0.0, 100.0);
+
+    ctf_curve1.SetYToConstant(1.0);
+    ctf_curve2.SetYToConstant(1.0);
+    ctf_curve1.ApplyCTF(ctf2);
+    // Generate powerspectrum
+    ctf_curve1.MultiplyBy(ctf_curve1);
+
+    ctf_curve2.ApplyPowerspectrumWithThickness(ctf2);
+
+    // CTF is different when thickness is 100
+    if ( ctf_curve1.YIsAlmostEqual(ctf_curve2, false, 0.001) == true ) {
+        FailTest;
+    }
+
+    // Test manually integrating ctf and compare with thickness formula
+    ctf_curve1.SetYToConstant(0.0);
+    Curve ctf_curve3;
+    ctf_curve3.SetupXAxis(0.0, 0.5, 500);
+    int counter = 0;
+
+    for ( float z_level = -495.0; z_level < 500.0; z_level = z_level + 10.0f ) {
+        ctf1.Init(300, 2.7, 0.07, 5000 + z_level, 5000 + z_level, 0, 1.0, 0.0, 0.0);
+        counter++;
+        ctf_curve3.SetYToConstant(1.0);
+        ctf_curve3.ApplyCTF(ctf1);
+        ctf_curve3.MultiplyBy(ctf_curve3);
+        ctf_curve1.AddWith(&ctf_curve3);
+    }
+    ctf_curve1.MultiplyByConstant(1.0f / counter);
+    if ( ctf_curve1.YIsAlmostEqual(ctf_curve2, true, 0.005f) == false ) {
+        FailTest;
+    }
+
+    // Test on a 2D power spectrum with astigmatism that formula and manual integration give similar results
+    counter = 0;
+    Image powerspectrum, temp_image;
+    powerspectrum.Allocate(500, 500, 1);
+    powerspectrum.SetToConstant(0.0);
+    temp_image.Allocate(500, 500, 1);
+    for ( float z_level = -495.0; z_level < 500.0; z_level = z_level + 10.0f ) {
+        ctf1.Init(300, 2.7, 0.07, 5000 + z_level, 9000 + z_level, 0, 1.0, 0.0, 0.0);
+        counter++;
+        temp_image.SetToConstant(1.0);
+        temp_image.ApplyPowerspectrumWithThickness(ctf1);
+        powerspectrum.AddImage(&temp_image);
+    }
+    powerspectrum.DivideByConstant(float(counter));
+    ctf1.Init(300, 2.7, 0.07, 5000, 9000, 0, 1.0, 0.0, 100.0);
+    temp_image.SetToConstant(1.0);
+    temp_image.ApplyPowerspectrumWithThickness(ctf1);
+
+    if ( powerspectrum.IsAlmostEqual(temp_image, true, 0.005f) == false ) {
+        FailTest;
+    }
+
+    // Make sure the same test fails if using a different thickness
+    ctf1.Init(300, 2.7, 0.07, 5000, 9000, 0, 1.0, 0.0, 200.0);
+    temp_image.SetToConstant(1.0);
+    temp_image.ApplyPowerspectrumWithThickness(ctf1);
+
+    if ( powerspectrum.IsAlmostEqual(temp_image, false, 0.005f) == true ) {
+        FailTest;
     }
 
     EndTest( );
